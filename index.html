@@ -70,18 +70,20 @@
   <header class="wrap">
     <div class="panel">
       <div class="head">
-        <div class="loginbar flex items-center gap-3 relative">
-          <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
-          <div class="flex flex-col items-start">
-            <div>
-              <strong id="loginName">Kamil Kowalczyk</strong>
-              <small id="loginId" class="opacity-70">(SoG1917)</small>
+        <div class="flex items-center gap-4">
+          <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" class="h-10">
+          <div class="loginbar flex items-center gap-3 relative">
+            <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
+            <div class="flex flex-col items-start">
+              <div>
+                <strong id="loginName">Kamil Kowalczyk</strong>
+                <small id="loginId" class="opacity-70">(SoG1917)</small>
+              </div>
+              <span id="loginRole" class="role-badge" style="display: none;"></span>
             </div>
-            <span id="loginRole" class="role-badge" style="display: none;"></span>
-          </div>
-          <select id="loginSelect" class="btn"></select>
+            <select id="loginSelect" class="btn"></select>
 
-          <div class="user-info-popup">
+            <div class="user-info-popup">
             <div class="panel">
               <div class="body user-info-popup-grid">
                 <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
@@ -98,6 +100,7 @@
             <div id="langSwitcher" class="flex gap-1">
               <button class="btn ghost text-xs" data-lang="pl">PL</button>
               <button class="btn ghost text-xs" data-lang="en">EN</button>
+              <button class="btn ghost text-xs" data-lang="tr">TR</button>
               <button class="btn ghost text-xs" data-lang="de">DE</button>
               <button class="btn ghost text-xs" data-lang="ar">AR</button>
             </div>
@@ -129,8 +132,8 @@
         </div>
         <div class="body">
           <form id="newUserForm" class="flex flex-col gap-4">
-            <input type="text" id="newLogin" name="login" class="btn" data-translate-key="placeholderLogin" placeholder="Login (np. SoGxxxx lub LK12)" required pattern="^(SoG[0-9]{4}|LK[0-9]{2})$">
-            <input type="password" id="newPassword" name="password" class="btn" data-translate-key="placeholderPassword" placeholder="Hasło" required>
+            <input type="text" id="newLogin" name="login" class="btn" data-translate-key="placeholderLogin" placeholder="Login (np. SoGxxxx, LK12, 1234)" required pattern="^(SoG[0-9]{4}|LK[0-9]{2}|[0-9]{2}|[0-9]{4})$">
+            <input type="password" id="newPassword" name="password" class="btn" data-translate-key="placeholderPassword" placeholder="Hasło (opcjonalne)">
             <input type="text" id="newName" name="name" class="btn" data-translate-key="placeholderName" placeholder="Imię i nazwisko" required>
             <button type="submit" class="btn primary" data-translate-key="createUserBtn">Stwórz użytkownika</button>
           </form>
@@ -161,6 +164,29 @@
       </div>
     </section>
   </main>
+
+  <div id="userDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
+    <div class="panel w-full max-w-md">
+      <div class="head">
+        <h2 class="m-0">Uzupełnij swoje dane</h2>
+      </div>
+      <div class="body">
+        <form id="userDetailsForm" class="flex flex-col gap-4">
+          <p>To jest Twoje pierwsze logowanie. Prosimy o uzupełnienie danych. Pola są opcjonalne.</p>
+          <input type="text" id="detailsName" name="name" class="btn" placeholder="Imię i nazwisko">
+          <input type="text" id="detailsDob" name="dob" class="btn" placeholder="Data urodzenia (DD.MM.RRRR)">
+          <select id="detailsLang" name="lang" class="btn">
+            <option value="pl">Polski</option>
+            <option value="en">English</option>
+            <option value="tr">Türkçe</option>
+            <option value="de">Deutsch</option>
+            <option value="ar">العربية</option>
+          </select>
+          <button type="submit" class="btn primary">Zapisz i kontynuuj</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <div id="colorPicker" class="hidden absolute panel p-2 z-20">
     <div class="grid grid-cols-4 gap-2">
@@ -201,6 +227,10 @@
       </div>
       <div class="body">
         <p>Tutaj znajdą się opcje administracyjne, takie jak zarządzanie użytkownikami i ich uprawnieniami.</p>
+        <div id="loginHistory" class="mt-4">
+            <h3 class="font-bold border-b border-white/10 pb-1">Historia logowań</h3>
+            <div id="loginHistoryList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
+        </div>
       </div>
     </div>
   </footer>
@@ -303,6 +333,13 @@
         plansTitle: '📌 Weitere Pläne', placeholderPlan: 'Neue Idee / Aufgabe…', addPlanBtn: '+ Plan hinzufügen', refreshBtn: '↻ Von MySQL aktualisieren',
         auftrag: 'Auftrag:', nextAuftrag: 'Nächster Auftrag:', model: 'Modell:', period: 'Zeitraum:', pruefungTime: '🧪 Prüfung — Zeit:', customTime: 'EIGENE',
       },
+      tr: {
+        appTitle: '🏭 Karton Doldurucu', statusReady: 'Durum: hazır', createUserTitle: 'Yeni kullanıcı oluştur',
+        placeholderLogin: 'Giriş (ör. SoGxxxx veya LK12)', placeholderPassword: 'Şifre', placeholderName: 'Ad ve soyad',
+        createUserBtn: 'Kullanıcı Oluştur', notesTitle: '💬 SOHBET', placeholderNote: 'Bir mesaj girin...', addNoteBtn: 'Gönder',
+        plansTitle: '📌 Gelecek planları', placeholderPlan: 'Yeni fikir / görev…', addPlanBtn: '+ Plan ekle', refreshBtn: '↻ MySQL\'den yenile',
+        auftrag: 'Sipariş:', nextAuftrag: 'Sonraki Sipariş:', model: 'Model:', period: 'Dönem:', pruefungTime: '🧪 Test — süre:', customTime: 'ÖZEL',
+      },
       ar: {
         appTitle: '🏭 حشو الكرتون', statusReady: 'الحالة: جاهز', createUserTitle: 'إنشاء مستخدم جديد',
         placeholderLogin: 'تسجيل الدخول (على سبيل المثال SoGxxxx أو LK12)', placeholderPassword: 'كلمة المرور', placeholderName: 'الاسم الأول والأخير',
@@ -313,7 +350,7 @@
     };
 
     let USERS = {
-      'SoG1917': { name: 'Kamil Kowalczyk', avatar: '' },
+      'SoG1917': { name: 'Kamil Kowalczyk', avatar: '', password: String(ADMIN_PASS) },
       'SoG2025': { name: 'John Locke', avatar: '' },
       'SoG1':    { name: 'Michael Scott', avatar: '' },
       'SoG1899': { name: 'James Corden', avatar: '' },
@@ -592,6 +629,38 @@
       $('#popupUserRole').textContent = role ? role.name : 'Użytkownik';
     }
 
+    function showUserDetailsModal() {
+        const currentUser = USERS[CFG.user.uid];
+        if (currentUser) {
+            $('#detailsName').value = currentUser.name || '';
+            $('#detailsLang').value = CFG.language || 'pl';
+        }
+        $('#userDetailsModal').classList.remove('hidden');
+    }
+
+    function initUserDetailsModal() {
+        $('#userDetailsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = USERS[CFG.user.uid];
+            if (user) {
+                user.name = $('#detailsName').value;
+                user.dob = $('#detailsDob').value; // Just store it as text
+                user.details_filled = true;
+
+                const selectedLang = $('#detailsLang').value;
+                setLanguage(selectedLang); // This also persists the language choice
+
+                CFG.users = USERS;
+                persist();
+
+                // Re-render user info in header and reload
+                showUser();
+                $('#userDetailsModal').classList.add('hidden');
+                window.location.reload();
+            }
+        });
+    }
+
     function initLogin(){
       const loginSelect = $('#loginSelect');
 
@@ -608,15 +677,40 @@
       loginSelect.value = CFG.user.uid;
       showUser();
 
+      // Check if we need to ask for details on initial load
+      const currentUser = USERS[CFG.user.uid];
+      if (currentUser && !currentUser.details_filled) {
+        showUserDetailsModal();
+      }
+
       loginSelect.addEventListener('change', () => {
         const selectedValue = loginSelect.value;
         if (selectedValue === 'new_user') {
           $('#newUserModal').classList.remove('hidden');
           loginSelect.value = CFG.user.uid; // revert selection
+          return;
+        }
+
+        const userToLogin = USERS[selectedValue];
+        if (userToLogin && userToLogin.password) {
+          const pass = prompt(`Wprowadź hasło dla ${selectedValue}:`);
+          if (pass !== userToLogin.password) {
+            alert('Błędne hasło!');
+            loginSelect.value = CFG.user.uid; // revert
+            return;
+          }
+        }
+
+        logLogin(selectedValue);
+        CFG.user.uid = selectedValue;
+        persist();
+
+        const newCurrentUser = USERS[selectedValue];
+        if (newCurrentUser && !newCurrentUser.details_filled) {
+            showUser(); // update header immediately
+            showUserDetailsModal();
         } else {
-          CFG.user.uid = selectedValue;
-          persist();
-          window.location.reload();
+            window.location.reload();
         }
       });
 
@@ -640,8 +734,8 @@
         const password = $('#newPassword').value;
         const name = $('#newName').value;
 
-        if (!/^(SoG[0-9]{4}|LK[0-9]{2})$/.test(login)) {
-          alert('Format loginu jest nieprawidłowy. Użyj formatu SoGxxxx lub LK12.');
+        if (!/^(SoG[0-9]{4}|LK[0-9]{2}|[0-9]{2}|[0-9]{4})$/.test(login)) {
+          alert('Format loginu jest nieprawidłowy. Użyj formatu SoGxxxx, LKxx, xx lub xxxx.');
           return;
         }
 
@@ -650,14 +744,17 @@
           return;
         }
 
-        USERS[login] = { name: name, avatar: '' };
+        USERS[login] = { name: name, avatar: '', password: password || undefined };
         CFG.users = USERS;
+        logLogin(login);
         CFG.user.uid = login;
         persist();
 
         $('#newUserModal').classList.add('hidden');
         $('#newUserForm').reset();
-        window.location.reload();
+
+        showUser(); // update header immediately
+        showUserDetailsModal(); // Show details modal for new user
       });
     }
 
@@ -714,10 +811,67 @@
       });
     }
 
+    function getTerminalId() {
+        let terminal = localStorage.getItem('KN007_TERMINAL');
+        if (!terminal) {
+            const terminalName = 'Terminal' + String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
+            const terminalKey = Math.random().toString(36).substring(2, 7); // e.g., 't12er'
+            terminal = `${terminalName} (${terminalKey})`;
+            localStorage.setItem('KN007_TERMINAL', terminal);
+        }
+        return terminal;
+    }
+
+    function logLogin(uid) {
+        const user = USERS[uid];
+        if (!user) return;
+
+        const history = JSON.parse(localStorage.getItem('KN007_LOGINS') || '[]');
+        const now = new Date();
+        const terminalId = getTerminalId();
+        const role = getUserRole(uid);
+
+        const logEntry = {
+            ts: now.toISOString(),
+            user: `${uid} (${user.name || 'N/A'})`,
+            terminal: terminalId,
+            accountType: role ? role.name : 'Użytkownik'
+        };
+
+        history.unshift(logEntry); // Add to the beginning
+        if (history.length > 100) { // Keep history to 100 entries
+            history.pop();
+        }
+        localStorage.setItem('KN007_LOGINS', JSON.stringify(history));
+    }
+
+    function renderLoginHistory() {
+        if (!isAdmin()) return;
+
+        const list = $('#loginHistoryList');
+        if (!list) return;
+
+        const history = JSON.parse(localStorage.getItem('KN007_LOGINS') || '[]');
+        if (history.length === 0) {
+            list.innerHTML = '<p class="opacity-70">Brak historii logowań.</p>';
+            return;
+        }
+
+        list.innerHTML = '';
+        history.forEach(entry => {
+            const d = new Date(entry.ts);
+            const date = d.toLocaleDateString('pl-PL');
+            const time = d.toLocaleTimeString('pl-PL');
+            const logHtml = `<div class="row !items-center"><div class="txt text-sm">Użytkownik <strong>${entry.user}</strong> zalogował się dnia ${date} o godz. ${time} z <strong>${entry.terminal}</strong> na konto <strong>${entry.accountType}</strong>.</div></div>`;
+            list.insertAdjacentHTML('beforeend', logHtml);
+        });
+    }
+
     function renderAdminPanel() {
       const footer = $('#adminFooter');
       if (isAdmin()) {
         footer.style.display = 'block';
+        renderLoginHistory();
       } else {
         footer.style.display = 'none';
       }
@@ -830,7 +984,7 @@
         }
     }
 
-    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); setStatus('gotowy'); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
+    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); setStatus('gotowy'); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
     init();
   </script>
 </body>
