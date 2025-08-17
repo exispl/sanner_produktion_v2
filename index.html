@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Kartonowy Napełniacz — v0.007r</title>
+  <link rel="icon" href="favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{ --bg:#0e1117; --panel:#121826; --panel2:#0f1624; --text:#e5e7eb; --muted:#93a4b5; --accent:#22c55e; --line:#1f2937; --yellow:#fde047; }
+    body[data-theme="light"] { --bg:#f3f4f6; --panel:#ffffff; --panel2:#f9fafb; --text:#111827; --muted:#6b7280; --accent:#16a34a; --line:#e5e7eb; }
+    body[data-theme="blue"] { --bg:#0c1424; --panel:#101c36; --panel2:#0e1a31; --text:#e0e7ff; --muted:#a0b3d9; --accent:#60a5fa; --line:#1e294b; }
+    body[data-theme="green"] { --bg:#052e16; --panel:#064e3b; --panel2:#043a2c; --text:#ecfdf5; --muted:#a7f3d0; --accent:#4ade80; --line:#022c22; }
+    body{margin:0;background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);font:16px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif; transition: background .3s, color .3s;}
+    .wrap{max-width:1200px;margin:auto;padding:12px 16px}
+    .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+    .head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
+    .body{padding:10px 14px}
+    .badge{font-size:12px;color:#cbd5e1;background:#0b1220;padding:4px 8px;border-radius:999px;border:1px solid var(--line)}
+    .btn{border:1px solid var(--line);background:#0b1220;color:var(--text);padding:6px 10px;border-radius:10px;cursor:pointer}
+    .btn.primary{background:#0d3b2c;border-color:#184c39}
+    .btn.ghost{background:transparent}
+    .machines{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:900px){.machines{grid-template-columns:1fr 1fr}}
+    .machine .title{display:flex;align-items:center;gap:10px}
+    .machine .title h2{margin:0;font-size:26px;letter-spacing:.3px}
+    .meta{color:var(--muted);font-size:12px;margin:6px 0}
+    .progress{margin-top:6px;height:18px;border:1px solid var(--line);border-radius:12px;background:#0b1220;position:relative;overflow:hidden}
+    .progress .bar{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg,#22c55e,#86efac);transition:width .25s ease}
+    .progress .label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+    /* Prüfung bigger + themed select with yellow text */
+    .pruef{margin-top:10px}
+    .pr-head{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+    .pr-head select.pr-select{background:var(--panel2);border:1px solid var(--line);color:var(--yellow);padding:8px 10px;border-radius:10px}
+    .pr-bar{position:relative;height:68px;border:1px solid var(--line);border-radius:14px;background:#0b1220;overflow:hidden}
+    .pr-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,#22c55e,#84cc16);transition:width .5s linear}
+    .pr-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.3px}
+    .pr-reset{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:4px 8px;cursor:pointer}
+    /* Notes & Plans */
+    .notes-list .row{display:flex;gap:10px;align-items:flex-start;border-bottom:1px dashed #263446;padding:8px 0}
+    .stamp{display:inline-flex;gap:6px;align-items:center}
+    .stamp .chip{background:#0b1220;border:1px solid #263446;border-radius:999px;padding:2px 6px}
+    .stamp .small{font-size:12px;color:#9aa8b6}
+    .stamp .digits{font-variant-numeric:tabular-nums;letter-spacing:.2px}
+    .notes-list .txt{flex:1}
+    .notes-list .act{display:flex;gap:6px}
+    .tag{display:inline-block;margin-left:6px;font-size:12px;padding:2px 6px;border-radius:999px;border:1px solid #3b4760}
+    .tag.draft{color:#eab308;border-color:#a16207;background:#2a2208}
+    .role-badge{font-size:12px;padding:3px 8px;border-radius:999px;font-weight:600;border:1px solid transparent}
+    .role-senior-dev{color:white;background-color:#3b82f6}
+    .role-teamleiter{color:white;background-color:#ec4899}
+    .role-einrichter{color:white;background-color:#f97316}
+    .role-admin{color:white;background-color:#60a5fa}
+    .role-leiharbeiter{color:white;background-color:#9ca3af}
+    .role-sanner-mitarbeiter{color:white;background-color:#22c55e}
+    .role-user{color:white;background-color:#9ca3af}
+    .user-info-popup{position:absolute;top:100%;left:0;z-index:10;width:280px;padding-top:8px;display:none;}
+    .loginbar:hover .user-info-popup{display:block;}
+    .user-info-popup .panel{border-width:2px;}
+    .user-info-popup-grid{display:grid;grid-template-columns:100px 1fr;gap:12px;align-items:center;}
+    .user-info-popup img{width:100px;height:100px;border-radius:12px;object-fit:cover;}
+    #urgent-notifications .alert{color:white; border-color:transparent;}
+    /* Chat stream */
+    .alerts{display:flex;flex-wrap:wrap;gap:8px}
+    .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
+  </style>
+</head>
+<body>
+  <div id="urgent-notifications" class="fixed top-0 left-1/2 -translate-x-1/2 z-30 p-4 space-y-2 w-full max-w-2xl"></div>
+  <header class="wrap">
+    <div class="panel">
+      <div class="head">
+        <div class="loginbar flex items-center gap-3 relative">
+          <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
+          <div class="flex flex-col items-start">
+            <div>
+              <strong id="loginName">Kamil Kowalczyk</strong>
+              <small id="loginId" class="opacity-70">(SoG1917)</small>
+            </div>
+            <span id="loginRole" class="role-badge" style="display: none;"></span>
+          </div>
+          <select id="loginSelect" class="btn"></select>
+
+          <div class="user-info-popup">
+            <div class="panel">
+              <div class="body user-info-popup-grid">
+                <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
+                <div>
+                  <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
+                  <p id="popupUserRole" class="text-sm"></p>
+                  <p class="text-xs mt-2">Ostatnio zalogowany: <span id="popupLastLogin">teraz</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div id="langSwitcher" class="flex gap-1">
+              <button class="btn ghost text-xs" data-lang="pl">PL</button>
+              <button class="btn ghost text-xs" data-lang="en">EN</button>
+              <button class="btn ghost text-xs" data-lang="de">DE</button>
+              <button class="btn ghost text-xs" data-lang="ar">AR</button>
+            </div>
+            <div id="themeSwitcher" class="flex items-center gap-2">
+              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
+              <button class="w-4 h-4 rounded-full border-2 border-black/20" style="background-color: #f3f4f6" data-theme="light" title="Light Theme"></button>
+              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0c1424" data-theme="blue" title="Blue Theme"></button>
+              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #052e16" data-theme="green" title="Green Theme"></button>
+            </div>
+            <div class="badge">v0.007r</div>
+        </div>
+      </div>
+      <div class="body">
+        <h1 class="m-0" data-translate-key="appTitle">🏭 Kartonowy Napełniacz <span class="text-xs opacity-70">(pure HTML)</span></h1>
+        <div id="statusLine" class="opacity-80 mt-1" data-translate-key="statusReady">Status: gotowy</div>
+        <div id="chatStream" class="alerts mt-2"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="machines" class="machines"></section>
+
+    <div id="newUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
+      <div class="panel w-full max-w-md">
+        <div class="head">
+          <h2 class="m-0" data-translate-key="createUserTitle">Tworzenie nowego użytkownika</h2>
+          <button id="closeModalBtn" class="btn ghost">✖</button>
+        </div>
+        <div class="body">
+          <form id="newUserForm" class="flex flex-col gap-4">
+            <input type="text" id="newLogin" name="login" class="btn" data-translate-key="placeholderLogin" placeholder="Login (np. SoGxxxx lub LK12)" required pattern="^(SoG[0-9]{4}|LK[0-9]{2})$">
+            <input type="password" id="newPassword" name="password" class="btn" data-translate-key="placeholderPassword" placeholder="Hasło" required>
+            <input type="text" id="newName" name="name" class="btn" data-translate-key="placeholderName" placeholder="Imię i nazwisko" required>
+            <button type="submit" class="btn primary" data-translate-key="createUserBtn">Stwórz użytkownika</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel mt-3">
+      <div class="head"><h2 class="m-0" data-translate-key="notesTitle">💬 CHAT</h2></div>
+      <div class="body">
+        <div class="flex gap-2 flex-wrap">
+          <input id="noteInput" class="btn" style="flex:1" data-translate-key="placeholderNote" placeholder="Wpisz wiadomość...">
+          <button id="addNote" class="btn primary" data-translate-key="addNoteBtn">Wyślij</button>
+        </div>
+        <div id="notesList" class="notes-list mt-2"></div>
+      </div>
+    </section>
+
+    <section class="panel mt-3">
+      <div class="head"><h2 class="m-0" data-translate-key="plansTitle">📌 Dalsze plany</h2></div>
+      <div class="body">
+        <div class="flex gap-2 flex-wrap">
+          <input id="planInput" class="btn" style="flex:1" data-translate-key="placeholderPlan" placeholder="Nowy pomysł / zadanie…">
+          <button id="addPlan" class="btn" data-translate-key="addPlanBtn">+ Dodaj plan</button>
+          <button id="refreshNP" class="btn ghost" data-translate-key="refreshBtn">↻ Odśwież z MySQL</button>
+        </div>
+        <div id="plansList" class="notes-list mt-2"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="colorPicker" class="hidden absolute panel p-2 z-20">
+    <div class="grid grid-cols-4 gap-2">
+      <button class="w-6 h-6 rounded-full" style="background-color: #ef4444;" data-color="#ef4444"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #f97316;" data-color="#f97316"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #eab308;" data-color="#eab308"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #84cc16;" data-color="#84cc16"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #22c55e;" data-color="#22c55e"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #14b8a6;" data-color="#14b8a6"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #3b82f6;" data-color="#3b82f6"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #a855f7;" data-color="#a855f7"></button>
+      <button class="w-6 h-6 rounded-full" style="background-color: #ec4899;" data-color="#ec4899"></button>
+      <button class="w-6 h-6 rounded-full bg-white border" data-color="#ffffff"></button>
+      <button class="w-6 h-6 rounded-full bg-slate-400" data-color="#94a3b8"></button>
+      <button class="w-6 h-6 rounded-full bg-black border" data-color="#000000"></button>
+    </div>
+  </div>
+
+  <div id="customTimeModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-20">
+    <div class="panel w-full max-w-xs">
+      <div class="head">
+        <h2 class="m-0">Ustaw czas</h2>
+        <button id="closeTimeModalBtn" class="btn ghost">✖</button>
+      </div>
+      <div class="body">
+        <form id="customTimeForm" class="flex flex-col gap-4">
+          <input type="number" id="customTimeInput" name="minutes" class="btn text-center text-lg" placeholder="Minuty" required>
+          <button type="submit" class="btn primary">Ustaw</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="wrap" id="adminFooter" style="display: none;">
+    <div class="panel mt-3">
+      <div class="head">
+        <h2 class="m-0">🔧 Panel Admina</h2>
+      </div>
+      <div class="body">
+        <p>Tutaj znajdą się opcje administracyjne, takie jak zarządzanie użytkownikami i ich uprawnieniami.</p>
+      </div>
+    </div>
+  </footer>
+
+  <template id="tpl-machine">
+    <article class="panel machine">
+      <div class="head">
+        <div class="title"><span>🤖</span><h2 class="code"></h2></div>
+        <button class="btn ghost settings-toggle">⚙️</button>
+      </div>
+      <div class="body">
+        <div class="meta text-sm space-y-2">
+          <div class="border border-white/10 rounded-lg p-2">
+            <div class="flex justify-between">
+              <div class="flex gap-2">
+                <span data-translate-key="auftrag">Auftrag:</span>
+                <strong class="auf-val">—</strong>
+              </div>
+              <div class="flex gap-2">
+                <span data-translate-key="nextAuftrag">Następny Auftrag:</span>
+                <span class="nextauf-val">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 items-center px-2">
+            <span data-translate-key="model">Model:</span>
+            <strong class="mdl-val">—</strong>
+            <span class="w-4 h-4 rounded-full bg-white/50 border border-white/20 model-color-dot" title="Zmień kolor"></span>
+          </div>
+          <div class="border border-white/10 rounded-lg p-2">
+            <span data-translate-key="period">Okres:</span>
+            <span class="period-val">—</span>
+          </div>
+        </div>
+
+        <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
+
+        <div class="flex justify-between items-center mt-2 text-sm">
+          <div data-translate-key="timeToComplete">Do ukończenia:</div>
+          <div class="font-bold text-lg completion-time">--:--</div>
+          <div class="completion-warning text-red-500 font-bold text-xl hidden">!</div>
+        </div>
+
+        <div class="pruef">
+          <div class="pr-head">
+            <span data-translate-key="pruefungTime">🧪 Prüfung — czas:</span>
+            <div class="pr-buttons flex gap-2">
+              <button class="btn ghost" data-time="3600">1H</button>
+              <button class="btn ghost" data-time="7200">2H</button>
+              <button class="btn ghost" data-time="10800">3H</button>
+              <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
+            </div>
+          </div>
+          <div class="pr-bar">
+            <div class="pr-fill"></div><div class="pr-label">60:00</div><div class="pr-reset">Reset</div>
+          </div>
+        </div>
+
+        <div class="machine-settings hidden mt-4 space-y-2">
+          <h4 class="font-bold border-b border-white/10 pb-1">Ustawienia</h4>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm items-center">
+            <label>Model:</label>
+            <input type="text" class="setting-input btn text-sm" data-source="order" data-key="model">
+            <label>Czas (min):</label>
+            <input type="number" class="setting-input btn text-sm w-24" data-source="machine" data-key="durationMin">
+          </div>
+           <small class="text-xs opacity-60">Wciśnij ENTER, aby zapisać.</small>
+        </div>
+
+      </div>
+    </article>
+  </template>
+
+  <script>
+    // --- basic state
+    const ORDERS_KEY='KN_ORDERS_V1';
+    const NOTES_KEY='KN007_NOTES';
+    const PLANS_KEY='KN007_PLANS';
+    const ADMIN_PASS = 4753; // kod 0..1000 wymagany do publikacji SoG1917
+
+    const TRANSLATIONS = {
+      pl: {
+        appTitle: '🏭 Kartonowy Napełniacz', statusReady: 'Status: gotowy', createUserTitle: 'Tworzenie nowego użytkownika',
+        placeholderLogin: 'Login (np. SoGxxxx lub LK12)', placeholderPassword: 'Hasło', placeholderName: 'Imię i nazwisko',
+        createUserBtn: 'Stwórz użytkownika', notesTitle: '💬 CHAT', placeholderNote: 'Wpisz wiadomość...', addNoteBtn: 'Wyślij',
+        plansTitle: '📌 Dalsze plany', placeholderPlan: 'Nowy pomysł / zadanie…', addPlanBtn: '+ Dodaj plan', refreshBtn: '↻ Odśwież z MySQL',
+        auftrag: 'Auftrag:', nextAuftrag: 'Następny Auftrag:', model: 'Model:', period: 'Okres:', pruefungTime: '🧪 Prüfung — czas:', customTime: 'WŁASNY',
+      },
+      en: {
+        appTitle: '🏭 Cardboard Filler', statusReady: 'Status: ready', createUserTitle: 'Create new user',
+        placeholderLogin: 'Login (e.g. SoGxxxx or LK12)', placeholderPassword: 'Password', placeholderName: 'First and last name',
+        createUserBtn: 'Create User', notesTitle: '💬 CHAT', placeholderNote: 'Enter a message...', addNoteBtn: 'Send',
+        plansTitle: '📌 Future plans', placeholderPlan: 'New idea / task…', addPlanBtn: '+ Add plan', refreshBtn: '↻ Refresh from MySQL',
+        auftrag: 'Order:', nextAuftrag: 'Next Order:', model: 'Model:', period: 'Period:', pruefungTime: '🧪 Prüfung — time:', customTime: 'CUSTOM',
+      },
+      de: {
+        appTitle: '🏭 Karton-Füller', statusReady: 'Status: bereit', createUserTitle: 'Neuen Benutzer erstellen',
+        placeholderLogin: 'Login (z.B. SoGxxxx oder LK12)', placeholderPassword: 'Passwort', placeholderName: 'Vor- und Nachname',
+        createUserBtn: 'Benutzer erstellen', notesTitle: '💬 CHAT', placeholderNote: 'Nachricht eingeben…', addNoteBtn: 'Senden',
+        plansTitle: '📌 Weitere Pläne', placeholderPlan: 'Neue Idee / Aufgabe…', addPlanBtn: '+ Plan hinzufügen', refreshBtn: '↻ Von MySQL aktualisieren',
+        auftrag: 'Auftrag:', nextAuftrag: 'Nächster Auftrag:', model: 'Modell:', period: 'Zeitraum:', pruefungTime: '🧪 Prüfung — Zeit:', customTime: 'EIGENE',
+      },
+      ar: {
+        appTitle: '🏭 حشو الكرتون', statusReady: 'الحالة: جاهز', createUserTitle: 'إنشاء مستخدم جديد',
+        placeholderLogin: 'تسجيل الدخول (على سبيل المثال SoGxxxx أو LK12)', placeholderPassword: 'كلمة المرور', placeholderName: 'الاسم الأول والأخير',
+        createUserBtn: 'إنشاء مستخدم', notesTitle: '💬 دردشة', placeholderNote: 'أدخل رسالة…', addNoteBtn: 'إرسال',
+        plansTitle: '📌 خطط مستقبلية', placeholderPlan: 'فكرة / مهمة جديدة…', addPlanBtn: '+ إضافة خطة', refreshBtn: '↻ تحديث من MySQL',
+        auftrag: 'طلب:', nextAuftrag: 'الطلب التالي:', model: 'نموذج:', period: 'فترة:', pruefungTime: '🧪 فحص — الوقت:', customTime: 'مخصص',
+      }
+    };
+
+    let USERS = {
+      'SoG1917': { name: 'Kamil Kowalczyk', avatar: '' },
+      'SoG2025': { name: 'John Locke', avatar: '' },
+      'SoG1':    { name: 'Michael Scott', avatar: '' },
+      'SoG1899': { name: 'James Corden', avatar: '' },
+      'SoP1':    { name: 'Piotr Nowak', avatar: '' },
+      'SoG2200': { name: 'User 2200', avatar: '' },
+      'SoG2020': { name: 'User 2020', avatar: '' },
+    };
+
+    const DEFAULTS={
+      user: { uid: 'SoG1917' },
+      users: USERS,
+      machines:[
+        { code:'MA820061', durationMin:25, pruef:3600 },
+        { code:'M820062',  durationMin:22, pruef:3600 },
+        { code:'MA820063', durationMin:25, pruef:3600 },
+        { code:'MA820064', durationMin:25, pruef:3600 },
+      ],
+      orders:{},
+    };
+    let CFG=JSON.parse(localStorage.getItem('KN007_CFG')||'null')||DEFAULTS;
+    // ensure USERS is up to date
+    if (CFG.users) { USERS = CFG.users; } else { CFG.users = USERS; }
+
+    const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const isAdmin=()=> CFG.user?.uid==='SoG1917';
+    function persist(){ localStorage.setItem('KN007_CFG', JSON.stringify(CFG)); }
+    function setStatus(t){ $('#statusLine').textContent='Status: '+t; }
+
+    // --- kv storage via php
+    async function saveShared(key,json){ try{ const res=await fetch('storage.php?a=set&key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(json)}); const j=await res.json(); return !!j.ok; }catch(e){ console.error(e); return false; } }
+    async function loadShared(key){ try{ const res=await fetch('storage.php?a=get&key='+encodeURIComponent(key)); const j=await res.json(); return j.v?JSON.parse(j.v):null; }catch(e){ console.error(e); return null; } }
+
+    // --- machines (minimal for 0.007 look)
+    let activePruefung = null;
+    class Pruefung{ constructor(root){ this.root=root; this.fill=$('.pr-fill',root); this.label=$('.pr-label',root); this.buttons=$$('.pr-buttons button',root); this.reset=$('.pr-reset',root); this.bar=$('.pr-bar', root);
+        this.total=3600; this.start=Date.now(); this.bind(); this.tick(); }
+      bind(){
+        this.buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.buttons.forEach(b => b.classList.remove('primary'));
+                btn.classList.add('primary');
+                const v = btn.dataset.time;
+                if (v === 'custom') {
+                    const m = prompt('Wpisz czas w minutach:', '60');
+                    this.setTime(m);
+                } else {
+                    this.total = parseInt(v, 10);
+                    this.start = Date.now();
+                }
+            });
+        });
+        this.reset.addEventListener('click',()=>{ this.start=Date.now(); this.buttons.forEach(b => b.classList.remove('primary')); });
+        this.bar.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            activePruefung = this;
+            $('#customTimeModal').classList.remove('hidden');
+            $('#customTimeInput').focus();
+        });
+      }
+      setTime(minutes) {
+        this.total = Math.max(60, (parseInt(minutes, 10) || 0) * 60);
+        this.start = Date.now();
+        this.buttons.forEach(b => b.classList.remove('primary'));
+      }
+      tick(){ const el=Math.min(this.total, Math.floor((Date.now()-this.start)/1000)); const left=this.total-el; const pct=this.total > 0 ? Math.floor(el/this.total*100) : 0;
+        this.fill.style.width=pct+'%'; const mm=String(Math.floor(left/60)).padStart(2,'0'), ss=String(left%60).padStart(2,'0'); this.label.textContent=`${mm}:${ss}`;
+        requestAnimationFrame(()=>this.tick()); }
+    }
+
+    let activeMachineForColor = null;
+    class Machine{ constructor(container,data,orders){ this.root=$('#tpl-machine').content.firstElementChild.cloneNode(true);
+        this.data = data;
+        this.orders = orders;
+        this.code=data.code; $('.code',this.root).textContent=this.code;
+
+        if (!this.data.completionTimestamp) {
+          this.data.completionTimestamp = Date.now() + (Math.floor(Math.random() * 14940) + 60) * 1000;
+        }
+
+        this.dot = $('.model-color-dot', this.root);
+        this.dot.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            activeMachineForColor = this;
+            const picker = $('#colorPicker');
+            picker.style.left = e.pageX + 'px';
+            picker.style.top = e.pageY + 'px';
+            picker.classList.remove('hidden');
+        });
+
+        this.completionTimeEl = $('.completion-time', this.root);
+        this.completionWarningEl = $('.completion-warning', this.root);
+
+        this.settingsToggle = $('.settings-toggle', this.root);
+        this.settingsPanel = $('.machine-settings', this.root);
+        this.settingsInputs = $$('.setting-input', this.settingsPanel);
+
+        this.settingsToggle.addEventListener('click', () => this.settingsPanel.classList.toggle('hidden'));
+        this.settingsInputs.forEach(input => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') this.saveSetting(input);
+            });
+        });
+
+        this.bar=$('.bar',this.root); this.label=$('.label',this.root);
+        container.appendChild(this.root); this.pr=new Pruefung($('.pruef',this.root));
+        // simple progress demo
+        let start=performance.now(), dur=(data.durationMin||25)*60000; const step=()=>{ const p=Math.min(1,(performance.now()-start)/dur); this.bar.style.width=(p*100)+'%'; this.label.textContent=Math.floor(p*100)+'%'; requestAnimationFrame(step) }; requestAnimationFrame(step);
+
+        this.render();
+        this.tickCompletion();
+    }
+      saveSetting(input) {
+        const key = input.dataset.key;
+        const source = input.dataset.source;
+        let value = input.value;
+        if(input.type === 'number') value = parseFloat(value) || 0;
+
+        if (source === 'machine') {
+            this.data[key] = value;
+        } else if (source === 'order') {
+            if (!this.orders[this.code]) this.orders[this.code] = genOrder();
+            this.orders[this.code][key] = value;
+        }
+
+        input.blur();
+        this.render();
+        persist();
+        setStatus('Zapisano ' + key);
+      }
+      render() {
+        const order = this.orders[this.code] || {};
+        $('.auf-val',this.root).textContent = order.auftrag || '—';
+        $('.mdl-val',this.root).textContent = order.model || '—';
+        $('.period-val',this.root).textContent = order.period || '—';
+        $('.nextauf-val',this.root).textContent = order.next || '—';
+
+        this.dot.style.backgroundColor = this.data.color || '#94a3b8';
+
+        // Populate settings inputs
+        this.settingsInputs.forEach(input => {
+            const key = input.dataset.key;
+            const source = input.dataset.source;
+            if (source === 'machine') {
+                input.value = this.data[key] || '';
+            } else if (source === 'order') {
+                input.value = order[key] || '';
+            }
+        });
+      }
+      setColor(color) {
+        this.data.color = color;
+        this.render();
+        persist();
+      }
+      tickCompletion() {
+        const now = Date.now();
+        const timeLeft = Math.max(0, Math.floor((this.data.completionTimestamp - now) / 1000));
+        const hours = Math.floor(timeLeft / 3600);
+        const minutes = Math.floor((timeLeft % 3600) / 60);
+        this.completionTimeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
+
+        const twoHours = 2 * 3600; const oneHour = 1 * 3600;
+        if (timeLeft > 0 && timeLeft < twoHours) {
+            this.completionWarningEl.classList.remove('hidden');
+            if (timeLeft < oneHour) {
+                showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu godziny!`, 'danger');
+            } else {
+                showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu 2 godzin!`, 'warning');
+            }
+        } else {
+            this.completionWarningEl.classList.add('hidden');
+            hideUrgentNotification(this.code);
+        }
+        requestAnimationFrame(()=>this.tickCompletion());
+      }
+    }
+
+    function genOrder(){ const rnd=String(Math.floor(Math.random()*10000)).padStart(4,'0'); const s=new Date(); const e=new Date(); e.setDate(s.getDate()+5);
+      const F=d=>`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+      return { auftrag:'1012'+rnd, model:'DASG-1 (201044)', period:`od ${F(s)} do ${F(e)}`, next:'' };
+    }
+
+    function renderMachines(){ const box=$('#machines'); box.innerHTML=''; (CFG.machines||[]).forEach(m=> new Machine(box,m, CFG.orders||{})); }
+
+    // --- stamps
+    function makeStamp(ts,user,smaller=false){
+      const d=new Date(ts);
+      const dd=String(d.getDate()).padStart(2,'0'), mm=String(d.getMonth()+1).padStart(2,'0'), yyyy=d.getFullYear();
+      const hh=String(d.getHours()).padStart(2,'0'), min=String(d.getMinutes()).padStart(2,'0');
+      const small=smaller?' small':'';
+      return `<span class="stamp">
+        <span class="chip small digits${small}">[${dd}/${mm}/${yyyy}]</span>
+        <span class="chip small digits${small}">[${hh}:${min}]</span>
+        <span class="chip small">${user.uid} (${user.name})</span>
+      </span>`;
+    }
+
+    // --- chat stream
+    function chatPush(text){ const el=document.createElement('div'); el.className='alert'; el.innerHTML=`<span>💬 ${text}</span> <button class="btn ghost">✖</button>`; $('.btn',el).onclick=()=>el.remove(); $('#chatStream').prepend(el); }
+
+    // --- notes / plans
+    let NOTES=[], PLANS=[];
+    function renderNotes(){
+      const list=$('#notesList'); list.innerHTML='';
+      NOTES.forEach(n=>{
+        const row=document.createElement('div'); row.className='row';
+        const tag = n.status==='DRAFT' ? '<span class="tag draft">DRAFT</span>' : '';
+        row.innerHTML=`<div class="meta">${makeStamp(n.ts, {uid:n.user,name:n.userName})} ${tag}</div>
+                       <div class="txt">${n.text}</div>
+                       <div class="act"></div>`;
+        const act=$('.act',row);
+        if(isAdmin()){
+          const bE=document.createElement('button'); bE.className='btn'; bE.textContent='✏️'; bE.title='Edytuj';
+          const bR=document.createElement('button'); bR.className='btn'; bR.textContent='↩️'; bR.title='Odpowiedz';
+          const bD=document.createElement('button'); bD.className='btn'; bD.textContent='🗑️'; bD.title='Usuń';
+          bE.onclick=async()=>{ const v=prompt('Edytuj notatkę', n.text); if(v!=null){ n.text=v; await saveNotes(); renderNotes(); } };
+          bR.onclick=async()=>{ const v=prompt('Odpowiedź', ''); if(v){ NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:`↪ ${v} (odpowiedź na #${n.id})`, status:'FINAL'}); await saveNotes(); renderNotes(); } };
+          bD.onclick=async()=>{ if(confirm('Usunąć notatkę?')){ NOTES = NOTES.filter(x=>x.id!==n.id); await saveNotes(); renderNotes(); } };
+          act.append(bE,bR,bD);
+        }
+        list.appendChild(row);
+      });
+    }
+    function renderPlans(){
+      const list=$('#plansList'); list.innerHTML='';
+      PLANS.forEach(p=>{
+        const row=document.createElement('div'); row.className='row';
+        row.innerHTML=`<div class="meta">${makeStamp(p.ts, {uid:p.user,name:p.userName}, true)}</div>
+                       <div class="txt">${p.text}</div>`;
+        list.appendChild(row);
+      });
+    }
+    async function saveNotes(){ await saveShared(NOTES_KEY, NOTES); }
+    async function loadNotes(){ const db=await loadShared(NOTES_KEY); if(db){ NOTES=db; } renderNotes(); }
+    async function savePlans(){ await saveShared(PLANS_KEY, PLANS); }
+    async function loadPlans(){ const db=await loadShared(PLANS_KEY); if(db){ PLANS=db; } renderPlans(); }
+
+    // --- login
+    function getUserRole(uid) {
+        if (!uid) return null;
+        const ROLES = {
+            'SoG1917': { name: 'Senior Developer', className: 'role-senior-dev' },
+            'SoG2025': { name: 'TeamLeiter', className: 'role-teamleiter' },
+            'SoG2200': { name: 'Einrichter', className: 'role-einrichter' },
+            'SoG2020': { name: 'Einrichter', className: 'role-einrichter' },
+        };
+        if (ROLES[uid]) return ROLES[uid];
+        if (uid.startsWith('SoG')) return { name: 'Administrator', className: 'role-admin' };
+        if (uid.startsWith('LK')) return { name: 'Leiharbeiter', className: 'role-leiharbeiter' };
+        if (uid.startsWith('SoP')) return { name: 'Administrator', className: 'role-admin' };
+        return { name: 'Użytkownik', className: 'role-user' };
+    }
+
+    function showUser(){
+      const uid = CFG.user?.uid;
+      const user = USERS[uid] || { name: 'Nieznany', avatar: '' };
+
+      $('#loginName').textContent = user.name;
+      $('#loginId').textContent = uid || '';
+      const avatarSrc = user.avatar || 'https://placehold.co/40/0e1117/ffffff?text=' + (user.name?.[0] || '?');
+      $('#userAvatar').src = avatarSrc;
+
+      const role = getUserRole(uid);
+      const roleEl = $('#loginRole');
+      if (role) {
+        roleEl.textContent = role.name;
+        roleEl.className = 'role-badge ' + role.className;
+        roleEl.style.display = 'inline-block';
+      } else {
+        roleEl.style.display = 'none';
+      }
+
+      // Update popup
+      $('#popupUserAvatar').src = user.avatar || 'https://placehold.co/184/0e1117/ffffff?text=' + (user.name?.[0] || '?');
+      $('#popupUserName').textContent = user.name;
+      $('#popupUserRole').textContent = role ? role.name : 'Użytkownik';
+    }
+
+    function initLogin(){
+      const loginSelect = $('#loginSelect');
+
+      // Populate select
+      loginSelect.innerHTML = '<option value="new_user">+ Nowy użytkownik</option>';
+      for (const uid in USERS) {
+        const user = USERS[uid];
+        const option = document.createElement('option');
+        option.value = uid;
+        option.textContent = `${user.name} (${uid})`;
+        loginSelect.appendChild(option);
+      }
+
+      loginSelect.value = CFG.user.uid;
+      showUser();
+
+      loginSelect.addEventListener('change', () => {
+        const selectedValue = loginSelect.value;
+        if (selectedValue === 'new_user') {
+          $('#newUserModal').classList.remove('hidden');
+          loginSelect.value = CFG.user.uid; // revert selection
+        } else {
+          CFG.user.uid = selectedValue;
+          persist();
+          window.location.reload();
+        }
+      });
+
+      $('#userAvatar').addEventListener('click', () => {
+        const newAvatar = prompt('Podaj nowy URL avatara:', USERS[CFG.user.uid].avatar || '');
+        if (newAvatar !== null) {
+          USERS[CFG.user.uid].avatar = newAvatar;
+          CFG.users = USERS; // make sure the global change is stored
+          persist();
+          showUser();
+        }
+      });
+
+      $('#closeModalBtn').onclick = () => {
+        $('#newUserModal').classList.add('hidden');
+      };
+
+      $('#newUserForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const login = $('#newLogin').value;
+        const password = $('#newPassword').value;
+        const name = $('#newName').value;
+
+        if (!/^(SoG[0-9]{4}|LK[0-9]{2})$/.test(login)) {
+          alert('Format loginu jest nieprawidłowy. Użyj formatu SoGxxxx lub LK12.');
+          return;
+        }
+
+        if (USERS[login]) {
+          alert('Użytkownik o takim loginie już istnieje.');
+          return;
+        }
+
+        USERS[login] = { name: name, avatar: '' };
+        CFG.users = USERS;
+        CFG.user.uid = login;
+        persist();
+
+        $('#newUserModal').classList.add('hidden');
+        $('#newUserForm').reset();
+        window.location.reload();
+      });
+    }
+
+    // --- init buttons
+    function initNotesPlans(){
+      $('#addNote').onclick=async()=>{
+        const v=$('#noteInput').value.trim(); if(!v) return;
+        let status='FINAL';
+        if(isAdmin()){
+          const code=prompt('Podaj kod (0..1000) aby opublikować do „chat”. Błędny -> DRAFT:','');
+          const n = parseInt(code,10);
+          if(!(n>=0 && n<=1000) || n!==ADMIN_PASS){
+            status='DRAFT';
+          } else {
+            status='FINAL';
+            chatPush(v);
+          }
+        }
+        NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v, status});
+        $('#noteInput').value=''; await saveNotes(); renderNotes();
+      };
+      $('#addPlan').onclick=async()=>{
+        const v=$('#planInput').value.trim(); if(!v) return;
+        PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v});
+        $('#planInput').value=''; await savePlans(); renderPlans();
+      };
+      $('#refreshNP').onclick=async()=>{ await loadNotes(); await loadPlans(); };
+      loadNotes(); loadPlans();
+    }
+
+    // --- machines render
+    function initMachines(){ const box=$('#machines'); box.innerHTML=''; (CFG.machines||[]).forEach(m=> new Machine(box,m, CFG.orders||{})); }
+
+    function initThemeSwitcher() {
+      const themeButtons = $$('#themeSwitcher button');
+      const body = document.body;
+
+      function applyTheme(theme) {
+        body.dataset.theme = theme;
+        CFG.theme = theme;
+        persist();
+      }
+
+      // Apply saved theme on load
+      if (CFG.theme) {
+        applyTheme(CFG.theme);
+      }
+
+      themeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const theme = button.dataset.theme;
+          applyTheme(theme);
+        });
+      });
+    }
+
+    function renderAdminPanel() {
+      const footer = $('#adminFooter');
+      if (isAdmin()) {
+        footer.style.display = 'block';
+      } else {
+        footer.style.display = 'none';
+      }
+    }
+
+    function setLanguage(lang) {
+        if (!TRANSLATIONS[lang]) return;
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        if (lang === 'ar') { document.body.style.fontSize = '17px'; }
+        else { document.body.style.fontSize = '15px'; }
+
+        $$('[data-translate-key]').forEach(el => {
+            const key = el.dataset.translateKey;
+            const translation = TRANSLATIONS[lang][key];
+            if (translation) {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = translation;
+                } else {
+                    // Sanitize to prevent HTML injection if keys are ever dynamic
+                    const safeContent = document.createTextNode(translation);
+                    // Handle elements with children (like the title H1)
+                    const icon = el.querySelector('span');
+                    el.innerHTML = ''; // Clear existing content
+                    if(icon) el.appendChild(icon);
+                    el.appendChild(safeContent);
+                }
+            }
+        });
+        CFG.language = lang;
+        persist();
+
+        $$('#langSwitcher button').forEach(btn => {
+            btn.classList.toggle('primary', btn.dataset.lang === lang);
+        });
+    }
+
+    function initLangSwitcher() {
+        const langButtons = $$('#langSwitcher button');
+        langButtons.forEach(button => {
+            button.addEventListener('click', () => setLanguage(button.dataset.lang));
+        });
+        setLanguage(CFG.language || 'pl');
+    }
+
+    function initCustomTimeModal() {
+        const modal = $('#customTimeModal');
+        const form = $('#customTimeForm');
+        const input = $('#customTimeInput');
+        const closeBtn = $('#closeTimeModalBtn');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (activePruefung) {
+                activePruefung.setTime(input.value);
+            }
+            modal.classList.add('hidden');
+            activePruefung = null;
+        });
+        closeBtn.onclick = () => {
+            modal.classList.add('hidden');
+            activePruefung = null;
+        };
+    }
+
+    function initColorPicker() {
+        const picker = $('#colorPicker');
+        $$('button', picker).forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const color = button.dataset.color;
+                if (activeMachineForColor) {
+                    activeMachineForColor.setColor(color);
+                }
+                picker.classList.add('hidden');
+                activeMachineForColor = null;
+            });
+        });
+        document.addEventListener('click', (e) => {
+            if (!picker.contains(e.target) && activeMachineForColor) {
+                picker.classList.add('hidden');
+                activeMachineForColor = null;
+            }
+        });
+    }
+
+    const activeNotifications = {};
+    function showUrgentNotification(id, message, level) {
+        const container = $('#urgent-notifications');
+        const existing = $(`#notification-${id}`, container);
+        const newClass = level === 'danger' ? 'bg-red-800/90' : 'bg-orange-500/90';
+        if (existing) {
+            if (!existing.classList.contains(newClass)) {
+                existing.className = `alert ${newClass} transition-all`;
+                existing.innerHTML = `<strong>PILNE:</strong> ${message}`;
+            }
+            return;
+        }
+        const el = document.createElement('div');
+        el.id = `notification-${id}`;
+        el.className = `alert ${newClass}`;
+        el.innerHTML = `<strong>PILNE:</strong> ${message}`;
+        container.appendChild(el);
+        activeNotifications[id] = el;
+    }
+    function hideUrgentNotification(id) {
+        if (activeNotifications[id]) {
+            activeNotifications[id].remove();
+            delete activeNotifications[id];
+        }
+    }
+
+    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); setStatus('gotowy'); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
+    init();
+  </script>
+</body>
+</html>
