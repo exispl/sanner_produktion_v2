@@ -284,17 +284,15 @@
         <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
 
         <div class="pruef">
-          <div class="pr-head">
-            <span data-translate-key="pruefungTime">🧪 Prüfung — czas:</span>
-          </div>
           <div class="pr-bar">
-            <div class="pr-fill"></div><div class="pr-label">60:00</div><div class="pr-reset">Reset</div>
-          </div>
-          <div class="pr-buttons flex gap-2 justify-end mt-2">
-            <button class="btn ghost" data-time="3600">1H</button>
-            <button class="btn ghost" data-time="7200">2H</button>
-            <button class="btn ghost" data-time="10800">3H</button>
-            <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
+            <div class="pr-fill"></div><div class="pr-label">60:00</div>
+            <div class="pr-buttons absolute right-[85px] top-1/2 -translate-y-1/2 flex gap-1">
+              <button class="btn ghost !p-1 text-xs" data-time="3600">1H</button>
+              <button class="btn ghost !p-1 text-xs" data-time="7200">2H</button>
+              <button class="btn ghost !p-1 text-xs" data-time="10800">3H</button>
+              <button class="btn ghost !p-1 text-xs" data-time="custom" data-translate-key="customTime">WŁASNY</button>
+            </div>
+            <div class="pr-reset">Reset</div>
           </div>
         </div>
 
