@@ -73,11 +73,13 @@
     /* Chat stream */
     .alerts{display:flex;flex-wrap:wrap;gap:8px}
     .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
+    @keyframes blink-red { 50% { background-color: transparent; } }
+    .blinking-red { background: #ef4444 !important; animation: blink-red 1.5s infinite; }
   </style>
 </head>
 <body>
-  <div id="urgent-notifications" class="fixed top-0 left-1/2 -translate-x-1/2 z-30 p-4 space-y-2 w-full max-w-2xl"></div>
   <header class="wrap">
+    <div id="urgent-notifications" class="space-y-2 mb-3"></div>
     <div class="panel">
       <div class="head">
         <div class="flex items-center gap-4">
@@ -249,53 +251,50 @@
     <article class="panel machine">
       <div class="head">
         <div class="title"><span>🤖</span><h2 class="code"></h2></div>
-        <button class="btn ghost settings-toggle">⚙️</button>
+        <div class="flex items-center gap-2">
+          <div class="completion-badge role-badge bg-gray-500 text-white">--:--</div>
+          <button class="btn ghost settings-toggle">⚙️</button>
+        </div>
       </div>
       <div class="body">
         <div class="meta text-sm space-y-2">
-          <div class="border border-white/10 rounded-lg p-2">
-            <div class="flex justify-between">
-              <div class="flex gap-2">
-                <span data-translate-key="auftrag">Auftrag:</span>
-                <strong class="auf-val">—</strong>
-              </div>
-              <div class="flex gap-2">
-                <span data-translate-key="nextAuftrag">Następny Auftrag:</span>
-                <span class="nextauf-val">—</span>
-              </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="border border-white/10 rounded-lg p-2">
+              <span data-translate-key="auftrag">Auftrag:</span>
+              <strong class="auf-val block font-bold text-base">—</strong>
+            </div>
+            <div class="border border-white/10 rounded-lg p-2">
+              <span data-translate-key="nextAuftrag">Następny Auftrag:</span>
+              <strong class="nextauf-val block font-bold text-base">—</strong>
             </div>
           </div>
-          <div class="flex gap-2 items-center px-2">
-            <span data-translate-key="model">Model:</span>
-            <strong class="mdl-val">—</strong>
-            <span class="w-4 h-4 rounded-full bg-white/50 border border-white/20 model-color-dot" title="Zmień kolor"></span>
+          <div class="border border-white/10 rounded-lg p-2">
+            <div class="flex items-center gap-2">
+                <span data-translate-key="model">Model:</span>
+                <strong class="mdl-val font-bold text-base">—</strong>
+                <span class="w-4 h-4 rounded-full bg-white/50 border border-white/20 model-color-dot ml-auto" title="Zmień kolor"></span>
+            </div>
           </div>
           <div class="border border-white/10 rounded-lg p-2">
             <span data-translate-key="period">Okres:</span>
-            <span class="period-val">—</span>
+            <strong class="period-val block font-bold">—</strong>
           </div>
         </div>
 
         <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
 
-        <div class="flex justify-between items-center mt-2 text-sm">
-          <div data-translate-key="timeToComplete">Do ukończenia:</div>
-          <div class="font-bold text-lg completion-time">--:--</div>
-          <div class="completion-warning text-red-500 font-bold text-xl hidden">!</div>
-        </div>
-
         <div class="pruef">
           <div class="pr-head">
             <span data-translate-key="pruefungTime">🧪 Prüfung — czas:</span>
-            <div class="pr-buttons flex gap-2">
-              <button class="btn ghost" data-time="3600">1H</button>
-              <button class="btn ghost" data-time="7200">2H</button>
-              <button class="btn ghost" data-time="10800">3H</button>
-              <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
-            </div>
           </div>
           <div class="pr-bar">
             <div class="pr-fill"></div><div class="pr-label">60:00</div><div class="pr-reset">Reset</div>
+          </div>
+          <div class="pr-buttons flex gap-2 justify-end mt-2">
+            <button class="btn ghost" data-time="3600">1H</button>
+            <button class="btn ghost" data-time="7200">2H</button>
+            <button class="btn ghost" data-time="10800">3H</button>
+            <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
           </div>
         </div>
 
@@ -306,8 +305,12 @@
             <input type="text" class="setting-input btn text-sm" data-source="order" data-key="model">
             <label>Czas (min):</label>
             <input type="number" class="setting-input btn text-sm w-24" data-source="machine" data-key="durationMin">
+            <label>Czas ukończenia:</label>
+            <input type="text" class="setting-input btn text-sm" data-source="machine" data-key="completionTimestamp" placeholder="YYYY-MM-DD HH:MM:SS">
+            <label>Następny gotowy:</label>
+            <input type="checkbox" class="setting-input h-5 w-5" data-source="order" data-key="nextReady">
           </div>
-           <small class="text-xs opacity-60">Wciśnij ENTER, aby zapisać.</small>
+           <small class="text-xs opacity-60">Wciśnij ENTER (lub zmień pole), aby zapisać.</small>
         </div>
 
       </div>
@@ -425,9 +428,34 @@
         this.start = Date.now();
         this.buttons.forEach(b => b.classList.remove('primary'));
       }
-      tick(){ const el=Math.min(this.total, Math.floor((Date.now()-this.start)/1000)); const left=this.total-el; const pct=this.total > 0 ? Math.floor(el/this.total*100) : 0;
-        this.fill.style.width=pct+'%'; const mm=String(Math.floor(left/60)).padStart(2,'0'), ss=String(left%60).padStart(2,'0'); this.label.textContent=`${mm}:${ss}`;
-        requestAnimationFrame(()=>this.tick()); }
+      tick(){
+        const el = Math.min(this.total, Math.floor((Date.now()-this.start)/1000));
+        const left = this.total-el;
+        const pct = this.total > 0 ? (el / this.total) : 0;
+
+        this.fill.style.width = (pct * 100) + '%';
+
+        // Blinking
+        if (left <= 0) {
+            if (!this.fill.classList.contains('blinking-red')) {
+                this.fill.style.background = ''; // remove gradient to allow class background to take over
+                this.fill.classList.add('blinking-red');
+            }
+        } else {
+            // Dynamic color
+            const hue = 120 * (1 - pct); // 120 (green) -> 0 (red)
+            this.fill.style.background = `linear-gradient(90deg, hsl(${hue}, 80%, 50%), hsl(${hue}, 80%, 65%))`;
+            // Remove blinking class if reset
+            if (this.fill.classList.contains('blinking-red')) {
+                this.fill.classList.remove('blinking-red');
+            }
+        }
+
+        const mm = String(Math.floor(left/60)).padStart(2,'0'), ss = String(left%60).padStart(2,'0');
+        this.label.textContent = `${mm}:${ss}`;
+
+        requestAnimationFrame(()=>this.tick());
+      }
     }
 
     let activeMachineForColor = null;
@@ -450,8 +478,7 @@
             picker.classList.remove('hidden');
         });
 
-        this.completionTimeEl = $('.completion-time', this.root);
-        this.completionWarningEl = $('.completion-warning', this.root);
+        this.completionBadgeEl = $('.completion-badge', this.root);
 
         this.settingsToggle = $('.settings-toggle', this.root);
         this.settingsPanel = $('.machine-settings', this.root);
@@ -459,8 +486,11 @@
 
         this.settingsToggle.addEventListener('click', () => this.settingsPanel.classList.toggle('hidden'));
         this.settingsInputs.forEach(input => {
-            input.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') this.saveSetting(input);
+            const eventType = input.type === 'checkbox' ? 'change' : 'keyup';
+            input.addEventListener(eventType, (e) => {
+                if (eventType === 'change' || e.key === 'Enter') {
+                    this.saveSetting(e.target);
+                }
             });
         });
 
@@ -475,8 +505,23 @@
       saveSetting(input) {
         const key = input.dataset.key;
         const source = input.dataset.source;
-        let value = input.value;
-        if(input.type === 'number') value = parseFloat(value) || 0;
+        let value;
+
+        if (input.type === 'checkbox') {
+            value = input.checked;
+        } else if (input.type === 'number') {
+            value = parseFloat(input.value) || 0;
+        } else {
+            value = input.value;
+        }
+
+        if (key === 'completionTimestamp' && typeof value === 'string' && value.includes('-')) {
+            value = new Date(value).getTime();
+            if (isNaN(value)) {
+                alert('Nieprawidłowy format daty!');
+                return;
+            }
+        }
 
         if (source === 'machine') {
             this.data[key] = value;
@@ -503,10 +548,19 @@
         this.settingsInputs.forEach(input => {
             const key = input.dataset.key;
             const source = input.dataset.source;
+            let value;
             if (source === 'machine') {
-                input.value = this.data[key] || '';
+                value = this.data[key];
             } else if (source === 'order') {
-                input.value = order[key] || '';
+                value = order[key];
+            }
+
+            if (input.type === 'checkbox') {
+                input.checked = !!value;
+            } else if (key === 'completionTimestamp' && value) {
+                input.value = new Date(value).toISOString().slice(0, 19).replace('T', ' ');
+            } else {
+                input.value = value || '';
             }
         });
       }
@@ -520,18 +574,34 @@
         const timeLeft = Math.max(0, Math.floor((this.data.completionTimestamp - now) / 1000));
         const hours = Math.floor(timeLeft / 3600);
         const minutes = Math.floor((timeLeft % 3600) / 60);
-        this.completionTimeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
+        this.completionBadgeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
 
-        const twoHours = 2 * 3600; const oneHour = 1 * 3600;
+        // Color logic
+        const fifteenHours = 15 * 3600;
+        const eightHours = 8 * 3600;
+        const twoHours = 2 * 3600;
+        const oneHour = 1 * 3600;
+
+        let badgeColorClass = 'bg-gray-500'; // > 15h
+        if (timeLeft <= fifteenHours && timeLeft > eightHours) {
+            badgeColorClass = 'bg-yellow-500'; // 8-15h
+        } else if (timeLeft <= eightHours && timeLeft > twoHours) {
+            badgeColorClass = 'bg-orange-500'; // 2-8h
+        } else if (timeLeft <= twoHours && timeLeft > 0) {
+            badgeColorClass = 'bg-red-600'; // < 2h
+        }
+
+        this.completionBadgeEl.className = 'completion-badge role-badge text-white'; // Reset classes
+        this.completionBadgeEl.classList.add(badgeColorClass);
+
+        // Urgent notification logic
         if (timeLeft > 0 && timeLeft < twoHours) {
-            this.completionWarningEl.classList.remove('hidden');
             if (timeLeft < oneHour) {
                 showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu godziny!`, 'danger');
             } else {
                 showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu 2 godzin!`, 'warning');
             }
         } else {
-            this.completionWarningEl.classList.add('hidden');
             hideUrgentNotification(this.code);
         }
         requestAnimationFrame(()=>this.tickCompletion());
@@ -982,8 +1052,9 @@
         }
         const el = document.createElement('div');
         el.id = `notification-${id}`;
-        el.className = `alert ${newClass}`;
+        el.className = `alert ${newClass} cursor-pointer`;
         el.innerHTML = `<strong>PILNE:</strong> ${message}`;
+        el.onclick = () => hideUrgentNotification(id);
         container.appendChild(el);
         activeNotifications[id] = el;
     }
