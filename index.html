@@ -9,9 +9,19 @@
   <style>
     :root{ --bg:#0e1117; --panel:#121826; --panel2:#0f1624; --text:#e5e7eb; --muted:#93a4b5; --accent:#22c55e; --line:#1f2937; --yellow:#fde047; }
     body[data-theme="light"] { --bg:#f3f4f6; --panel:#ffffff; --panel2:#f9fafb; --text:#111827; --muted:#6b7280; --accent:#16a34a; --line:#e5e7eb; }
+    body[data-theme="light"] .btn{background:#e5e7eb;border-color:#d1d5db}
+    body[data-theme="light"] .btn.primary{background:#16a34a;border-color:#15803d;color:white}
+    body[data-theme="light"] .badge{background:#e5e7eb;color:#374151;border-color:#d1d5db}
+    body[data-theme="light"] .progress, body[data-theme="light"] .pr-bar{background:#e5e7eb}
+    body[data-theme="light"] .pr-head select.pr-select{background:var(--panel);border-color:var(--line);color:var(--text)}
+    body[data-theme="light"] .pr-reset{background:var(--panel)}
+    body[data-theme="light"] .stamp .chip{background:#e5e7eb;color:#374151;border-color:#d1d5db}
+    body[data-theme="light"] .notes-list .row{border-bottom-color:#e5e7eb}
+    body[data-theme="light"] .tag.draft{color:#92400e;border-color:#f59e0b;background:#fef3c7}
+    body[data-theme="light"] .alert{background:#e5e7eb;color:#374151;border-color:#d1d5db}
     body[data-theme="blue"] { --bg:#0c1424; --panel:#101c36; --panel2:#0e1a31; --text:#e0e7ff; --muted:#a0b3d9; --accent:#60a5fa; --line:#1e294b; }
     body[data-theme="green"] { --bg:#052e16; --panel:#064e3b; --panel2:#043a2c; --text:#ecfdf5; --muted:#a7f3d0; --accent:#4ade80; --line:#022c22; }
-    body{margin:0;background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);font:16px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif; transition: background .3s, color .3s;}
+    body{margin:0;background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);font:17px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif; transition: background .3s, color .3s;}
     .wrap{max-width:1200px;margin:auto;padding:12px 16px}
     .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
     .head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
@@ -114,8 +124,8 @@
         </div>
       </div>
       <div class="body">
-        <h1 class="m-0" data-translate-key="appTitle">🏭 Kartonowy Napełniacz <span class="text-xs opacity-70">(pure HTML)</span></h1>
-        <div id="statusLine" class="opacity-80 mt-1" data-translate-key="statusReady">Status: gotowy</div>
+        <h1 class="m-0" data-translate-key="appTitle">🏭 Kartonowy Napełniacz</h1>
+        <div id="statusLine" class="opacity-80 mt-1" data-translate-key="statusReady"></div>
         <div id="chatStream" class="alerts mt-2"></div>
       </div>
     </div>
@@ -313,35 +323,35 @@
 
     const TRANSLATIONS = {
       pl: {
-        appTitle: '🏭 Kartonowy Napełniacz', statusReady: 'Status: gotowy', createUserTitle: 'Tworzenie nowego użytkownika',
+        appTitle: '🏭 Kartonowy Napełniacz', createUserTitle: 'Tworzenie nowego użytkownika',
         placeholderLogin: 'Login (np. SoGxxxx lub LK12)', placeholderPassword: 'Hasło', placeholderName: 'Imię i nazwisko',
         createUserBtn: 'Stwórz użytkownika', notesTitle: '💬 CHAT', placeholderNote: 'Wpisz wiadomość...', addNoteBtn: 'Wyślij',
         plansTitle: '📌 Dalsze plany', placeholderPlan: 'Nowy pomysł / zadanie…', addPlanBtn: '+ Dodaj plan', refreshBtn: '↻ Odśwież z MySQL',
         auftrag: 'Auftrag:', nextAuftrag: 'Następny Auftrag:', model: 'Model:', period: 'Okres:', pruefungTime: '🧪 Prüfung — czas:', customTime: 'WŁASNY',
       },
       en: {
-        appTitle: '🏭 Cardboard Filler', statusReady: 'Status: ready', createUserTitle: 'Create new user',
+        appTitle: '🏭 Cardboard Filler', createUserTitle: 'Create new user',
         placeholderLogin: 'Login (e.g. SoGxxxx or LK12)', placeholderPassword: 'Password', placeholderName: 'First and last name',
         createUserBtn: 'Create User', notesTitle: '💬 CHAT', placeholderNote: 'Enter a message...', addNoteBtn: 'Send',
         plansTitle: '📌 Future plans', placeholderPlan: 'New idea / task…', addPlanBtn: '+ Add plan', refreshBtn: '↻ Refresh from MySQL',
         auftrag: 'Order:', nextAuftrag: 'Next Order:', model: 'Model:', period: 'Period:', pruefungTime: '🧪 Prüfung — time:', customTime: 'CUSTOM',
       },
       de: {
-        appTitle: '🏭 Karton-Füller', statusReady: 'Status: bereit', createUserTitle: 'Neuen Benutzer erstellen',
+        appTitle: '🏭 Karton-Füller', createUserTitle: 'Neuen Benutzer erstellen',
         placeholderLogin: 'Login (z.B. SoGxxxx oder LK12)', placeholderPassword: 'Passwort', placeholderName: 'Vor- und Nachname',
         createUserBtn: 'Benutzer erstellen', notesTitle: '💬 CHAT', placeholderNote: 'Nachricht eingeben…', addNoteBtn: 'Senden',
         plansTitle: '📌 Weitere Pläne', placeholderPlan: 'Neue Idee / Aufgabe…', addPlanBtn: '+ Plan hinzufügen', refreshBtn: '↻ Von MySQL aktualisieren',
         auftrag: 'Auftrag:', nextAuftrag: 'Nächster Auftrag:', model: 'Modell:', period: 'Zeitraum:', pruefungTime: '🧪 Prüfung — Zeit:', customTime: 'EIGENE',
       },
       tr: {
-        appTitle: '🏭 Karton Doldurucu', statusReady: 'Durum: hazır', createUserTitle: 'Yeni kullanıcı oluştur',
+        appTitle: '🏭 Karton Doldurucu', createUserTitle: 'Yeni kullanıcı oluştur',
         placeholderLogin: 'Giriş (ör. SoGxxxx veya LK12)', placeholderPassword: 'Şifre', placeholderName: 'Ad ve soyad',
         createUserBtn: 'Kullanıcı Oluştur', notesTitle: '💬 SOHBET', placeholderNote: 'Bir mesaj girin...', addNoteBtn: 'Gönder',
         plansTitle: '📌 Gelecek planları', placeholderPlan: 'Yeni fikir / görev…', addPlanBtn: '+ Plan ekle', refreshBtn: '↻ MySQL\'den yenile',
         auftrag: 'Sipariş:', nextAuftrag: 'Sonraki Sipariş:', model: 'Model:', period: 'Dönem:', pruefungTime: '🧪 Test — süre:', customTime: 'ÖZEL',
       },
       ar: {
-        appTitle: '🏭 حشو الكرتون', statusReady: 'الحالة: جاهز', createUserTitle: 'إنشاء مستخدم جديد',
+        appTitle: '🏭 حشو الكرتون', createUserTitle: 'إنشاء مستخدم جديد',
         placeholderLogin: 'تسجيل الدخول (على سبيل المثال SoGxxxx أو LK12)', placeholderPassword: 'كلمة المرور', placeholderName: 'الاسم الأول والأخير',
         createUserBtn: 'إنشاء مستخدم', notesTitle: '💬 دردشة', placeholderNote: 'أدخل رسالة…', addNoteBtn: 'إرسال',
         plansTitle: '📌 خطط مستقبلية', placeholderPlan: 'فكرة / مهمة جديدة…', addPlanBtn: '+ إضافة خطة', refreshBtn: '↻ تحديث من MySQL',
@@ -364,7 +374,7 @@
       users: USERS,
       machines:[
         { code:'MA820061', durationMin:25, pruef:3600 },
-        { code:'M820062',  durationMin:22, pruef:3600 },
+        { code:'MA820062',  durationMin:22, pruef:3600 },
         { code:'MA820063', durationMin:25, pruef:3600 },
         { code:'MA820064', durationMin:25, pruef:3600 },
       ],
@@ -984,7 +994,7 @@
         }
     }
 
-    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); setStatus('gotowy'); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
+    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
     init();
   </script>
 </body>
