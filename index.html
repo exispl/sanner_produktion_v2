@@ -242,6 +242,12 @@
     </div>
   </div>
 
+  <div id="machineSelector" class="hidden absolute panel p-2 z-40">
+    <div id="machineSelectorList" class="flex flex-col gap-1 max-h-80 overflow-y-auto">
+      <!-- DYNAMIC CONTENT -->
+    </div>
+  </div>
+
   <div id="customConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
     <div class="panel w-full max-w-sm">
       <div class="body space-y-4">
@@ -272,10 +278,10 @@
   <template id="tpl-machine">
     <article class="panel machine">
       <div class="head">
-        <div class="title"><span>🤖</span><h2 class="code"></h2></div>
+        <div class="title"><span>🤖</span><button class="code-btn btn ghost text-2xl"></button></div>
         <div class="flex items-center gap-2">
-          <span class="text-xs opacity-70">Przewidywany czas do końca:</span>
-          <div class="completion-badge role-badge bg-gray-500 text-white">--:--</div>
+          <span class="text-sm opacity-70">Przewidywany czas do końca:</span>
+          <div class="completion-badge role-badge bg-gray-500 text-white text-sm">--:--</div>
           <button class="btn ghost settings-toggle">⚙️</button>
         </div>
       </div>
@@ -295,7 +301,7 @@
             <div class="flex items-center gap-2">
                 <span data-translate-key="model">Model:</span>
                 <strong class="mdl-val font-bold text-base">—</strong>
-                <span class="w-6 h-6 rounded-full bg-white/50 border-2 border-white/20 model-color-dot ml-auto" title="Zmień kolor"></span>
+                <span class="w-7 h-8 rounded-md bg-white/50 border-2 border-white/20 model-color-dot ml-auto" title="Zmień kolor"></span>
             </div>
           </div>
           <div class="border border-white/10 rounded-lg p-2">
@@ -609,11 +615,66 @@
         }
     }
 
+    const MachineSelectorManager = (() => {
+        const selector = $('#machineSelector');
+        const list = $('#machineSelectorList');
+        let activeMachineInstance = null;
+
+        const close = () => {
+            if (selector) selector.classList.add('hidden');
+            activeMachineInstance = null;
+        };
+
+        const open = (machine, e) => {
+            activeMachineInstance = machine;
+            populateList();
+            const btnRect = e.target.getBoundingClientRect();
+            selector.style.left = btnRect.left + 'px';
+            selector.style.top = btnRect.bottom + 'px';
+            selector.classList.remove('hidden');
+        };
+
+        const populateList = () => {
+            if(!list) return;
+            list.innerHTML = '';
+            DEFAULTS.machines.forEach(machineData => {
+                const btn = document.createElement('button');
+                btn.className = 'btn text-left w-full hover:bg-gray-700';
+                const order = CFG.orders[machineData.code] || {};
+                const modelInfo = order.model || 'Brak modelu';
+                btn.innerHTML = `${machineData.code} <span class="opacity-50 text-xs">${modelInfo}</span>`;
+
+                btn.onclick = () => {
+                    if (activeMachineInstance) {
+                        // For now, visual change only, as requested.
+                        activeMachineInstance.updateCodeDisplay(machineData.code);
+                    }
+                    close();
+                };
+                list.appendChild(btn);
+            });
+        };
+
+        document.addEventListener('click', (e) => {
+            if (activeMachineInstance && selector && !selector.contains(e.target) && !activeMachineInstance.codeBtn.contains(e.target)) {
+                close();
+            }
+        });
+
+        return { open };
+    })();
+
     let activeMachineForColor = null;
     class Machine{ constructor(container,data,orders){ this.root=$('#tpl-machine').content.firstElementChild.cloneNode(true);
         this.data = data;
         this.orders = orders;
-        this.code=data.code; $('.code',this.root).textContent=this.code;
+        this.code = data.code;
+        this.codeBtn = $('.code-btn', this.root);
+        this.codeBtn.textContent = this.code;
+
+        this.codeBtn.addEventListener('click', (e) => {
+            MachineSelectorManager.open(this, e);
+        });
 
         if (!this.data.completionTimestamp) {
           this.data.completionTimestamp = Date.now() + (Math.floor(Math.random() * 14940) + 60) * 1000;
@@ -677,6 +738,10 @@
             this.orders[this.code][key] = value;
         }
 
+        if (key === 'model' && typeof value === 'string' && value.includes('201044')) {
+            this.setColor('#ffffff');
+        }
+
         input.blur();
         this.render();
         persist();
@@ -687,7 +752,12 @@
         $('.auf-val',this.root).textContent = order.auftrag || '—';
         $('.mdl-val',this.root).textContent = order.model || '—';
         $('.period-val',this.root).textContent = order.period || '—';
-        $('.nextauf-val',this.root).textContent = order.next || '—';
+
+        const nextAuftragEl = $('.nextauf-val', this.root);
+        nextAuftragEl.textContent = order.next || '—';
+        if (order.nextReady) {
+            nextAuftragEl.textContent += ' ✓';
+        }
 
         this.dot.style.backgroundColor = this.data.color || '#94a3b8';
 
@@ -730,12 +800,14 @@
         const oneHour = 1 * 3600;
 
         let badgeColorClass = 'bg-gray-500'; // > 15h
-        if (timeLeft <= fifteenHours && timeLeft > eightHours) {
-            badgeColorClass = 'bg-yellow-500'; // 8-15h
-        } else if (timeLeft <= eightHours && timeLeft > twoHours) {
-            badgeColorClass = 'bg-orange-500'; // 2-8h
-        } else if (timeLeft <= twoHours && timeLeft > 0) {
+        if (timeLeft <= 0) {
+            badgeColorClass = 'bg-yellow-400 text-black';
+        } else if (timeLeft <= twoHours) {
             badgeColorClass = 'bg-red-600'; // < 2h
+        } else if (timeLeft <= eightHours) {
+            badgeColorClass = 'bg-orange-500'; // 2-8h
+        } else if (timeLeft <= fifteenHours) {
+            badgeColorClass = 'bg-yellow-500'; // 8-15h
         }
 
         this.completionBadgeEl.className = 'completion-badge role-badge text-white'; // Reset classes
@@ -751,6 +823,10 @@
         } else {
             hideUrgentNotification(this.code);
         }
+      }
+      updateCodeDisplay(newCode) {
+        this.codeBtn.textContent = newCode;
+        // This is a visual change only for now. The underlying machine data is not swapped.
       }
     }
 
