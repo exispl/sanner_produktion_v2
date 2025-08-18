@@ -24,7 +24,7 @@
     body{margin:0;background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);font:17px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif; transition: background .3s, color .3s;}
     .wrap{max-width:1200px;margin:auto;padding:12px 16px}
     .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-    .head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
+    .head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
     .body{padding:10px 14px}
     .badge{font-size:12px;color:#cbd5e1;background:#0b1220;padding:4px 8px;border-radius:999px;border:1px solid var(--line)}
     .btn{border:1px solid var(--line);background:#0b1220;color:var(--text);padding:6px 10px;border-radius:10px;cursor:pointer}
@@ -42,7 +42,9 @@
     .pruef{margin-top:10px}
     .pr-head{display:flex;gap:8px;align-items:center;margin-bottom:6px}
     .pr-head select.pr-select{background:var(--panel2);border:1px solid var(--line);color:var(--yellow);padding:8px 10px;border-radius:10px}
-    .pr-bar{position:relative;height:68px;border:1px solid var(--line);border-radius:14px;background:#0b1220;overflow:hidden}
+    body[data-theme="light"] .model-color-dot { border-color: #cbd5e1 !important; }
+    .pr-bar{position:relative;height:36px;border:1px solid var(--line);border-radius:14px;background:#0b1220;overflow:hidden}
+    .pr-buttons button { font-size: 0.7rem; }
     .pr-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,#22c55e,#84cc16);transition:width .5s linear}
     .pr-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.3px}
     .pr-reset{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:4px 8px;cursor:pointer}
@@ -57,6 +59,9 @@
     .tag{display:inline-block;margin-left:6px;font-size:12px;padding:2px 6px;border-radius:999px;border:1px solid #3b4760}
     .tag.draft{color:#eab308;border-color:#a16207;background:#2a2208}
     .role-badge{font-size:12px;padding:3px 8px;border-radius:999px;font-weight:600;border:1px solid transparent}
+    .carton-box{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel2)}
+    .carton-fill{position:absolute;bottom:0;left:0;right:0;width:100%;height:0%;background-color:var(--accent);transition:height .5s linear}
+    .carton-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
     .role-senior-dev{color:white;background-color:#3b82f6}
     .role-teamleiter{color:white;background-color:#ec4899}
     .role-einrichter{color:white;background-color:#f97316}
@@ -75,6 +80,8 @@
     .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
     @keyframes blink-red { 50% { background-color: transparent; } }
     .blinking-red { background: #ef4444 !important; animation: blink-red 1.5s infinite; }
+    @keyframes blink-green { 50% { background-color: #22c55e80; } }
+    .blinking-green { background-color: #22c55e !important; animation: blink-green 2s infinite; }
   </style>
 </head>
 <body>
@@ -109,12 +116,12 @@
           </div>
         </div>
         <div class="flex items-center gap-4">
-            <div id="langSwitcher" class="flex gap-1">
-              <button class="btn ghost text-xs" data-lang="pl">PL</button>
-              <button class="btn ghost text-xs" data-lang="en">EN</button>
-              <button class="btn ghost text-xs" data-lang="tr">TR</button>
-              <button class="btn ghost text-xs" data-lang="de">DE</button>
-              <button class="btn ghost text-xs" data-lang="ar">AR</button>
+            <div id="langSwitcher" class="flex gap-2">
+              <button class="btn ghost text-xl" data-lang="pl" title="Polski">🇵🇱</button>
+              <button class="btn ghost text-xl" data-lang="en" title="English">🇬🇧</button>
+              <button class="btn ghost text-xl" data-lang="tr" title="Türkçe">🇹🇷</button>
+              <button class="btn ghost text-xl" data-lang="de" title="Deutsch">🇩🇪</button>
+              <button class="btn ghost text-xl" data-lang="ar" title="العربية">🇸🇦</button>
             </div>
             <div id="themeSwitcher" class="flex items-center gap-2">
               <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
@@ -122,7 +129,7 @@
               <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0c1424" data-theme="blue" title="Blue Theme"></button>
               <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #052e16" data-theme="green" title="Green Theme"></button>
             </div>
-            <div class="badge">v0.007r</div>
+            <button id="settingsBtn" class="btn ghost text-2xl">⚙️</button>
         </div>
       </div>
       <div class="body">
@@ -272,7 +279,7 @@
             <div class="flex items-center gap-2">
                 <span data-translate-key="model">Model:</span>
                 <strong class="mdl-val font-bold text-base">—</strong>
-                <span class="w-4 h-4 rounded-full bg-white/50 border border-white/20 model-color-dot ml-auto" title="Zmień kolor"></span>
+                <span class="w-6 h-6 rounded-full bg-white/50 border-2 border-white/20 model-color-dot ml-auto" title="Zmień kolor"></span>
             </div>
           </div>
           <div class="border border-white/10 rounded-lg p-2">
@@ -281,7 +288,12 @@
           </div>
         </div>
 
-        <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
+        <div class="carton-progress grid grid-cols-2 grid-rows-2 gap-1.5 w-32 h-40 mx-auto mt-3">
+          <div class="carton-box" data-carton-id="1"><div class="carton-fill"></div><div class="carton-label">#1</div></div>
+          <div class="carton-box" data-carton-id="3"><div class="carton-fill"></div><div class="carton-label">#3</div></div>
+          <div class="carton-box" data-carton-id="2"><div class="carton-fill"></div><div class="carton-label">#2</div></div>
+          <div class="carton-box" data-carton-id="4"><div class="carton-fill"></div><div class="carton-label">#4</div></div>
+        </div>
 
         <div class="pruef">
           <div class="pr-bar">
@@ -378,8 +390,13 @@
         { code:'MA820062',  durationMin:22, pruef:3600 },
         { code:'MA820063', durationMin:25, pruef:3600 },
         { code:'MA820064', durationMin:25, pruef:3600 },
+        { code:'MA820051', durationMin:25, pruef:3600, color: '#ffffff' },
+        { code:'MA820054', durationMin:25, pruef:3600, color: '#ffffff' },
       ],
-      orders:{},
+      orders:{
+        'MA820051': { model: 'DASG-1 (201044)' },
+        'MA820054': { model: 'DASG-1 (201044)' }
+      },
     };
     let CFG=JSON.parse(localStorage.getItem('KN007_CFG')||'null')||DEFAULTS;
     // ensure USERS is up to date
@@ -397,21 +414,25 @@
     // --- machines (minimal for 0.007 look)
     let activePruefung = null;
     class Pruefung{ constructor(root){ this.root=root; this.fill=$('.pr-fill',root); this.label=$('.pr-label',root); this.buttons=$$('.pr-buttons button',root); this.reset=$('.pr-reset',root); this.bar=$('.pr-bar', root);
-        this.total=3600; this.start=Date.now(); this.bind(); this.tick(); }
+        this.total=3600; this.start=Date.now(); this.prufungType = 'short'; this.bind(); this.tick(); }
       bind(){
         this.buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.buttons.forEach(b => b.classList.remove('primary'));
-                btn.classList.add('primary');
-                const v = btn.dataset.time;
-                if (v === 'custom') {
-                    const m = prompt('Wpisz czas w minutach:', '60');
-                    this.setTime(m);
-                } else {
+            const v = btn.dataset.time;
+            if (v === 'custom') {
+                btn.textContent = 'Short';
+                btn.addEventListener('click', () => {
+                    this.prufungType = this.prufungType === 'short' ? 'long' : 'short';
+                    btn.textContent = this.prufungType === 'short' ? 'Short' : 'Long';
+                    // Potentially apply a time setting here based on type
+                });
+            } else {
+                btn.addEventListener('click', () => {
+                    this.buttons.forEach(b => b.classList.remove('primary'));
+                    btn.classList.add('primary');
                     this.total = parseInt(v, 10);
                     this.start = Date.now();
-                }
-            });
+                });
+            }
         });
         this.reset.addEventListener('click',()=>{ this.start=Date.now(); this.buttons.forEach(b => b.classList.remove('primary')); });
         this.bar.addEventListener('contextmenu', (e) => {
@@ -456,6 +477,86 @@
       }
     }
 
+    class CartonProgress {
+        constructor(container, machineData, orderData) {
+            this.container = container;
+            this.boxes = $$('.carton-box', container);
+            this.fills = $$('.carton-fill', container);
+            this.labels = $$('.carton-label', container);
+
+            this.sequence = [0, 3, 1, 2]; // 0-indexed for visual layout: 1->4->2->3
+            this.state = {
+                currentCartonSequenceIndex: 0,
+                startTime: Date.now(),
+                cartons: [
+                    { id: 1, progress: 0, label: '#1' },
+                    { id: 2, progress: 0, label: '#2' },
+                    { id: 3, progress: 0, label: '#3' },
+                    { id: 4, progress: 0, label: '#4' }
+                ]
+            };
+            this.durationPerCarton = (machineData.durationMin || 25) * 60 * 1000 / 4;
+
+            this.bindEvents();
+            this.tick();
+        }
+
+        bindEvents() {
+            this.boxes.forEach((box, index) => {
+                box.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    const cartonId = parseInt(box.dataset.cartonId, 10);
+                    const confirmed = confirm(`Zresetować karton #${cartonId}?`);
+                    if (confirmed) {
+                        this.resetCarton(index);
+                    }
+                });
+            });
+        }
+
+        resetCarton(visualIndex) {
+            const cartonDataIndex = this.state.cartons.findIndex(c => this.sequence[c.id -1] === visualIndex);
+            // This is getting complicated. Let's simplify. The visual index IS the carton index for binding.
+            const cartonId = visualIndex + 1; // assuming visual order is 0,1,2,3
+
+            this.state.currentCartonSequenceIndex = this.sequence.indexOf(visualIndex);
+            this.state.startTime = Date.now();
+
+            // Reset all fills
+            this.fills.forEach(fill => {
+                fill.style.height = '0%';
+                fill.classList.remove('blinking-green');
+            });
+        }
+
+        tick() {
+            if (this.state.currentCartonSequenceIndex >= this.sequence.length) {
+                // All cartons are full, just ensure the last one blinks
+                const lastCartonVisualIndex = this.sequence[this.sequence.length - 1];
+                if (!this.fills[lastCartonVisualIndex].classList.contains('blinking-green')) {
+                    this.fills[lastCartonVisualIndex].classList.add('blinking-green');
+                }
+                requestAnimationFrame(() => this.tick());
+                return;
+            }
+
+            const now = Date.now();
+            const elapsedTime = now - this.state.startTime;
+            const progress = Math.min(1, elapsedTime / this.durationPerCarton);
+
+            const activeCartonVisualIndex = this.sequence[this.state.currentCartonSequenceIndex];
+            this.fills[activeCartonVisualIndex].style.height = (progress * 100) + '%';
+
+            if (progress >= 1) {
+                this.fills[activeCartonVisualIndex].classList.add('blinking-green');
+                this.state.currentCartonSequenceIndex++;
+                this.state.startTime = Date.now(); // Reset timer for the next carton
+            }
+
+            requestAnimationFrame(() => this.tick());
+        }
+    }
+
     let activeMachineForColor = null;
     class Machine{ constructor(container,data,orders){ this.root=$('#tpl-machine').content.firstElementChild.cloneNode(true);
         this.data = data;
@@ -492,10 +593,9 @@
             });
         });
 
-        this.bar=$('.bar',this.root); this.label=$('.label',this.root);
-        container.appendChild(this.root); this.pr=new Pruefung($('.pruef',this.root));
-        // simple progress demo
-        let start=performance.now(), dur=(data.durationMin||25)*60000; const step=()=>{ const p=Math.min(1,(performance.now()-start)/dur); this.bar.style.width=(p*100)+'%'; this.label.textContent=Math.floor(p*100)+'%'; requestAnimationFrame(step) }; requestAnimationFrame(step);
+        container.appendChild(this.root);
+        this.pr = new Pruefung($('.pruef', this.root));
+        this.cartons = new CartonProgress($('.carton-progress', this.root), data, this.orders);
 
         this.render();
         this.tickCompletion();
