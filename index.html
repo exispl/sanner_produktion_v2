@@ -622,11 +622,7 @@
         this.dot = $('.model-color-dot', this.root);
         this.dot.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            activeMachineForColor = this;
-            const picker = $('#colorPicker');
-            picker.style.left = e.pageX + 'px';
-            picker.style.top = e.pageY + 'px';
-            picker.classList.remove('hidden');
+            PickerManager.open(this, e);
         });
 
         this.completionBadgeEl = $('.completion-badge', this.root);
@@ -1176,6 +1172,7 @@
             }
             modal.classList.add('hidden');
             activePruefung = null;
+            return false;
         });
         closeBtn.onclick = () => {
             modal.classList.add('hidden');
@@ -1183,27 +1180,42 @@
         };
     }
 
-    function initColorPicker() {
+    const PickerManager = (() => {
         const picker = $('#colorPicker');
-        $$('button', picker).forEach(button => {
-            button.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                const color = button.dataset.color;
-                if (activeMachineForColor) {
-                    activeMachineForColor.setColor(color);
-                }
-                picker.classList.add('hidden');
-                activeMachineForColor = null;
+        let activeMachine = null;
+
+        const close = () => {
+            if (picker) picker.classList.add('hidden');
+            activeMachine = null;
+        };
+
+        const open = (machine, e) => {
+            activeMachine = machine;
+            picker.style.left = e.pageX + 'px';
+            picker.style.top = e.pageY + 'px';
+            picker.classList.remove('hidden');
+        };
+
+        if(picker) {
+            $$('button', picker).forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (activeMachine) {
+                        activeMachine.setColor(button.dataset.color);
+                    }
+                    close();
+                });
             });
-        });
-        document.addEventListener('click', (e) => {
-            if (!picker.contains(e.target) && activeMachineForColor) {
-                picker.classList.add('hidden');
-                activeMachineForColor = null;
-            }
-        });
-    }
+
+            document.addEventListener('click', (e) => {
+                if (activeMachine && !picker.contains(e.target)) {
+                    close();
+                }
+            });
+        }
+
+        return { open };
+    })();
 
     // Clean up expired snoozes on load
     try {
@@ -1289,7 +1301,7 @@
         newCancelBtn.onclick = () => close(false);
     }
 
-    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
+    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); }
     init();
   </script>
 </body>
