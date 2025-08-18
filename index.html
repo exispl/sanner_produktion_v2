@@ -84,7 +84,7 @@
     @keyframes blink-green { 50% { background-color: #22c55e80; } }
     .blinking-green { background-color: #22c55e !important; animation: blink-green 2s infinite; }
     .prufung-type-short { border: 1px solid var(--line) !important; }
-    .prufung-type-long { border: 2px solid var(--text) !important; font-weight: bold; }
+    .prufung-type-long { border: 2px solid var(--text) !important; font-weight: bold; padding-left: 1rem !important; padding-right: 1rem !important; }
     .next-ready-checkbox:not(:checked) { filter: grayscale(1); }
   </style>
 </head>
@@ -242,6 +242,18 @@
     </div>
   </div>
 
+  <div id="customConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+    <div class="panel w-full max-w-sm">
+      <div class="body space-y-4">
+        <p id="customConfirmMessage" class="text-center">Czy na pewno chcesz to zrobić?</p>
+        <div class="flex justify-center gap-4">
+          <button id="customConfirmCancel" class="btn">Anuluj</button>
+          <button id="customConfirmOk" class="btn primary">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer class="wrap" id="adminFooter" style="display: none;">
     <div class="panel mt-3">
       <div class="head">
@@ -262,6 +274,7 @@
       <div class="head">
         <div class="title"><span>🤖</span><h2 class="code"></h2></div>
         <div class="flex items-center gap-2">
+          <span class="text-xs opacity-70">Przewidywany czas do końca:</span>
           <div class="completion-badge role-badge bg-gray-500 text-white">--:--</div>
           <button class="btn ghost settings-toggle">⚙️</button>
         </div>
@@ -442,7 +455,7 @@
 
       togglePrufungType() {
         this.prufungType = this.prufungType === 'short' ? 'long' : 'short';
-        this.customButton.textContent = this.prufungType === 'short' ? 'Short' : 'Long';
+        this.customButton.textContent = this.prufungType === 'short' ? 'Short' : 'Long 📏';
         this.updateCustomButtonBorder();
       }
 
@@ -544,10 +557,11 @@
                 box.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     const cartonId = parseInt(box.dataset.cartonId, 10);
-                    const confirmed = confirm(`Zresetować karton #${cartonId}?`);
-                    if (confirmed) {
-                        this.resetCarton(index);
-                    }
+                    showCustomConfirm(`Zresetować karton #${cartonId}?`, (confirmed) => {
+                        if (confirmed) {
+                            this.resetCarton(index);
+                        }
+                    });
                 });
             });
         }
@@ -636,7 +650,8 @@
         this.cartons = new CartonProgress($('.carton-progress', this.root), data, this.orders);
 
         this.render();
-        this.tickCompletion();
+        this.updateCompletionTime(); // Initial call
+        this.completionInterval = setInterval(() => this.updateCompletionTime(), 60000); // Refresh every minute
     }
       saveSetting(input) {
         const key = input.dataset.key;
@@ -705,7 +720,7 @@
         this.render();
         persist();
       }
-      tickCompletion() {
+      updateCompletionTime() {
         const now = Date.now();
         const timeLeft = Math.max(0, Math.floor((this.data.completionTimestamp - now) / 1000));
         const hours = Math.floor(timeLeft / 3600);
@@ -740,7 +755,6 @@
         } else {
             hideUrgentNotification(this.code);
         }
-        requestAnimationFrame(()=>this.tickCompletion());
       }
     }
 
@@ -1172,8 +1186,9 @@
     function initColorPicker() {
         const picker = $('#colorPicker');
         $$('button', picker).forEach(button => {
-            button.addEventListener('click', (e) => {
+            button.addEventListener('mousedown', (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 const color = button.dataset.color;
                 if (activeMachineForColor) {
                     activeMachineForColor.setColor(color);
@@ -1248,6 +1263,30 @@
         const snoozed = JSON.parse(localStorage.getItem('KN007_SNOOZED') || '{}');
         snoozed[id] = Date.now() + 30 * 60 * 1000; // Snooze for 30 mins
         localStorage.setItem('KN007_SNOOZED', JSON.stringify(snoozed));
+    }
+
+    function showCustomConfirm(message, callback) {
+        const modal = $('#customConfirmModal');
+        const msgEl = $('#customConfirmMessage');
+        const okBtn = $('#customConfirmOk');
+        const cancelBtn = $('#customConfirmCancel');
+
+        msgEl.textContent = message;
+        modal.classList.remove('hidden');
+
+        const newOkBtn = okBtn.cloneNode(true);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        const close = (result) => {
+            modal.classList.add('hidden');
+            callback(result);
+        };
+
+        newOkBtn.onclick = () => close(true);
+        newCancelBtn.onclick = () => close(false);
     }
 
     function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
