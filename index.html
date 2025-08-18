@@ -59,9 +59,12 @@
     .tag{display:inline-block;margin-left:6px;font-size:12px;padding:2px 6px;border-radius:999px;border:1px solid #3b4760}
     .tag.draft{color:#eab308;border-color:#a16207;background:#2a2208}
     .role-badge{font-size:12px;padding:3px 8px;border-radius:999px;font-weight:600;border:1px solid transparent}
-    .carton-box{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel2)}
-    .carton-fill{position:absolute;bottom:0;left:0;right:0;width:100%;height:0%;background-color:var(--accent);transition:height .5s linear}
-    .carton-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+    .carton-box-large, .carton-box-thumb { position: relative; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel2); }
+    .carton-fill, .carton-fill-thumb, .carton-fill-bag1, .carton-fill-bag2 { position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 0%; background-color: var(--accent); transition: height 0.5s linear; }
+    .carton-label, .carton-label-thumb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    .carton-label { font-size: 20px; }
+    .carton-label-thumb { font-size: 10px; }
+    .carton-thumbnails .blinking-thumbnail { animation: blink-green 2s infinite; box-shadow: 0 0 8px 2px #22c55e80; }
     .role-senior-dev{color:white;background-color:#3b82f6}
     .role-teamleiter{color:white;background-color:#ec4899}
     .role-einrichter{color:white;background-color:#f97316}
@@ -248,6 +251,22 @@
     </div>
   </div>
 
+  <div id="contextMenu" class="hidden absolute panel p-1 z-50 w-48">
+    <div id="contextMenuList" class="flex flex-col gap-1"></div>
+  </div>
+
+  <div id="customInputModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+    <div class="panel w-full max-w-xs">
+      <div class="head"><h2 id="customInputTitle" class="m-0">Wprowadź wartość</h2></div>
+      <div class="body">
+        <form id="customInputForm" class="flex flex-col gap-4">
+          <input type="text" id="customInput" class="btn text-center text-lg" required>
+          <button type="submit" class="btn primary">Zatwierdź</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div id="customConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
     <div class="panel w-full max-w-sm">
       <div class="body space-y-4">
@@ -274,6 +293,25 @@
       </div>
     </div>
   </footer>
+
+  <template id="tpl-carton-focus-standard">
+    <div class="carton-box-large h-full">
+        <div class="carton-fill"></div>
+        <div class="carton-label"></div>
+    </div>
+  </template>
+  <template id="tpl-carton-focus-MA820059">
+    <div class="h-full flex gap-1">
+        <div class="w-1/2 h-full carton-box-large">
+            <div class="carton-fill-bag1"></div>
+            <div class="carton-label"></div>
+        </div>
+        <div class="w-1/2 h-full carton-box-large">
+            <div class="carton-fill-bag2"></div>
+            <div class="carton-label"></div>
+        </div>
+    </div>
+  </template>
 
   <template id="tpl-machine">
     <article class="panel machine">
@@ -310,11 +348,14 @@
           </div>
         </div>
 
-        <div class="carton-progress grid grid-cols-2 grid-rows-2 gap-1.5 w-32 h-40 mx-auto mt-3">
-          <div class="carton-box" data-carton-id="1"><div class="carton-fill"></div><div class="carton-label">#1</div></div>
-          <div class="carton-box" data-carton-id="3"><div class="carton-fill"></div><div class="carton-label">#3</div></div>
-          <div class="carton-box" data-carton-id="2"><div class="carton-fill"></div><div class="carton-label">#2</div></div>
-          <div class="carton-box" data-carton-id="4"><div class="carton-fill"></div><div class="carton-label">#4</div></div>
+        <div class="carton-progress-container flex gap-4 mt-3">
+          <div class="carton-focus-view flex-grow h-48"></div>
+          <div class="carton-thumbnails flex flex-col gap-1.5 w-24">
+            <div class="carton-box-thumb h-1/4" data-carton-id="1"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#1</div></div>
+            <div class="carton-box-thumb h-1/4" data-carton-id="2"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#2</div></div>
+            <div class="carton-box-thumb h-1/4" data-carton-id="3"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#3</div></div>
+            <div class="carton-box-thumb h-1/4" data-carton-id="4"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#4</div></div>
+          </div>
         </div>
 
         <div class="pruef">
@@ -537,81 +578,178 @@
     class CartonProgress {
         constructor(container, machineData, orderData) {
             this.container = container;
-            this.boxes = $$('.carton-box', container);
-            this.fills = $$('.carton-fill', container);
-            this.labels = $$('.carton-label', container);
+            this.focusView = $('.carton-focus-view', container);
+            this.thumbnails = $$('.carton-box-thumb', container);
+            this.machineData = machineData;
 
-            this.sequence = [0, 3, 1, 2]; // 0-indexed for visual layout: 1->4->2->3
+            this.isSpecial = machineData.code === 'MA820059';
+            this.bagsPerCarton = this.isSpecial ? 2 : 1;
+            this.piecesPerBag = 3000; // TODO: make this configurable
+
+            this.fillOrder = [0, 3, 1, 2]; // Logical fill order: 1 -> 4 -> 2 -> 3
+
             this.state = {
-                currentCartonSequenceIndex: 0,
+                currentSequenceIndex: 0, // index in fillOrder
+                currentBagInCarton: 1, // 1 or 2
                 startTime: Date.now(),
-                cartons: [
-                    { id: 1, progress: 0, label: '#1' },
-                    { id: 2, progress: 0, label: '#2' },
-                    { id: 3, progress: 0, label: '#3' },
-                    { id: 4, progress: 0, label: '#4' }
-                ]
+                cartonStates: [ {bag1:0, bag2:0}, {bag1:0, bag2:0}, {bag1:0, bag2:0}, {bag1:0, bag2:0} ]
             };
-            this.durationPerCarton = (machineData.durationMin || 25) * 60 * 1000 / 4;
 
+            this.init();
             this.bindEvents();
             this.tick();
         }
 
+        init() {
+            this.setActiveCarton(this.state.currentSequenceIndex);
+        }
+
         bindEvents() {
-            this.boxes.forEach((box, index) => {
-                box.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    const cartonId = parseInt(box.dataset.cartonId, 10);
-                    showCustomConfirm(`Zresetować karton #${cartonId}?`, (confirmed) => {
-                        if (confirmed) {
-                            this.resetCarton(index);
-                        }
-                    });
+            this.thumbnails.forEach((thumb, visualIndex) => {
+                thumb.addEventListener('contextmenu', (e) => {
+                    const items = [
+                        { label: 'Resetuj', action: () => this.resetCarton(visualIndex) },
+                        { label: 'Ustaw liczbę sztuk', action: () => this.setPieces(visualIndex) },
+                        { label: 'Zacznij od tego', action: () => this.startFrom(visualIndex) }
+                    ];
+                    ContextMenuManager.open(e, items);
                 });
             });
         }
 
         resetCarton(visualIndex) {
-            const cartonDataIndex = this.state.cartons.findIndex(c => this.sequence[c.id -1] === visualIndex);
-            // This is getting complicated. Let's simplify. The visual index IS the carton index for binding.
-            const cartonId = visualIndex + 1; // assuming visual order is 0,1,2,3
+            this.state.cartonStates[visualIndex] = { bag1: 0, bag2: 0 };
+            if (this.fillOrder[this.state.currentSequenceIndex] === visualIndex) {
+                this.state.startTime = Date.now();
+                this.state.currentBagInCarton = 1;
+            }
+            this.render();
+        }
 
-            this.state.currentCartonSequenceIndex = this.sequence.indexOf(visualIndex);
-            this.state.startTime = Date.now();
+        setPieces(visualIndex) {
+            const cartonState = this.state.cartonStates[visualIndex];
+            const currentPieces = Math.floor((cartonState.bag1 + cartonState.bag2) * this.piecesPerBag);
 
-            // Reset all fills
-            this.fills.forEach(fill => {
-                fill.style.height = '0%';
-                fill.classList.remove('blinking-green');
+            showCustomInput(`Ustaw sztuki dla kartonu #${visualIndex + 1}`, currentPieces, (newValue) => {
+                const pieces = parseInt(newValue, 10);
+                if (isNaN(pieces) || pieces < 0) return;
+
+                const totalPossiblePieces = this.piecesPerBag * this.bagsPerCarton;
+                const progress = Math.min(1, pieces / totalPossiblePieces);
+
+                this.state.cartonStates[visualIndex].bag1 = Math.min(1, progress * this.bagsPerCarton);
+                this.state.cartonStates[visualIndex].bag2 = this.isSpecial ? Math.max(0, (progress * this.bagsPerCarton) - 1) : 0;
+
+                if (this.fillOrder[this.state.currentSequenceIndex] === visualIndex) {
+                    const totalDurationForCarton = (this.machineData.durationMin * 60 * 1000) * this.bagsPerCarton;
+                    const newElapsedTime = totalDurationForCarton * progress;
+                    this.state.startTime = Date.now() - newElapsedTime;
+                }
+                this.render();
             });
         }
 
-        tick() {
-            if (this.state.currentCartonSequenceIndex >= this.sequence.length) {
-                // All cartons are full, just ensure the last one blinks
-                const lastCartonVisualIndex = this.sequence[this.sequence.length - 1];
-                if (!this.fills[lastCartonVisualIndex].classList.contains('blinking-green')) {
-                    this.fills[lastCartonVisualIndex].classList.add('blinking-green');
+        startFrom(visualIndex) {
+            const newSequenceIndex = this.fillOrder.indexOf(visualIndex);
+            if (newSequenceIndex !== -1) {
+                this.state.currentSequenceIndex = newSequenceIndex;
+                this.state.currentBagInCarton = 1;
+                this.state.startTime = Date.now();
+
+                for (let i = newSequenceIndex; i < this.fillOrder.length; i++) {
+                    const idxToReset = this.fillOrder[i];
+                    this.state.cartonStates[idxToReset] = { bag1: 0, bag2: 0 };
                 }
+                this.setActiveCarton(newSequenceIndex);
+            }
+        }
+
+        setActiveCarton(sequenceIndex) {
+            const visualIndex = this.fillOrder[sequenceIndex];
+
+            this.thumbnails.forEach((thumb, i) => {
+                thumb.classList.toggle('blinking-thumbnail', i === visualIndex);
+            });
+
+            this.focusView.innerHTML = '';
+            const templateId = this.isSpecial ? '#tpl-carton-focus-MA820059' : '#tpl-carton-focus-standard';
+            const template = $(templateId);
+            if (template) {
+                this.focusView.appendChild(template.content.cloneNode(true));
+            }
+            this.render();
+        }
+
+        tick() {
+            if (this.state.currentSequenceIndex >= this.fillOrder.length) {
                 requestAnimationFrame(() => this.tick());
-                return;
+                return; // All done
             }
 
-            const now = Date.now();
-            const elapsedTime = now - this.state.startTime;
-            const progress = Math.min(1, elapsedTime / this.durationPerCarton);
+            const durationPerBag = (this.machineData.durationMin || 25) * 60 * 1000;
+            const elapsedTime = Date.now() - this.state.startTime;
+            let progress = Math.min(1, elapsedTime / durationPerBag);
 
-            const activeCartonVisualIndex = this.sequence[this.state.currentCartonSequenceIndex];
-            this.fills[activeCartonVisualIndex].style.height = (progress * 100) + '%';
+            const visualIndexOfActiveCarton = this.fillOrder[this.state.currentSequenceIndex];
+            const cartonState = this.state.cartonStates[visualIndexOfActiveCarton];
+
+            if (this.isSpecial) {
+                if (this.state.currentBagInCarton === 1) {
+                    cartonState.bag1 = progress;
+                } else {
+                    cartonState.bag2 = progress;
+                }
+            } else {
+                cartonState.bag1 = progress;
+            }
 
             if (progress >= 1) {
-                this.fills[activeCartonVisualIndex].classList.add('blinking-green');
-                this.state.currentCartonSequenceIndex++;
-                this.state.startTime = Date.now(); // Reset timer for the next carton
+                if (this.isSpecial && this.state.currentBagInCarton === 1) {
+                    this.state.currentBagInCarton = 2;
+                    this.state.startTime = Date.now();
+                } else {
+                    this.state.currentSequenceIndex++;
+                    this.state.currentBagInCarton = 1;
+                    this.state.startTime = Date.now();
+                    if (this.state.currentSequenceIndex < this.fillOrder.length) {
+                        this.setActiveCarton(this.state.currentSequenceIndex);
+                    }
+                }
             }
 
+            this.render();
             requestAnimationFrame(() => this.tick());
+        }
+
+        render() {
+            const visualIndexOfActiveCarton = this.fillOrder[this.state.currentSequenceIndex];
+            const cartonState = this.state.cartonStates[visualIndexOfActiveCarton];
+            const totalPieces = this.piecesPerBag;
+
+            if (this.isSpecial) {
+                const bag1Fill = this.focusView.querySelector('.carton-fill-bag1');
+                const bag2Fill = this.focusView.querySelector('.carton-fill-bag2');
+                const bag1Label = this.focusView.querySelector('.carton-fill-bag1 + .carton-label');
+                const bag2Label = this.focusView.querySelector('.carton-fill-bag2 + .carton-label');
+
+                if(bag1Fill) bag1Fill.style.height = (cartonState.bag1 * 100) + '%';
+                if(bag2Fill) bag2Fill.style.height = (cartonState.bag2 * 100) + '%';
+                if(bag1Label) bag1Label.textContent = `${Math.floor(cartonState.bag1 * totalPieces)} / ${totalPieces}`;
+                if(bag2Label) bag2Label.textContent = `${Math.floor(cartonState.bag2 * totalPieces)} / ${totalPieces}`;
+            } else {
+                const fill = this.focusView.querySelector('.carton-fill');
+                const label = this.focusView.querySelector('.carton-label');
+                if(fill) fill.style.height = (cartonState.bag1 * 100) + '%';
+                if(label) label.textContent = `${Math.floor(cartonState.bag1 * totalPieces)} / ${totalPieces}`;
+            }
+
+            // Update thumbnails
+            this.thumbnails.forEach((thumb, visualIndex) => {
+                const state = this.state.cartonStates[visualIndex];
+                const thumbFill = thumb.querySelector('.carton-fill-thumb');
+                const totalProgress = (state.bag1 + state.bag2) / this.bagsPerCarton;
+                if(thumbFill) thumbFill.style.height = (totalProgress * 100) + '%';
+            });
         }
     }
 
@@ -1375,6 +1513,66 @@
 
         newOkBtn.onclick = () => close(true);
         newCancelBtn.onclick = () => close(false);
+    }
+
+    const ContextMenuManager = (() => {
+        const menu = $('#contextMenu');
+        if (!menu) return { open: () => {} };
+        const list = $('#contextMenuList');
+        let active = false;
+
+        const close = () => {
+            menu.classList.add('hidden');
+            active = false;
+        };
+
+        const open = (e, items) => {
+            e.preventDefault();
+            e.stopPropagation();
+            list.innerHTML = '';
+            items.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'btn ghost text-left w-full hover:bg-gray-700';
+                btn.textContent = item.label;
+                btn.onclick = (evt) => {
+                    evt.stopPropagation();
+                    item.action();
+                    close();
+                };
+                list.appendChild(btn);
+            });
+
+            menu.style.left = e.pageX + 'px';
+            menu.style.top = e.pageY + 'px';
+            menu.classList.remove('hidden');
+            active = true;
+        };
+
+        document.addEventListener('click', () => {
+            if (active) close();
+        });
+
+        return { open };
+    })();
+
+    function showCustomInput(title, initialValue, callback) {
+        const modal = $('#customInputModal');
+        const titleEl = $('#customInputTitle');
+        const form = $('#customInputForm');
+        const input = $('#customInput');
+
+        titleEl.textContent = title;
+        input.value = initialValue;
+        modal.classList.remove('hidden');
+        input.focus();
+        input.select();
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            modal.classList.add('hidden');
+            callback(input.value);
+            form.onsubmit = null; // clean up listener
+        };
     }
 
     function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); }
