@@ -78,10 +78,14 @@
     /* Chat stream */
     .alerts{display:flex;flex-wrap:wrap;gap:8px}
     .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
-    @keyframes blink-red { 50% { background-color: transparent; } }
-    .blinking-red { background: #ef4444 !important; animation: blink-red 1.5s infinite; }
+    @keyframes blink-opacity { 50% { opacity: 0.2; } }
+    .pruef-bar-finished { border-color: transparent !important; }
+    .blinking-red-final { background: #ef4444 !important; animation: blink-opacity 1.5s infinite; }
     @keyframes blink-green { 50% { background-color: #22c55e80; } }
     .blinking-green { background-color: #22c55e !important; animation: blink-green 2s infinite; }
+    .prufung-type-short { border: 1px solid var(--line) !important; }
+    .prufung-type-long { border: 2px solid var(--text) !important; font-weight: bold; }
+    .next-ready-checkbox:not(:checked) { filter: grayscale(1); }
   </style>
 </head>
 <body>
@@ -177,7 +181,6 @@
         <div class="flex gap-2 flex-wrap">
           <input id="planInput" class="btn" style="flex:1" data-translate-key="placeholderPlan" placeholder="Nowy pomysł / zadanie…">
           <button id="addPlan" class="btn" data-translate-key="addPlanBtn">+ Dodaj plan</button>
-          <button id="refreshNP" class="btn ghost" data-translate-key="refreshBtn">↻ Odśwież z MySQL</button>
         </div>
         <div id="plansList" class="notes-list mt-2"></div>
       </div>
@@ -413,28 +416,59 @@
 
     // --- machines (minimal for 0.007 look)
     let activePruefung = null;
-    class Pruefung{ constructor(root){ this.root=root; this.fill=$('.pr-fill',root); this.label=$('.pr-label',root); this.buttons=$$('.pr-buttons button',root); this.reset=$('.pr-reset',root); this.bar=$('.pr-bar', root);
-        this.total=3600; this.start=Date.now(); this.prufungType = 'short'; this.bind(); this.tick(); }
+    class Pruefung{
+      constructor(root){
+        this.root=root;
+        this.fill=$('.pr-fill',root);
+        this.label=$('.pr-label',root);
+        this.buttons=$$('.pr-buttons button',root);
+        this.reset=$('.pr-reset',root);
+        this.bar=$('.pr-bar', root);
+        this.customButton = this.buttons.find(b => b.dataset.time === 'custom');
+
+        this.total=3600;
+        this.start=Date.now();
+        this.prufungType = 'short';
+
+        this.bind();
+        this.updateCustomButtonBorder();
+        this.tick();
+      }
+
+      updateCustomButtonBorder() {
+        this.customButton.classList.remove('prufung-type-short', 'prufung-type-long');
+        this.customButton.classList.add(this.prufungType === 'short' ? 'prufung-type-short' : 'prufung-type-long');
+      }
+
+      togglePrufungType() {
+        this.prufungType = this.prufungType === 'short' ? 'long' : 'short';
+        this.customButton.textContent = this.prufungType === 'short' ? 'Short' : 'Long';
+        this.updateCustomButtonBorder();
+      }
+
       bind(){
         this.buttons.forEach(btn => {
             const v = btn.dataset.time;
             if (v === 'custom') {
                 btn.textContent = 'Short';
-                btn.addEventListener('click', () => {
-                    this.prufungType = this.prufungType === 'short' ? 'long' : 'short';
-                    btn.textContent = this.prufungType === 'short' ? 'Short' : 'Long';
-                    // Potentially apply a time setting here based on type
-                });
+                btn.addEventListener('click', () => this.togglePrufungType());
             } else {
                 btn.addEventListener('click', () => {
                     this.buttons.forEach(b => b.classList.remove('primary'));
                     btn.classList.add('primary');
                     this.total = parseInt(v, 10);
                     this.start = Date.now();
+                    this.togglePrufungType();
                 });
             }
         });
-        this.reset.addEventListener('click',()=>{ this.start=Date.now(); this.buttons.forEach(b => b.classList.remove('primary')); });
+
+        this.reset.addEventListener('click', () => {
+            this.start=Date.now();
+            this.buttons.forEach(b => b.classList.remove('primary'));
+            this.togglePrufungType();
+        });
+
         this.bar.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             activePruefung = this;
@@ -442,11 +476,14 @@
             $('#customTimeInput').focus();
         });
       }
+
       setTime(minutes) {
         this.total = Math.max(60, (parseInt(minutes, 10) || 0) * 60);
         this.start = Date.now();
         this.buttons.forEach(b => b.classList.remove('primary'));
+        this.togglePrufungType();
       }
+
       tick(){
         const el = Math.min(this.total, Math.floor((Date.now()-this.start)/1000));
         const left = this.total-el;
@@ -454,20 +491,21 @@
 
         this.fill.style.width = (pct * 100) + '%';
 
-        // Blinking
         if (left <= 0) {
-            if (!this.fill.classList.contains('blinking-red')) {
-                this.fill.style.background = ''; // remove gradient to allow class background to take over
-                this.fill.classList.add('blinking-red');
+            if (!this.bar.classList.contains('pruef-bar-finished')) {
+                this.bar.classList.add('pruef-bar-finished');
+                this.fill.classList.remove('blinking-red-final'); // remove old animation class
+                this.fill.classList.add('blinking-red-final'); // add new one
+                this.label.style.display = 'none';
             }
         } else {
-            // Dynamic color
-            const hue = 120 * (1 - pct); // 120 (green) -> 0 (red)
-            this.fill.style.background = `linear-gradient(90deg, hsl(${hue}, 80%, 50%), hsl(${hue}, 80%, 65%))`;
-            // Remove blinking class if reset
-            if (this.fill.classList.contains('blinking-red')) {
-                this.fill.classList.remove('blinking-red');
+            if (this.bar.classList.contains('pruef-bar-finished')) {
+                this.bar.classList.remove('pruef-bar-finished');
+                this.fill.classList.remove('blinking-red-final');
+                this.label.style.display = 'flex';
             }
+            const hue = 120 * (1 - pct);
+            this.fill.style.background = `linear-gradient(90deg, hsl(${hue}, 80%, 50%), hsl(${hue}, 80%, 65%))`;
         }
 
         const mm = String(Math.floor(left/60)).padStart(2,'0'), ss = String(left%60).padStart(2,'0');
@@ -938,7 +976,7 @@
 
     // --- init buttons
     function initNotesPlans(){
-      $('#addNote').onclick=async()=>{
+      const addNoteAction = async () => {
         const v=$('#noteInput').value.trim(); if(!v) return;
         let status='FINAL';
         if(isAdmin()){
@@ -954,13 +992,29 @@
         NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v, status});
         $('#noteInput').value=''; await saveNotes(); renderNotes();
       };
+
+      $('#addNote').onclick = addNoteAction;
+      $('#noteInput').addEventListener('keyup', (e) => {
+          if (e.key === 'Enter') {
+              addNoteAction();
+          }
+      });
+
       $('#addPlan').onclick=async()=>{
         const v=$('#planInput').value.trim(); if(!v) return;
         PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v});
         $('#planInput').value=''; await savePlans(); renderPlans();
       };
+
       $('#refreshNP').onclick=async()=>{ await loadNotes(); await loadPlans(); };
-      loadNotes(); loadPlans();
+
+      loadNotes();
+      loadPlans();
+
+      setInterval(() => {
+        loadNotes();
+        loadPlans();
+      }, 30000);
     }
 
     // --- machines render
@@ -1136,23 +1190,53 @@
         });
     }
 
+    // Clean up expired snoozes on load
+    try {
+        const snoozed = JSON.parse(localStorage.getItem('KN007_SNOOZED') || '{}');
+        const now = Date.now();
+        for (const id in snoozed) {
+            if (snoozed[id] < now) {
+                delete snoozed[id];
+            }
+        }
+        localStorage.setItem('KN007_SNOOZED', JSON.stringify(snoozed));
+    } catch(e) { console.error("Failed to clean snoozed notifications", e); }
+
+
     const activeNotifications = {};
     function showUrgentNotification(id, message, level) {
-        const container = $('#urgent-notifications');
-        const existing = $(`#notification-${id}`, container);
-        const newClass = level === 'danger' ? 'bg-red-800/90' : 'bg-orange-500/90';
-        if (existing) {
-            if (!existing.classList.contains(newClass)) {
-                existing.className = `alert ${newClass} transition-all`;
-                existing.innerHTML = `<strong>PILNE:</strong> ${message}`;
-            }
-            return;
+        const snoozed = JSON.parse(localStorage.getItem('KN007_SNOOZED') || '{}');
+        if (snoozed[id] && snoozed[id] > Date.now()) {
+            return; // It's snoozed, do not show
         }
+        if (activeNotifications[id]) return; // Already visible
+
+        const container = $('#urgent-notifications');
+        const newClass = level === 'danger' ? 'bg-red-800/90' : 'bg-orange-500/90';
+
         const el = document.createElement('div');
         el.id = `notification-${id}`;
-        el.className = `alert ${newClass} cursor-pointer`;
-        el.innerHTML = `<strong>PILNE:</strong> ${message}`;
-        el.onclick = () => hideUrgentNotification(id);
+        el.className = `alert ${newClass} flex items-center justify-between w-full`;
+        el.innerHTML = `<div class="flex-grow cursor-pointer"><strong>PILNE:</strong> ${message}</div>
+                        <div class="flex items-center gap-2 pl-4 border-l border-white/30">
+                            <label for="next-ready-${id}" class="text-xs">Następny gotowy?</label>
+                            <input type="checkbox" id="next-ready-${id}" class="next-ready-checkbox h-5 w-5" data-machine-code="${id}">
+                        </div>`;
+
+        el.querySelector('.flex-grow').onclick = () => hideUrgentNotification(id);
+
+        const checkbox = el.querySelector('.next-ready-checkbox');
+        const order = CFG.orders[id] || {};
+        checkbox.checked = !!order.nextReady;
+        checkbox.addEventListener('change', (e) => {
+            const machineCode = e.target.dataset.machineCode;
+            const isChecked = e.target.checked;
+            if (!CFG.orders[machineCode]) CFG.orders[machineCode] = genOrder();
+            CFG.orders[machineCode].nextReady = isChecked;
+            persist();
+            setStatus(`Zapisano status gotowości dla ${machineCode}`);
+        });
+
         container.appendChild(el);
         activeNotifications[id] = el;
     }
@@ -1161,6 +1245,9 @@
             activeNotifications[id].remove();
             delete activeNotifications[id];
         }
+        const snoozed = JSON.parse(localStorage.getItem('KN007_SNOOZED') || '{}');
+        snoozed[id] = Date.now() + 30 * 60 * 1000; // Snooze for 30 mins
+        localStorage.setItem('KN007_SNOOZED', JSON.stringify(snoozed));
     }
 
     function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
