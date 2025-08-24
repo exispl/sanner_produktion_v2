@@ -24,7 +24,7 @@
     body{margin:0;background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);font:17px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif; transition: background .3s, color .3s;}
     .wrap{max-width:1200px;margin:auto;padding:12px 16px}
     .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-    .head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+    .head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
     .body{padding:10px 14px}
     .badge{font-size:12px;color:#cbd5e1;background:#0b1220;padding:4px 8px;border-radius:999px;border:1px solid var(--line)}
     .btn{border:1px solid var(--line);background:#0b1220;color:var(--text);padding:6px 10px;border-radius:10px;cursor:pointer}
@@ -42,9 +42,7 @@
     .pruef{margin-top:10px}
     .pr-head{display:flex;gap:8px;align-items:center;margin-bottom:6px}
     .pr-head select.pr-select{background:var(--panel2);border:1px solid var(--line);color:var(--yellow);padding:8px 10px;border-radius:10px}
-    body[data-theme="light"] .model-color-dot { border-color: #cbd5e1 !important; }
-    .pr-bar{position:relative;height:36px;border:1px solid var(--line);border-radius:14px;background:#0b1220;overflow:hidden}
-    .pr-buttons button { font-size: 0.7rem; }
+    .pr-bar{position:relative;height:68px;border:1px solid var(--line);border-radius:14px;background:#0b1220;overflow:hidden}
     .pr-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,#22c55e,#84cc16);transition:width .5s linear}
     .pr-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.3px}
     .pr-reset{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:4px 8px;cursor:pointer}
@@ -59,12 +57,6 @@
     .tag{display:inline-block;margin-left:6px;font-size:12px;padding:2px 6px;border-radius:999px;border:1px solid #3b4760}
     .tag.draft{color:#eab308;border-color:#a16207;background:#2a2208}
     .role-badge{font-size:12px;padding:3px 8px;border-radius:999px;font-weight:600;border:1px solid transparent}
-    .carton-box-large, .carton-box-thumb { position: relative; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel2); }
-    .carton-fill, .carton-fill-thumb, .carton-fill-bag1, .carton-fill-bag2 { position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 0%; background-color: var(--accent); transition: height 0.5s linear; }
-    .carton-label, .carton-label-thumb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-    .carton-label { font-size: 20px; }
-    .carton-label-thumb { font-size: 10px; }
-    .carton-thumbnails .blinking-thumbnail { animation: blink-green 2s infinite; box-shadow: 0 0 8px 2px #22c55e80; }
     .role-senior-dev{color:white;background-color:#3b82f6}
     .role-teamleiter{color:white;background-color:#ec4899}
     .role-einrichter{color:white;background-color:#f97316}
@@ -81,19 +73,11 @@
     /* Chat stream */
     .alerts{display:flex;flex-wrap:wrap;gap:8px}
     .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
-    @keyframes blink-opacity { 50% { opacity: 0.2; } }
-    .pruef-bar-finished { border-color: transparent !important; }
-    .blinking-red-final { background: #ef4444 !important; animation: blink-opacity 1.5s infinite; }
-    @keyframes blink-green { 50% { background-color: #22c55e80; } }
-    .blinking-green { background-color: #22c55e !important; animation: blink-green 2s infinite; }
-    .prufung-type-short { border: 1px solid var(--line) !important; }
-    .prufung-type-long { border: 2px solid var(--text) !important; font-weight: bold; padding-left: 1rem !important; padding-right: 1rem !important; }
-    .next-ready-checkbox:not(:checked) { filter: grayscale(1); }
   </style>
 </head>
 <body>
+  <div id="urgent-notifications" class="fixed top-0 left-1/2 -translate-x-1/2 z-30 p-4 space-y-2 w-full max-w-2xl"></div>
   <header class="wrap">
-    <div id="urgent-notifications" class="space-y-2 mb-3"></div>
     <div class="panel">
       <div class="head">
         <div class="flex items-center gap-4">
@@ -110,25 +94,26 @@
             <select id="loginSelect" class="btn"></select>
 
             <div class="user-info-popup">
-            <div class="panel">
-              <div class="body user-info-popup-grid">
-                <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
-                <div>
-                  <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
-                  <p id="popupUserRole" class="text-sm"></p>
-                  <p class="text-xs mt-2">Ostatnio zalogowany: <span id="popupLastLogin">teraz</span></p>
+              <div class="panel">
+                <div class="body user-info-popup-grid">
+                  <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
+                  <div>
+                    <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
+                    <p id="popupUserRole" class="text-sm"></p>
+                    <p class="text-xs mt-2">Ostatnio zalogowany: <span id="popupLastLogin">teraz</span></p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="flex items-center gap-4">
-            <div id="langSwitcher" class="flex gap-2">
-              <button class="btn ghost text-xl" data-lang="pl" title="Polski">🇵🇱</button>
-              <button class="btn ghost text-xl" data-lang="en" title="English">🇬🇧</button>
-              <button class="btn ghost text-xl" data-lang="tr" title="Türkçe">🇹🇷</button>
-              <button class="btn ghost text-xl" data-lang="de" title="Deutsch">🇩🇪</button>
-              <button class="btn ghost text-xl" data-lang="ar" title="العربية">🇸🇦</button>
+            <div id="langSwitcher" class="flex gap-1">
+              <button class="btn ghost text-xs" data-lang="pl">PL</button>
+              <button class="btn ghost text-xs" data-lang="en">EN</button>
+              <button class="btn ghost text-xs" data-lang="tr">TR</button>
+              <button class="btn ghost text-xs" data-lang="de">DE</button>
+              <button class="btn ghost text-xs" data-lang="ar">AR</button>
             </div>
             <div id="themeSwitcher" class="flex items-center gap-2">
               <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
@@ -136,7 +121,7 @@
               <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0c1424" data-theme="blue" title="Blue Theme"></button>
               <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #052e16" data-theme="green" title="Green Theme"></button>
             </div>
-            <button id="settingsBtn" class="btn ghost text-2xl">⚙️</button>
+            <div class="badge">v0.007r</div>
         </div>
       </div>
       <div class="body">
@@ -150,6 +135,29 @@
   <main class="wrap">
     <section id="machines" class="machines"></section>
 
+    <div id="userDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
+      <div class="panel w-full max-w-md">
+        <div class="head">
+          <h2 class="m-0">Uzupełnij swoje dane</h2>
+        </div>
+        <div class="body">
+          <form id="userDetailsForm" class="flex flex-col gap-4">
+            <p>To jest Twoje pierwsze logowanie. Prosimy o uzupełnienie danych. Pola są opcjonalne.</p>
+            <input type="text" id="detailsName" name="name" class="btn" placeholder="Imię i nazwisko">
+            <input type="text" id="detailsDob" name="dob" class="btn" placeholder="Data urodzenia (DD.MM.RRRR)">
+            <select id="detailsLang" name="lang" class="btn">
+              <option value="pl">Polski</option>
+              <option value="en">English</option>
+              <option value="tr">Türkçe</option>
+              <option value="de">Deutsch</option>
+              <option value="ar">العربية</option>
+            </select>
+            <button type="submit" class="btn primary">Zapisz i kontynuuj</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <div id="newUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
       <div class="panel w-full max-w-md">
         <div class="head">
@@ -158,8 +166,8 @@
         </div>
         <div class="body">
           <form id="newUserForm" class="flex flex-col gap-4">
-            <input type="text" id="newLogin" name="login" class="btn" data-translate-key="placeholderLogin" placeholder="Login (np. SoGxxxx, LK12, 1234)" required pattern="^(SoG[0-9]{4}|LK[0-9]{2}|[0-9]{2}|[0-9]{4})$">
-            <input type="password" id="newPassword" name="password" class="btn" data-translate-key="placeholderPassword" placeholder="Hasło (opcjonalne)">
+            <input type="text" id="newLogin" name="login" class="btn" data-translate-key="placeholderLogin" placeholder="Login (np. SoGxxxx lub LK12)" required pattern="^(SoG[0-9]{4}|LK[0-9]{2})$">
+            <input type="password" id="newPassword" name="password" class="btn" data-translate-key="placeholderPassword" placeholder="Hasło" required>
             <input type="text" id="newName" name="name" class="btn" data-translate-key="placeholderName" placeholder="Imię i nazwisko" required>
             <button type="submit" class="btn primary" data-translate-key="createUserBtn">Stwórz użytkownika</button>
           </form>
@@ -184,34 +192,12 @@
         <div class="flex gap-2 flex-wrap">
           <input id="planInput" class="btn" style="flex:1" data-translate-key="placeholderPlan" placeholder="Nowy pomysł / zadanie…">
           <button id="addPlan" class="btn" data-translate-key="addPlanBtn">+ Dodaj plan</button>
+          <button id="refreshNP" class="btn ghost" data-translate-key="refreshBtn">↻ Odśwież z MySQL</button>
         </div>
         <div id="plansList" class="notes-list mt-2"></div>
       </div>
     </section>
   </main>
-
-  <div id="userDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
-    <div class="panel w-full max-w-md">
-      <div class="head">
-        <h2 class="m-0">Uzupełnij swoje dane</h2>
-      </div>
-      <div class="body">
-        <form id="userDetailsForm" class="flex flex-col gap-4">
-          <p>To jest Twoje pierwsze logowanie. Prosimy o uzupełnienie danych. Pola są opcjonalne.</p>
-          <input type="text" id="detailsName" name="name" class="btn" placeholder="Imię i nazwisko">
-          <input type="text" id="detailsDob" name="dob" class="btn" placeholder="Data urodzenia (DD.MM.RRRR)">
-          <select id="detailsLang" name="lang" class="btn">
-            <option value="pl">Polski</option>
-            <option value="en">English</option>
-            <option value="tr">Türkçe</option>
-            <option value="de">Deutsch</option>
-            <option value="ar">العربية</option>
-          </select>
-          <button type="submit" class="btn primary">Zapisz i kontynuuj</button>
-        </form>
-      </div>
-    </div>
-  </div>
 
   <div id="colorPicker" class="hidden absolute panel p-2 z-20">
     <div class="grid grid-cols-4 gap-2">
@@ -245,40 +231,6 @@
     </div>
   </div>
 
-  <div id="machineSelector" class="hidden absolute panel p-2 z-40">
-    <div id="machineSelectorList" class="flex flex-col gap-1 max-h-80 overflow-y-auto">
-      <!-- DYNAMIC CONTENT -->
-    </div>
-  </div>
-
-  <div id="contextMenu" class="hidden absolute panel p-1 z-50 w-48">
-    <div id="contextMenuList" class="flex flex-col gap-1"></div>
-  </div>
-
-  <div id="customInputModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-    <div class="panel w-full max-w-xs">
-      <div class="head"><h2 id="customInputTitle" class="m-0">Wprowadź wartość</h2></div>
-      <div class="body">
-        <form id="customInputForm" class="flex flex-col gap-4">
-          <input type="text" id="customInput" class="btn text-center text-lg" required>
-          <button type="submit" class="btn primary">Zatwierdź</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div id="customConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-    <div class="panel w-full max-w-sm">
-      <div class="body space-y-4">
-        <p id="customConfirmMessage" class="text-center">Czy na pewno chcesz to zrobić?</p>
-        <div class="flex justify-center gap-4">
-          <button id="customConfirmCancel" class="btn">Anuluj</button>
-          <button id="customConfirmOk" class="btn primary">OK</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <footer class="wrap" id="adminFooter" style="display: none;">
     <div class="panel mt-3">
       <div class="head">
@@ -294,80 +246,57 @@
     </div>
   </footer>
 
-  <template id="tpl-carton-focus-standard">
-    <div class="carton-box-large h-full">
-        <div class="carton-fill"></div>
-        <div class="carton-label"></div>
-    </div>
-  </template>
-  <template id="tpl-carton-focus-MA820059">
-    <div class="h-full flex gap-1">
-        <div class="w-1/2 h-full carton-box-large">
-            <div class="carton-fill-bag1"></div>
-            <div class="carton-label"></div>
-        </div>
-        <div class="w-1/2 h-full carton-box-large">
-            <div class="carton-fill-bag2"></div>
-            <div class="carton-label"></div>
-        </div>
-    </div>
-  </template>
-
   <template id="tpl-machine">
     <article class="panel machine">
       <div class="head">
-        <div class="title"><span>🤖</span><button class="code-btn btn ghost text-2xl"></button></div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm opacity-70">Przewidywany czas do końca:</span>
-          <div class="completion-badge role-badge bg-gray-500 text-white text-sm">--:--</div>
-          <button class="btn ghost settings-toggle">⚙️</button>
-        </div>
+        <div class="title"><span>🤖</span><h2 class="code"></h2></div>
+        <button class="btn ghost settings-toggle">⚙️</button>
       </div>
       <div class="body">
         <div class="meta text-sm space-y-2">
-          <div class="grid grid-cols-2 gap-2">
-            <div class="border border-white/10 rounded-lg p-2">
-              <span data-translate-key="auftrag">Auftrag:</span>
-              <strong class="auf-val block font-bold text-base">—</strong>
-            </div>
-            <div class="border border-white/10 rounded-lg p-2">
-              <span data-translate-key="nextAuftrag">Następny Auftrag:</span>
-              <strong class="nextauf-val block font-bold text-base">—</strong>
+          <div class="border border-white/10 rounded-lg p-2">
+            <div class="flex justify-between">
+              <div class="flex gap-2">
+                <span data-translate-key="auftrag">Auftrag:</span>
+                <strong class="auf-val">—</strong>
+              </div>
+              <div class="flex gap-2">
+                <span data-translate-key="nextAuftrag">Następny Auftrag:</span>
+                <span class="nextauf-val">—</span>
+              </div>
             </div>
           </div>
-          <div class="border border-white/10 rounded-lg p-2">
-            <div class="flex items-center gap-2">
-                <span data-translate-key="model">Model:</span>
-                <strong class="mdl-val font-bold text-base">—</strong>
-                <span class="w-7 h-8 rounded-md bg-white/50 border-2 border-white/20 model-color-dot ml-auto" title="Zmień kolor"></span>
-            </div>
+          <div class="flex gap-2 items-center px-2">
+            <span data-translate-key="model">Model:</span>
+            <strong class="mdl-val">—</strong>
+            <span class="w-4 h-4 rounded-full bg-white/50 border border-white/20 model-color-dot" title="Zmień kolor"></span>
           </div>
           <div class="border border-white/10 rounded-lg p-2">
             <span data-translate-key="period">Okres:</span>
-            <strong class="period-val block font-bold">—</strong>
+            <span class="period-val">—</span>
           </div>
         </div>
 
-        <div class="carton-progress-container flex gap-4 mt-3">
-          <div class="carton-focus-view flex-grow h-48"></div>
-          <div class="carton-thumbnails flex flex-col gap-1.5 w-24">
-            <div class="carton-box-thumb h-1/4" data-carton-id="1"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#1</div></div>
-            <div class="carton-box-thumb h-1/4" data-carton-id="2"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#2</div></div>
-            <div class="carton-box-thumb h-1/4" data-carton-id="3"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#3</div></div>
-            <div class="carton-box-thumb h-1/4" data-carton-id="4"><div class="carton-fill-thumb"></div><div class="carton-label-thumb">#4</div></div>
-          </div>
+        <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
+
+        <div class="flex justify-between items-center mt-2 text-sm">
+          <div data-translate-key="timeToComplete">Do ukończenia:</div>
+          <div class="font-bold text-lg completion-time">--:--</div>
+          <div class="completion-warning text-red-500 font-bold text-xl hidden">!</div>
         </div>
 
         <div class="pruef">
-          <div class="pr-bar">
-            <div class="pr-fill"></div><div class="pr-label">60:00</div>
-            <div class="pr-buttons absolute right-[85px] top-1/2 -translate-y-1/2 flex gap-1">
-              <button class="btn ghost !p-1 text-xs" data-time="3600">1H</button>
-              <button class="btn ghost !p-1 text-xs" data-time="7200">2H</button>
-              <button class="btn ghost !p-1 text-xs" data-time="10800">3H</button>
-              <button class="btn ghost !p-1 text-xs" data-time="custom" data-translate-key="customTime">WŁASNY</button>
+          <div class="pr-head">
+            <span data-translate-key="pruefungTime">🧪 Prüfung — czas:</span>
+            <div class="pr-buttons flex gap-2">
+              <button class="btn ghost" data-time="3600">1H</button>
+              <button class="btn ghost" data-time="7200">2H</button>
+              <button class="btn ghost" data-time="10800">3H</button>
+              <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
             </div>
-            <div class="pr-reset">Reset</div>
+          </div>
+          <div class="pr-bar">
+            <div class="pr-fill"></div><div class="pr-label">60:00</div><div class="pr-reset">Reset</div>
           </div>
         </div>
 
@@ -378,12 +307,8 @@
             <input type="text" class="setting-input btn text-sm" data-source="order" data-key="model">
             <label>Czas (min):</label>
             <input type="number" class="setting-input btn text-sm w-24" data-source="machine" data-key="durationMin">
-            <label>Czas ukończenia:</label>
-            <input type="text" class="setting-input btn text-sm" data-source="machine" data-key="completionTimestamp" placeholder="YYYY-MM-DD HH:MM:SS">
-            <label>Następny gotowy:</label>
-            <input type="checkbox" class="setting-input h-5 w-5" data-source="order" data-key="nextReady">
           </div>
-           <small class="text-xs opacity-60">Wciśnij ENTER (lub zmień pole), aby zapisać.</small>
+           <small class="text-xs opacity-60">Wciśnij ENTER, aby zapisać.</small>
         </div>
 
       </div>
@@ -453,13 +378,8 @@
         { code:'MA820062',  durationMin:22, pruef:3600 },
         { code:'MA820063', durationMin:25, pruef:3600 },
         { code:'MA820064', durationMin:25, pruef:3600 },
-        { code:'MA820051', durationMin:25, pruef:3600, color: '#ffffff' },
-        { code:'MA820054', durationMin:25, pruef:3600, color: '#ffffff' },
       ],
-      orders:{
-        'MA820051': { model: 'DASG-1 (201044)' },
-        'MA820054': { model: 'DASG-1 (201044)' }
-      },
+      orders:{},
     };
     let CFG=JSON.parse(localStorage.getItem('KN007_CFG')||'null')||DEFAULTS;
     // ensure USERS is up to date
@@ -476,59 +396,24 @@
 
     // --- machines (minimal for 0.007 look)
     let activePruefung = null;
-    class Pruefung{
-      constructor(root){
-        this.root=root;
-        this.fill=$('.pr-fill',root);
-        this.label=$('.pr-label',root);
-        this.buttons=$$('.pr-buttons button',root);
-        this.reset=$('.pr-reset',root);
-        this.bar=$('.pr-bar', root);
-        this.customButton = this.buttons.find(b => b.dataset.time === 'custom');
-
-        this.total=3600;
-        this.start=Date.now();
-        this.prufungType = 'short';
-
-        this.bind();
-        this.updateCustomButtonBorder();
-        this.tick();
-      }
-
-      updateCustomButtonBorder() {
-        this.customButton.classList.remove('prufung-type-short', 'prufung-type-long');
-        this.customButton.classList.add(this.prufungType === 'short' ? 'prufung-type-short' : 'prufung-type-long');
-      }
-
-      togglePrufungType() {
-        this.prufungType = this.prufungType === 'short' ? 'long' : 'short';
-        this.customButton.textContent = this.prufungType === 'short' ? 'Short' : 'Long 📏';
-        this.updateCustomButtonBorder();
-      }
-
+    class Pruefung{ constructor(root){ this.root=root; this.fill=$('.pr-fill',root); this.label=$('.pr-label',root); this.buttons=$$('.pr-buttons button',root); this.reset=$('.pr-reset',root); this.bar=$('.pr-bar', root);
+        this.total=3600; this.start=Date.now(); this.bind(); this.tick(); }
       bind(){
         this.buttons.forEach(btn => {
-            const v = btn.dataset.time;
-            if (v === 'custom') {
-                btn.textContent = 'Short';
-                btn.addEventListener('click', () => this.togglePrufungType());
-            } else {
-                btn.addEventListener('click', () => {
-                    this.buttons.forEach(b => b.classList.remove('primary'));
-                    btn.classList.add('primary');
+            btn.addEventListener('click', () => {
+                this.buttons.forEach(b => b.classList.remove('primary'));
+                btn.classList.add('primary');
+                const v = btn.dataset.time;
+                if (v === 'custom') {
+                    const m = prompt('Wpisz czas w minutach:', '60');
+                    this.setTime(m);
+                } else {
                     this.total = parseInt(v, 10);
                     this.start = Date.now();
-                    this.togglePrufungType();
-                });
-            }
+                }
+            });
         });
-
-        this.reset.addEventListener('click', () => {
-            this.start=Date.now();
-            this.buttons.forEach(b => b.classList.remove('primary'));
-            this.togglePrufungType();
-        });
-
+        this.reset.addEventListener('click',()=>{ this.start=Date.now(); this.buttons.forEach(b => b.classList.remove('primary')); });
         this.bar.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             activePruefung = this;
@@ -536,283 +421,21 @@
             $('#customTimeInput').focus();
         });
       }
-
       setTime(minutes) {
         this.total = Math.max(60, (parseInt(minutes, 10) || 0) * 60);
         this.start = Date.now();
         this.buttons.forEach(b => b.classList.remove('primary'));
-        this.togglePrufungType();
       }
-
-      tick(){
-        const el = Math.min(this.total, Math.floor((Date.now()-this.start)/1000));
-        const left = this.total-el;
-        const pct = this.total > 0 ? (el / this.total) : 0;
-
-        this.fill.style.width = (pct * 100) + '%';
-
-        if (left <= 0) {
-            if (!this.bar.classList.contains('pruef-bar-finished')) {
-                this.bar.classList.add('pruef-bar-finished');
-                this.fill.classList.remove('blinking-red-final'); // remove old animation class
-                this.fill.classList.add('blinking-red-final'); // add new one
-                this.label.style.display = 'none';
-            }
-        } else {
-            if (this.bar.classList.contains('pruef-bar-finished')) {
-                this.bar.classList.remove('pruef-bar-finished');
-                this.fill.classList.remove('blinking-red-final');
-                this.label.style.display = 'flex';
-            }
-            const hue = 120 * (1 - pct);
-            this.fill.style.background = `linear-gradient(90deg, hsl(${hue}, 80%, 50%), hsl(${hue}, 80%, 65%))`;
-        }
-
-        const mm = String(Math.floor(left/60)).padStart(2,'0'), ss = String(left%60).padStart(2,'0');
-        this.label.textContent = `${mm}:${ss}`;
-
-        requestAnimationFrame(()=>this.tick());
-      }
+      tick(){ const el=Math.min(this.total, Math.floor((Date.now()-this.start)/1000)); const left=this.total-el; const pct=this.total > 0 ? Math.floor(el/this.total*100) : 0;
+        this.fill.style.width=pct+'%'; const mm=String(Math.floor(left/60)).padStart(2,'0'), ss=String(left%60).padStart(2,'0'); this.label.textContent=`${mm}:${ss}`;
+        requestAnimationFrame(()=>this.tick()); }
     }
-
-    class CartonProgress {
-        constructor(container, machineData, orderData) {
-            this.container = container;
-            this.focusView = $('.carton-focus-view', container);
-            this.thumbnails = $$('.carton-box-thumb', container);
-            this.machineData = machineData;
-
-            this.isSpecial = machineData.code === 'MA820059';
-            this.bagsPerCarton = this.isSpecial ? 2 : 1;
-            this.piecesPerBag = 3000; // TODO: make this configurable
-
-            this.fillOrder = [0, 3, 1, 2]; // Logical fill order: 1 -> 4 -> 2 -> 3
-
-            this.state = {
-                currentSequenceIndex: 0, // index in fillOrder
-                currentBagInCarton: 1, // 1 or 2
-                startTime: Date.now(),
-                cartonStates: [ {bag1:0, bag2:0}, {bag1:0, bag2:0}, {bag1:0, bag2:0}, {bag1:0, bag2:0} ]
-            };
-
-            this.init();
-            this.bindEvents();
-            this.tick();
-        }
-
-        init() {
-            this.setActiveCarton(this.state.currentSequenceIndex);
-        }
-
-        bindEvents() {
-            this.thumbnails.forEach((thumb, visualIndex) => {
-                thumb.addEventListener('contextmenu', (e) => {
-                    const items = [
-                        { label: 'Resetuj', action: () => this.resetCarton(visualIndex) },
-                        { label: 'Ustaw liczbę sztuk', action: () => this.setPieces(visualIndex) },
-                        { label: 'Zacznij od tego', action: () => this.startFrom(visualIndex) }
-                    ];
-                    ContextMenuManager.open(e, items);
-                });
-            });
-        }
-
-        resetCarton(visualIndex) {
-            this.state.cartonStates[visualIndex] = { bag1: 0, bag2: 0 };
-            if (this.fillOrder[this.state.currentSequenceIndex] === visualIndex) {
-                this.state.startTime = Date.now();
-                this.state.currentBagInCarton = 1;
-            }
-            this.render();
-        }
-
-        setPieces(visualIndex) {
-            const cartonState = this.state.cartonStates[visualIndex];
-            const currentPieces = Math.floor((cartonState.bag1 + cartonState.bag2) * this.piecesPerBag);
-
-            showCustomInput(`Ustaw sztuki dla kartonu #${visualIndex + 1}`, currentPieces, (newValue) => {
-                const pieces = parseInt(newValue, 10);
-                if (isNaN(pieces) || pieces < 0) return;
-
-                const totalPossiblePieces = this.piecesPerBag * this.bagsPerCarton;
-                const progress = Math.min(1, pieces / totalPossiblePieces);
-
-                this.state.cartonStates[visualIndex].bag1 = Math.min(1, progress * this.bagsPerCarton);
-                this.state.cartonStates[visualIndex].bag2 = this.isSpecial ? Math.max(0, (progress * this.bagsPerCarton) - 1) : 0;
-
-                if (this.fillOrder[this.state.currentSequenceIndex] === visualIndex) {
-                    const totalDurationForCarton = (this.machineData.durationMin * 60 * 1000) * this.bagsPerCarton;
-                    const newElapsedTime = totalDurationForCarton * progress;
-                    this.state.startTime = Date.now() - newElapsedTime;
-                }
-                this.render();
-            });
-        }
-
-        startFrom(visualIndex) {
-            const newSequenceIndex = this.fillOrder.indexOf(visualIndex);
-            if (newSequenceIndex !== -1) {
-                this.state.currentSequenceIndex = newSequenceIndex;
-                this.state.currentBagInCarton = 1;
-                this.state.startTime = Date.now();
-
-                for (let i = newSequenceIndex; i < this.fillOrder.length; i++) {
-                    const idxToReset = this.fillOrder[i];
-                    this.state.cartonStates[idxToReset] = { bag1: 0, bag2: 0 };
-                }
-                this.setActiveCarton(newSequenceIndex);
-            }
-        }
-
-        setActiveCarton(sequenceIndex) {
-            const visualIndex = this.fillOrder[sequenceIndex];
-
-            this.thumbnails.forEach((thumb, i) => {
-                thumb.classList.toggle('blinking-thumbnail', i === visualIndex);
-            });
-
-            this.focusView.innerHTML = '';
-            const templateId = this.isSpecial ? '#tpl-carton-focus-MA820059' : '#tpl-carton-focus-standard';
-            const template = $(templateId);
-            if (template) {
-                this.focusView.appendChild(template.content.cloneNode(true));
-            }
-            this.render();
-        }
-
-        tick() {
-            if (this.state.currentSequenceIndex >= this.fillOrder.length) {
-                requestAnimationFrame(() => this.tick());
-                return; // All done
-            }
-
-            const durationPerBag = (this.machineData.durationMin || 25) * 60 * 1000;
-            const elapsedTime = Date.now() - this.state.startTime;
-            let progress = Math.min(1, elapsedTime / durationPerBag);
-
-            const visualIndexOfActiveCarton = this.fillOrder[this.state.currentSequenceIndex];
-            const cartonState = this.state.cartonStates[visualIndexOfActiveCarton];
-
-            if (this.isSpecial) {
-                if (this.state.currentBagInCarton === 1) {
-                    cartonState.bag1 = progress;
-                } else {
-                    cartonState.bag2 = progress;
-                }
-            } else {
-                cartonState.bag1 = progress;
-            }
-
-            if (progress >= 1) {
-                if (this.isSpecial && this.state.currentBagInCarton === 1) {
-                    this.state.currentBagInCarton = 2;
-                    this.state.startTime = Date.now();
-                } else {
-                    this.state.currentSequenceIndex++;
-                    this.state.currentBagInCarton = 1;
-                    this.state.startTime = Date.now();
-                    if (this.state.currentSequenceIndex < this.fillOrder.length) {
-                        this.setActiveCarton(this.state.currentSequenceIndex);
-                    }
-                }
-            }
-
-            this.render();
-            requestAnimationFrame(() => this.tick());
-        }
-
-        render() {
-            const visualIndexOfActiveCarton = this.fillOrder[this.state.currentSequenceIndex];
-            const cartonState = this.state.cartonStates[visualIndexOfActiveCarton];
-            const totalPieces = this.piecesPerBag;
-
-            if (this.isSpecial) {
-                const bag1Fill = this.focusView.querySelector('.carton-fill-bag1');
-                const bag2Fill = this.focusView.querySelector('.carton-fill-bag2');
-                const bag1Label = this.focusView.querySelector('.carton-fill-bag1 + .carton-label');
-                const bag2Label = this.focusView.querySelector('.carton-fill-bag2 + .carton-label');
-
-                if(bag1Fill) bag1Fill.style.height = (cartonState.bag1 * 100) + '%';
-                if(bag2Fill) bag2Fill.style.height = (cartonState.bag2 * 100) + '%';
-                if(bag1Label) bag1Label.textContent = `${Math.floor(cartonState.bag1 * totalPieces)} / ${totalPieces}`;
-                if(bag2Label) bag2Label.textContent = `${Math.floor(cartonState.bag2 * totalPieces)} / ${totalPieces}`;
-            } else {
-                const fill = this.focusView.querySelector('.carton-fill');
-                const label = this.focusView.querySelector('.carton-label');
-                if(fill) fill.style.height = (cartonState.bag1 * 100) + '%';
-                if(label) label.textContent = `${Math.floor(cartonState.bag1 * totalPieces)} / ${totalPieces}`;
-            }
-
-            // Update thumbnails
-            this.thumbnails.forEach((thumb, visualIndex) => {
-                const state = this.state.cartonStates[visualIndex];
-                const thumbFill = thumb.querySelector('.carton-fill-thumb');
-                const totalProgress = (state.bag1 + state.bag2) / this.bagsPerCarton;
-                if(thumbFill) thumbFill.style.height = (totalProgress * 100) + '%';
-            });
-        }
-    }
-
-    const MachineSelectorManager = (() => {
-        const selector = $('#machineSelector');
-        const list = $('#machineSelectorList');
-        let activeMachineInstance = null;
-
-        const close = () => {
-            if (selector) selector.classList.add('hidden');
-            activeMachineInstance = null;
-        };
-
-        const open = (machine, e) => {
-            activeMachineInstance = machine;
-            populateList();
-            const btnRect = e.target.getBoundingClientRect();
-            selector.style.left = btnRect.left + 'px';
-            selector.style.top = btnRect.bottom + 'px';
-            selector.classList.remove('hidden');
-        };
-
-        const populateList = () => {
-            if(!list) return;
-            list.innerHTML = '';
-            DEFAULTS.machines.forEach(machineData => {
-                const btn = document.createElement('button');
-                btn.className = 'btn text-left w-full hover:bg-gray-700';
-                const order = CFG.orders[machineData.code] || {};
-                const modelInfo = order.model || 'Brak modelu';
-                btn.innerHTML = `${machineData.code} <span class="opacity-50 text-xs">${modelInfo}</span>`;
-
-                btn.onclick = () => {
-                    if (activeMachineInstance) {
-                        // For now, visual change only, as requested.
-                        activeMachineInstance.updateCodeDisplay(machineData.code);
-                    }
-                    close();
-                };
-                list.appendChild(btn);
-            });
-        };
-
-        document.addEventListener('click', (e) => {
-            if (activeMachineInstance && selector && !selector.contains(e.target) && !activeMachineInstance.codeBtn.contains(e.target)) {
-                close();
-            }
-        });
-
-        return { open };
-    })();
 
     let activeMachineForColor = null;
     class Machine{ constructor(container,data,orders){ this.root=$('#tpl-machine').content.firstElementChild.cloneNode(true);
         this.data = data;
         this.orders = orders;
-        this.code = data.code;
-        this.codeBtn = $('.code-btn', this.root);
-        this.codeBtn.textContent = this.code;
-
-        this.codeBtn.addEventListener('click', (e) => {
-            MachineSelectorManager.open(this, e);
-        });
+        this.code=data.code; $('.code',this.root).textContent=this.code;
 
         if (!this.data.completionTimestamp) {
           this.data.completionTimestamp = Date.now() + (Math.floor(Math.random() * 14940) + 60) * 1000;
@@ -821,10 +444,15 @@
         this.dot = $('.model-color-dot', this.root);
         this.dot.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            PickerManager.open(this, e);
+            activeMachineForColor = this;
+            const picker = $('#colorPicker');
+            picker.style.left = e.pageX + 'px';
+            picker.style.top = e.pageY + 'px';
+            picker.classList.remove('hidden');
         });
 
-        this.completionBadgeEl = $('.completion-badge', this.root);
+        this.completionTimeEl = $('.completion-time', this.root);
+        this.completionWarningEl = $('.completion-warning', this.root);
 
         this.settingsToggle = $('.settings-toggle', this.root);
         this.settingsPanel = $('.machine-settings', this.root);
@@ -832,52 +460,30 @@
 
         this.settingsToggle.addEventListener('click', () => this.settingsPanel.classList.toggle('hidden'));
         this.settingsInputs.forEach(input => {
-            const eventType = input.type === 'checkbox' ? 'change' : 'keyup';
-            input.addEventListener(eventType, (e) => {
-                if (eventType === 'change' || e.key === 'Enter') {
-                    this.saveSetting(e.target);
-                }
+            input.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') this.saveSetting(input);
             });
         });
 
-        container.appendChild(this.root);
-        this.pr = new Pruefung($('.pruef', this.root));
-        this.cartons = new CartonProgress($('.carton-progress', this.root), data, this.orders);
+        this.bar=$('.bar',this.root); this.label=$('.label',this.root);
+        container.appendChild(this.root); this.pr=new Pruefung($('.pruef',this.root));
+        // simple progress demo
+        let start=performance.now(), dur=(data.durationMin||25)*60000; const step=()=>{ const p=Math.min(1,(performance.now()-start)/dur); this.bar.style.width=(p*100)+'%'; this.label.textContent=Math.floor(p*100)+'%'; requestAnimationFrame(step) }; requestAnimationFrame(step);
 
         this.render();
-        this.updateCompletionTime(); // Initial call
-        this.completionInterval = setInterval(() => this.updateCompletionTime(), 60000); // Refresh every minute
+        this.tickCompletion();
     }
       saveSetting(input) {
         const key = input.dataset.key;
         const source = input.dataset.source;
-        let value;
-
-        if (input.type === 'checkbox') {
-            value = input.checked;
-        } else if (input.type === 'number') {
-            value = parseFloat(input.value) || 0;
-        } else {
-            value = input.value;
-        }
-
-        if (key === 'completionTimestamp' && typeof value === 'string' && value.includes('-')) {
-            value = new Date(value).getTime();
-            if (isNaN(value)) {
-                alert('Nieprawidłowy format daty!');
-                return;
-            }
-        }
+        let value = input.value;
+        if(input.type === 'number') value = parseFloat(value) || 0;
 
         if (source === 'machine') {
             this.data[key] = value;
         } else if (source === 'order') {
             if (!this.orders[this.code]) this.orders[this.code] = genOrder();
             this.orders[this.code][key] = value;
-        }
-
-        if (key === 'model' && typeof value === 'string' && value.includes('201044')) {
-            this.setColor('#ffffff');
         }
 
         input.blur();
@@ -890,12 +496,7 @@
         $('.auf-val',this.root).textContent = order.auftrag || '—';
         $('.mdl-val',this.root).textContent = order.model || '—';
         $('.period-val',this.root).textContent = order.period || '—';
-
-        const nextAuftragEl = $('.nextauf-val', this.root);
-        nextAuftragEl.textContent = order.next || '—';
-        if (order.nextReady) {
-            nextAuftragEl.textContent += ' ✓';
-        }
+        $('.nextauf-val',this.root).textContent = order.next || '—';
 
         this.dot.style.backgroundColor = this.data.color || '#94a3b8';
 
@@ -903,19 +504,10 @@
         this.settingsInputs.forEach(input => {
             const key = input.dataset.key;
             const source = input.dataset.source;
-            let value;
             if (source === 'machine') {
-                value = this.data[key];
+                input.value = this.data[key] || '';
             } else if (source === 'order') {
-                value = order[key];
-            }
-
-            if (input.type === 'checkbox') {
-                input.checked = !!value;
-            } else if (key === 'completionTimestamp' && value) {
-                input.value = new Date(value).toISOString().slice(0, 19).replace('T', ' ');
-            } else {
-                input.value = value || '';
+                input.value = order[key] || '';
             }
         });
       }
@@ -924,47 +516,26 @@
         this.render();
         persist();
       }
-      updateCompletionTime() {
+      tickCompletion() {
         const now = Date.now();
         const timeLeft = Math.max(0, Math.floor((this.data.completionTimestamp - now) / 1000));
         const hours = Math.floor(timeLeft / 3600);
         const minutes = Math.floor((timeLeft % 3600) / 60);
-        this.completionBadgeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
+        this.completionTimeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
 
-        // Color logic
-        const fifteenHours = 15 * 3600;
-        const eightHours = 8 * 3600;
-        const twoHours = 2 * 3600;
-        const oneHour = 1 * 3600;
-
-        let badgeColorClass = 'bg-gray-500'; // > 15h
-        if (timeLeft <= 0) {
-            badgeColorClass = 'bg-yellow-400 text-black';
-        } else if (timeLeft <= twoHours) {
-            badgeColorClass = 'bg-red-600'; // < 2h
-        } else if (timeLeft <= eightHours) {
-            badgeColorClass = 'bg-orange-500'; // 2-8h
-        } else if (timeLeft <= fifteenHours) {
-            badgeColorClass = 'bg-yellow-500'; // 8-15h
-        }
-
-        this.completionBadgeEl.className = 'completion-badge role-badge text-white'; // Reset classes
-        this.completionBadgeEl.classList.add(badgeColorClass);
-
-        // Urgent notification logic
+        const twoHours = 2 * 3600; const oneHour = 1 * 3600;
         if (timeLeft > 0 && timeLeft < twoHours) {
+            this.completionWarningEl.classList.remove('hidden');
             if (timeLeft < oneHour) {
                 showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu godziny!`, 'danger');
             } else {
                 showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu 2 godzin!`, 'warning');
             }
         } else {
+            this.completionWarningEl.classList.add('hidden');
             hideUrgentNotification(this.code);
         }
-      }
-      updateCodeDisplay(newCode) {
-        this.codeBtn.textContent = newCode;
-        // This is a visual change only for now. The underlying machine data is not swapped.
+        requestAnimationFrame(()=>this.tickCompletion());
       }
     }
 
@@ -1084,16 +655,15 @@
             const user = USERS[CFG.user.uid];
             if (user) {
                 user.name = $('#detailsName').value;
-                user.dob = $('#detailsDob').value; // Just store it as text
+                user.dob = $('#detailsDob').value;
                 user.details_filled = true;
 
                 const selectedLang = $('#detailsLang').value;
-                setLanguage(selectedLang); // This also persists the language choice
+                setLanguage(selectedLang);
 
                 CFG.users = USERS;
                 persist();
 
-                // Re-render user info in header and reload
                 showUser();
                 $('#userDetailsModal').classList.add('hidden');
                 window.location.reload();
@@ -1117,7 +687,6 @@
       loginSelect.value = CFG.user.uid;
       showUser();
 
-      // Check if we need to ask for details on initial load
       const currentUser = USERS[CFG.user.uid];
       if (currentUser && !currentUser.details_filled) {
         showUserDetailsModal();
@@ -1147,7 +716,7 @@
 
         const newCurrentUser = USERS[selectedValue];
         if (newCurrentUser && !newCurrentUser.details_filled) {
-            showUser(); // update header immediately
+            showUser();
             showUserDetailsModal();
         } else {
             window.location.reload();
@@ -1184,7 +753,7 @@
           return;
         }
 
-        USERS[login] = { name: name, avatar: '', password: password || undefined };
+        USERS[login] = { name: name, avatar: '', password: password || undefined, details_filled: false };
         CFG.users = USERS;
         logLogin(login);
         CFG.user.uid = login;
@@ -1192,15 +761,14 @@
 
         $('#newUserModal').classList.add('hidden');
         $('#newUserForm').reset();
-
-        showUser(); // update header immediately
-        showUserDetailsModal(); // Show details modal for new user
+        showUser();
+        showUserDetailsModal();
       });
     }
 
     // --- init buttons
     function initNotesPlans(){
-      const addNoteAction = async () => {
+      $('#addNote').onclick=async()=>{
         const v=$('#noteInput').value.trim(); if(!v) return;
         let status='FINAL';
         if(isAdmin()){
@@ -1216,29 +784,13 @@
         NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v, status});
         $('#noteInput').value=''; await saveNotes(); renderNotes();
       };
-
-      $('#addNote').onclick = addNoteAction;
-      $('#noteInput').addEventListener('keyup', (e) => {
-          if (e.key === 'Enter') {
-              addNoteAction();
-          }
-      });
-
       $('#addPlan').onclick=async()=>{
         const v=$('#planInput').value.trim(); if(!v) return;
         PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v});
         $('#planInput').value=''; await savePlans(); renderPlans();
       };
-
       $('#refreshNP').onclick=async()=>{ await loadNotes(); await loadPlans(); };
-
-      loadNotes();
-      loadPlans();
-
-      setInterval(() => {
-        loadNotes();
-        loadPlans();
-      }, 30000);
+      loadNotes(); loadPlans();
     }
 
     // --- machines render
@@ -1271,7 +823,7 @@
         let terminal = localStorage.getItem('KN007_TERMINAL');
         if (!terminal) {
             const terminalName = 'Terminal' + String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
-            const terminalKey = Math.random().toString(36).substring(2, 7); // e.g., 't12er'
+            const terminalKey = Math.random().toString(36).substring(2, 7);
             terminal = `${terminalName} (${terminalKey})`;
             localStorage.setItem('KN007_TERMINAL', terminal);
         }
@@ -1294,8 +846,8 @@
             accountType: role ? role.name : 'Użytkownik'
         };
 
-        history.unshift(logEntry); // Add to the beginning
-        if (history.length > 100) { // Keep history to 100 entries
+        history.unshift(logEntry);
+        if (history.length > 100) {
             history.pop();
         }
         localStorage.setItem('KN007_LOGINS', JSON.stringify(history));
@@ -1303,7 +855,6 @@
 
     function renderLoginHistory() {
         if (!isAdmin()) return;
-
         const list = $('#loginHistoryList');
         if (!list) return;
 
@@ -1386,7 +937,6 @@
             }
             modal.classList.add('hidden');
             activePruefung = null;
-            return false;
         });
         closeBtn.onclick = () => {
             modal.classList.add('hidden');
@@ -1394,90 +944,43 @@
         };
     }
 
-    const PickerManager = (() => {
+    function initColorPicker() {
         const picker = $('#colorPicker');
-        let activeMachine = null;
-
-        const close = () => {
-            if (picker) picker.classList.add('hidden');
-            activeMachine = null;
-        };
-
-        const open = (machine, e) => {
-            activeMachine = machine;
-            picker.style.left = e.pageX + 'px';
-            picker.style.top = e.pageY + 'px';
-            picker.classList.remove('hidden');
-        };
-
-        if(picker) {
-            $$('button', picker).forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (activeMachine) {
-                        activeMachine.setColor(button.dataset.color);
-                    }
-                    close();
-                });
-            });
-
-            document.addEventListener('click', (e) => {
-                if (activeMachine && !picker.contains(e.target)) {
-                    close();
+        $$('button', picker).forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const color = button.dataset.color;
+                if (activeMachineForColor) {
+                    activeMachineForColor.setColor(color);
                 }
+                picker.classList.add('hidden');
+                activeMachineForColor = null;
             });
-        }
-
-        return { open };
-    })();
-
-    // Clean up expired snoozes on load
-    try {
-        const snoozed = JSON.parse(localStorage.getItem('KN007_SNOOZED') || '{}');
-        const now = Date.now();
-        for (const id in snoozed) {
-            if (snoozed[id] < now) {
-                delete snoozed[id];
+        });
+        document.addEventListener('click', (e) => {
+            if (!picker.contains(e.target) && activeMachineForColor) {
+                picker.classList.add('hidden');
+                activeMachineForColor = null;
             }
-        }
-        localStorage.setItem('KN007_SNOOZED', JSON.stringify(snoozed));
-    } catch(e) { console.error("Failed to clean snoozed notifications", e); }
-
+        });
+    }
 
     const activeNotifications = {};
     function showUrgentNotification(id, message, level) {
-        const snoozed = JSON.parse(localStorage.getItem('KN007_SNOOZED') || '{}');
-        if (snoozed[id] && snoozed[id] > Date.now()) {
-            return; // It's snoozed, do not show
-        }
-        if (activeNotifications[id]) return; // Already visible
-
         const container = $('#urgent-notifications');
+        const existing = $(`#notification-${id}`, container);
         const newClass = level === 'danger' ? 'bg-red-800/90' : 'bg-orange-500/90';
-
+        if (existing) {
+            if (!existing.classList.contains(newClass)) {
+                existing.className = `alert ${newClass} transition-all`;
+                existing.innerHTML = `<strong>PILNE:</strong> ${message}`;
+            }
+            return;
+        }
         const el = document.createElement('div');
         el.id = `notification-${id}`;
-        el.className = `alert ${newClass} flex items-center justify-between w-full`;
-        el.innerHTML = `<div class="flex-grow cursor-pointer"><strong>PILNE:</strong> ${message}</div>
-                        <div class="flex items-center gap-2 pl-4 border-l border-white/30">
-                            <label for="next-ready-${id}" class="text-xs">Następny gotowy?</label>
-                            <input type="checkbox" id="next-ready-${id}" class="next-ready-checkbox h-5 w-5" data-machine-code="${id}">
-                        </div>`;
-
-        el.querySelector('.flex-grow').onclick = () => hideUrgentNotification(id);
-
-        const checkbox = el.querySelector('.next-ready-checkbox');
-        const order = CFG.orders[id] || {};
-        checkbox.checked = !!order.nextReady;
-        checkbox.addEventListener('change', (e) => {
-            const machineCode = e.target.dataset.machineCode;
-            const isChecked = e.target.checked;
-            if (!CFG.orders[machineCode]) CFG.orders[machineCode] = genOrder();
-            CFG.orders[machineCode].nextReady = isChecked;
-            persist();
-            setStatus(`Zapisano status gotowości dla ${machineCode}`);
-        });
-
+        el.className = `alert ${newClass}`;
+        el.innerHTML = `<strong>PILNE:</strong> ${message}`;
         container.appendChild(el);
         activeNotifications[id] = el;
     }
@@ -1486,93 +989,6 @@
             activeNotifications[id].remove();
             delete activeNotifications[id];
         }
-        const snoozed = JSON.parse(localStorage.getItem('KN007_SNOOZED') || '{}');
-        snoozed[id] = Date.now() + 30 * 60 * 1000; // Snooze for 30 mins
-        localStorage.setItem('KN007_SNOOZED', JSON.stringify(snoozed));
-    }
-
-    function showCustomConfirm(message, callback) {
-        const modal = $('#customConfirmModal');
-        const msgEl = $('#customConfirmMessage');
-        const okBtn = $('#customConfirmOk');
-        const cancelBtn = $('#customConfirmCancel');
-
-        msgEl.textContent = message;
-        modal.classList.remove('hidden');
-
-        const newOkBtn = okBtn.cloneNode(true);
-        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-
-        const newCancelBtn = cancelBtn.cloneNode(true);
-        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-
-        const close = (result) => {
-            modal.classList.add('hidden');
-            callback(result);
-        };
-
-        newOkBtn.onclick = () => close(true);
-        newCancelBtn.onclick = () => close(false);
-    }
-
-    const ContextMenuManager = (() => {
-        const menu = $('#contextMenu');
-        if (!menu) return { open: () => {} };
-        const list = $('#contextMenuList');
-        let active = false;
-
-        const close = () => {
-            menu.classList.add('hidden');
-            active = false;
-        };
-
-        const open = (e, items) => {
-            e.preventDefault();
-            e.stopPropagation();
-            list.innerHTML = '';
-            items.forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'btn ghost text-left w-full hover:bg-gray-700';
-                btn.textContent = item.label;
-                btn.onclick = (evt) => {
-                    evt.stopPropagation();
-                    item.action();
-                    close();
-                };
-                list.appendChild(btn);
-            });
-
-            menu.style.left = e.pageX + 'px';
-            menu.style.top = e.pageY + 'px';
-            menu.classList.remove('hidden');
-            active = true;
-        };
-
-        document.addEventListener('click', () => {
-            if (active) close();
-        });
-
-        return { open };
-    })();
-
-    function showCustomInput(title, initialValue, callback) {
-        const modal = $('#customInputModal');
-        const titleEl = $('#customInputTitle');
-        const form = $('#customInputForm');
-        const input = $('#customInput');
-
-        titleEl.textContent = title;
-        input.value = initialValue;
-        modal.classList.remove('hidden');
-        input.focus();
-        input.select();
-
-        form.onsubmit = (e) => {
-            e.preventDefault();
-            modal.classList.add('hidden');
-            callback(input.value);
-            form.onsubmit = null; // clean up listener
-        };
     }
 
     function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); }
