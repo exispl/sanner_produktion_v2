@@ -6,6 +6,7 @@
   <title>Kartonowy Napełniacz — v0.007r</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <style>
     :root{ --bg:#0e1117; --panel:#121826; --panel2:#0f1624; --text:#e5e7eb; --muted:#93a4b5; --accent:#22c55e; --line:#1f2937; --yellow:#fde047; }
     body[data-theme="light"] { --bg:#f3f4f6; --panel:#ffffff; --panel2:#f9fafb; --text:#111827; --muted:#6b7280; --accent:#16a34a; --line:#e5e7eb; }
@@ -81,7 +82,10 @@
     <div class="panel">
       <div class="head">
         <div class="flex items-center gap-4">
-          <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" class="h-10">
+          <div class="flex flex-col items-center p-2">
+            <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" style="width: 180px; height: 180px;">
+            <span id="shiftYear" class="text-3xl font-bold mt-2">2025</span>
+          </div>
           <div class="loginbar flex items-center gap-3 relative">
             <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
             <div class="flex flex-col items-start">
@@ -91,7 +95,15 @@
               </div>
               <span id="loginRole" class="role-badge" style="display: none;"></span>
             </div>
-            <select id="loginSelect" class="btn"></select>
+            <div id="custom-login-select" class="relative">
+              <button id="custom-login-toggle" class="btn flex items-center gap-2">
+                <span>Zmień</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              <div id="custom-login-options" class="hidden absolute right-0 top-full mt-2 w-64 panel z-20">
+                <!-- populated by JS -->
+              </div>
+            </div>
 
             <div class="user-info-popup">
             <div class="panel">
@@ -110,9 +122,7 @@
             <div id="langSwitcher" class="flex gap-1">
               <button class="btn ghost text-xs" data-lang="pl">PL</button>
               <button class="btn ghost text-xs" data-lang="en">EN</button>
-              <button class="btn ghost text-xs" data-lang="tr">TR</button>
               <button class="btn ghost text-xs" data-lang="de">DE</button>
-              <button class="btn ghost text-xs" data-lang="ar">AR</button>
             </div>
             <div id="themeSwitcher" class="flex items-center gap-2">
               <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
@@ -132,24 +142,14 @@
   </header>
 
   <main class="wrap">
-    <section id="machines" class="machines"></section>
-
-    <div id="newUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
-      <div class="panel w-full max-w-md">
-        <div class="head">
-          <h2 class="m-0" data-translate-key="createUserTitle">Tworzenie nowego użytkownika</h2>
-          <button id="closeModalBtn" class="btn ghost">✖</button>
-        </div>
-        <div class="body">
-          <form id="newUserForm" class="flex flex-col gap-4">
-            <input type="text" id="newLogin" name="login" class="btn" data-translate-key="placeholderLogin" placeholder="Login (np. SoGxxxx, LK12, 1234)" required pattern="^(SoG[0-9]{4}|LK[0-9]{2}|[0-9]{2}|[0-9]{4})$">
-            <input type="password" id="newPassword" name="password" class="btn" data-translate-key="placeholderPassword" placeholder="Hasło (opcjonalne)">
-            <input type="text" id="newName" name="name" class="btn" data-translate-key="placeholderName" placeholder="Imię i nazwisko" required>
-            <button type="submit" class="btn primary" data-translate-key="createUserBtn">Stwórz użytkownika</button>
-          </form>
-        </div>
+    <section id="minimized-machines-dock" class="panel mb-3 hidden">
+      <div class="head">
+        <h2 class="m-0">Zminimalizowane maszyny</h2>
       </div>
-    </div>
+      <div id="minimized-machines-list" class="body flex flex-wrap gap-2"></div>
+    </section>
+
+    <section id="machines" class="machines"></section>
 
     <section class="panel mt-3">
       <div class="head"><h2 class="m-0" data-translate-key="notesTitle">💬 CHAT</h2></div>
@@ -171,6 +171,13 @@
           <button id="refreshNP" class="btn ghost" data-translate-key="refreshBtn">↻ Odśwież z MySQL</button>
         </div>
         <div id="plansList" class="notes-list mt-2"></div>
+      </div>
+    </section>
+
+    <section id="hints-card" class="panel mt-3">
+      <div class="head"><h2 class="m-0">💡 Podpowiedzi</h2></div>
+      <div class="body">
+        <p>Tutaj pojawią się podpowiedzi i wskazówki.</p>
       </div>
     </section>
   </main>
@@ -249,7 +256,13 @@
     <article class="panel machine">
       <div class="head">
         <div class="title"><span>🤖</span><h2 class="code"></h2></div>
-        <button class="btn ghost settings-toggle">⚙️</button>
+        <div class="flex items-center gap-2">
+          <button class="btn ghost favorite-toggle" title="Ulubione">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+          </button>
+          <button class="btn ghost text-lg font-bold minimize-toggle" title="Minimalizuj">_</button>
+          <button class="btn ghost settings-toggle">⚙️</button>
+        </div>
       </div>
       <div class="body">
         <div class="meta text-sm space-y-2">
@@ -365,7 +378,6 @@
       'SoG1':    { name: 'Michael Scott', avatar: '' },
       'SoG1899': { name: 'James Corden', avatar: '' },
       'SoP1':    { name: 'Piotr Nowak', avatar: '' },
-      'SoG2200': { name: 'User 2200', avatar: '' },
       'SoG2020': { name: 'User 2020', avatar: '' },
     };
 
@@ -431,6 +443,27 @@
     }
 
     let activeMachineForColor = null;
+    let sortableInstance = null;
+
+    function initDragAndDrop() {
+      if (sortableInstance) {
+        sortableInstance.destroy();
+      }
+      const container = $('#machines');
+      if (!container) return;
+
+      sortableInstance = new Sortable(container, {
+        animation: 150,
+        ghostClass: 'opacity-50',
+        onEnd: function (evt) {
+          const machineElements = $$('.machine', container);
+          const newOrderCodes = machineElements.map(el => $('.code', el).textContent);
+          const machineMap = new Map(CFG.machines.map(m => [m.code, m]));
+          CFG.machines = newOrderCodes.map(code => machineMap.get(code));
+          persist();
+        }
+      });
+    }
     class Machine{ constructor(container,data,orders){ this.root=$('#tpl-machine').content.firstElementChild.cloneNode(true);
         this.data = data;
         this.orders = orders;
@@ -463,6 +496,23 @@
                 if (e.key === 'Enter') this.saveSetting(input);
             });
         });
+
+        this.minimizeBtn = $('.minimize-toggle', this.root);
+        this.minimizeBtn.addEventListener('click', () => {
+            this.data.minimized = true;
+            persist();
+            renderAllMachines();
+        });
+
+        this.favoriteBtn = $('.favorite-toggle', this.root);
+        this.favoriteBtn.addEventListener('click', () => {
+            this.data.favorite = !this.data.favorite;
+            persist();
+            renderAllMachines();
+        });
+        if (this.data.favorite) {
+            this.favoriteBtn.classList.add('text-yellow-400');
+        }
 
         this.bar=$('.bar',this.root); this.label=$('.label',this.root);
         container.appendChild(this.root); this.pr=new Pruefung($('.pruef',this.root));
@@ -543,7 +593,44 @@
       return { auftrag:'1012'+rnd, model:'DASG-1 (201044)', period:`od ${F(s)} do ${F(e)}`, next:'' };
     }
 
-    function renderMachines(){ const box=$('#machines'); box.innerHTML=''; (CFG.machines||[]).forEach(m=> new Machine(box,m, CFG.orders||{})); }
+    function renderAllMachines() {
+      const machinesContainer = $('#machines');
+      const minimizedContainer = $('#minimized-machines-list');
+      const minimizedDock = $('#minimized-machines-dock');
+
+      machinesContainer.innerHTML = '';
+      minimizedContainer.innerHTML = '';
+
+      let hasMinimized = false;
+
+      const sortedMachines = (CFG.machines || []).sort((a, b) => {
+        if (a.favorite && !b.favorite) return -1;
+        if (!a.favorite && b.favorite) return 1;
+        return (a.code || '').localeCompare(b.code || '');
+      });
+
+      sortedMachines.forEach(machineData => {
+        if (!machineData.code) return; // Skip invalid machine data
+
+        if (machineData.minimized) {
+          hasMinimized = true;
+          const chip = document.createElement('button');
+          chip.className = 'btn';
+          chip.textContent = machineData.code;
+          chip.onclick = () => {
+            machineData.minimized = false;
+            persist();
+            renderAllMachines();
+          };
+          minimizedContainer.appendChild(chip);
+        } else {
+          new Machine(machinesContainer, machineData, CFG.orders || {});
+        }
+      });
+
+      minimizedDock.classList.toggle('hidden', !hasMinimized);
+      initDragAndDrop();
+    }
 
     // --- stamps
     function makeStamp(ts,user,smaller=false){
@@ -604,7 +691,6 @@
         const ROLES = {
             'SoG1917': { name: 'Senior Developer', className: 'role-senior-dev' },
             'SoG2025': { name: 'TeamLeiter', className: 'role-teamleiter' },
-            'SoG2200': { name: 'Einrichter', className: 'role-einrichter' },
             'SoG2020': { name: 'Einrichter', className: 'role-einrichter' },
         };
         if (ROLES[uid]) return ROLES[uid];
@@ -672,20 +758,69 @@
     }
 
     function initLogin(){
-      const loginSelect = $('#loginSelect');
+      showUser(); // Show the currently logged-in user.
 
-      // Populate select
-      loginSelect.innerHTML = '<option value="new_user">+ Nowy użytkownik</option>';
+      const toggleBtn = $('#custom-login-toggle');
+      const optionsContainer = $('#custom-login-options');
+
+      if (!toggleBtn || !optionsContainer) return;
+
+      // Populate options
+      optionsContainer.innerHTML = '';
       for (const uid in USERS) {
         const user = USERS[uid];
-        const option = document.createElement('option');
-        option.value = uid;
-        option.textContent = `${user.name} (${uid})`;
-        loginSelect.appendChild(option);
+        const optionEl = document.createElement('div');
+        optionEl.className = 'flex items-center gap-3 p-2 hover:bg-white/10 cursor-pointer';
+        optionEl.dataset.uid = uid;
+
+        const avatarSrc = user.avatar || `https://placehold.co/40/0e1117/ffffff?text=${user.name?.[0] || '?'}`;
+
+        optionEl.innerHTML = `
+          <img src="${avatarSrc}" class="w-8 h-8 rounded-full">
+          <span>${user.name} (${uid})</span>
+        `;
+
+        // Handle user selection
+        optionEl.addEventListener('click', () => {
+          const selectedValue = uid;
+          const userToLogin = USERS[selectedValue];
+
+          if (userToLogin && userToLogin.password) {
+            const pass = prompt(`Wprowadź hasło dla ${selectedValue}:`);
+            if (pass !== userToLogin.password) {
+              alert('Błędne hasło!');
+              return;
+            }
+          }
+
+          logLogin(selectedValue);
+          CFG.user.uid = selectedValue;
+          persist();
+
+          const newCurrentUser = USERS[selectedValue];
+          if (newCurrentUser && !newCurrentUser.details_filled) {
+              showUser();
+              showUserDetailsModal();
+          } else {
+              window.location.reload();
+          }
+        });
+
+        optionsContainer.appendChild(optionEl);
       }
 
-      loginSelect.value = CFG.user.uid;
-      showUser();
+      // Toggle dropdown visibility
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        optionsContainer.classList.toggle('hidden');
+      });
+
+      // Close dropdown on outside click
+      document.addEventListener('click', () => {
+        if (!optionsContainer.classList.contains('hidden')) {
+          optionsContainer.classList.add('hidden');
+        }
+      });
 
       // Check if we need to ask for details on initial load
       const currentUser = USERS[CFG.user.uid];
@@ -693,78 +828,15 @@
         showUserDetailsModal();
       }
 
-      loginSelect.addEventListener('change', () => {
-        const selectedValue = loginSelect.value;
-        if (selectedValue === 'new_user') {
-          $('#newUserModal').classList.remove('hidden');
-          loginSelect.value = CFG.user.uid; // revert selection
-          return;
-        }
-
-        const userToLogin = USERS[selectedValue];
-        if (userToLogin && userToLogin.password) {
-          const pass = prompt(`Wprowadź hasło dla ${selectedValue}:`);
-          if (pass !== userToLogin.password) {
-            alert('Błędne hasło!');
-            loginSelect.value = CFG.user.uid; // revert
-            return;
-          }
-        }
-
-        logLogin(selectedValue);
-        CFG.user.uid = selectedValue;
-        persist();
-
-        const newCurrentUser = USERS[selectedValue];
-        if (newCurrentUser && !newCurrentUser.details_filled) {
-            showUser(); // update header immediately
-            showUserDetailsModal();
-        } else {
-            window.location.reload();
-        }
-      });
-
+      // Handle avatar change click
       $('#userAvatar').addEventListener('click', () => {
         const newAvatar = prompt('Podaj nowy URL avatara:', USERS[CFG.user.uid].avatar || '');
         if (newAvatar !== null) {
           USERS[CFG.user.uid].avatar = newAvatar;
-          CFG.users = USERS; // make sure the global change is stored
+          CFG.users = USERS;
           persist();
           showUser();
         }
-      });
-
-      $('#closeModalBtn').onclick = () => {
-        $('#newUserModal').classList.add('hidden');
-      };
-
-      $('#newUserForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const login = $('#newLogin').value;
-        const password = $('#newPassword').value;
-        const name = $('#newName').value;
-
-        if (!/^(SoG[0-9]{4}|LK[0-9]{2}|[0-9]{2}|[0-9]{4})$/.test(login)) {
-          alert('Format loginu jest nieprawidłowy. Użyj formatu SoGxxxx, LKxx, xx lub xxxx.');
-          return;
-        }
-
-        if (USERS[login]) {
-          alert('Użytkownik o takim loginie już istnieje.');
-          return;
-        }
-
-        USERS[login] = { name: name, avatar: '', password: password || undefined };
-        CFG.users = USERS;
-        logLogin(login);
-        CFG.user.uid = login;
-        persist();
-
-        $('#newUserModal').classList.add('hidden');
-        $('#newUserForm').reset();
-
-        showUser(); // update header immediately
-        showUserDetailsModal(); // Show details modal for new user
       });
     }
 
@@ -796,8 +868,6 @@
     }
 
     // --- machines render
-    function initMachines(){ const box=$('#machines'); box.innerHTML=''; (CFG.machines||[]).forEach(m=> new Machine(box,m, CFG.orders||{})); }
-
     function initThemeSwitcher() {
       const themeButtons = $$('#themeSwitcher button');
       const body = document.body;
@@ -994,7 +1064,30 @@
         }
     }
 
-    function init(){ initThemeSwitcher(); initLangSwitcher(); initMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
+    function updateShiftIndicator() {
+      const shiftYearEl = $('#shiftYear');
+      if (!shiftYearEl) return;
+
+      const now = new Date();
+      const hour = now.getHours();
+
+      let color;
+      // Shift 1: 14:00 - 21:59 -> Green (#22c55e)
+      if (hour >= 14 && hour < 22) {
+        color = '#22c55e';
+      }
+      // Shift 3: 06:00 - 13:59 -> Blue (#60a5fa)
+      else if (hour >= 6 && hour < 14) {
+        color = '#60a5fa';
+      }
+      // Shift 2: 22:00 - 05:59 -> Yellow (#fde047)
+      else {
+        color = '#fde047';
+      }
+      shiftYearEl.style.color = color;
+    }
+
+    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); updateShiftIndicator(); setInterval(updateShiftIndicator, 60000); }
     init();
   </script>
 </body>
