@@ -16,9 +16,10 @@
     body[data-theme="light"] .progress, body[data-theme="light"] .pr-bar{background:#e5e7eb}
     body[data-theme="light"] .pr-head select.pr-select{background:var(--panel);border-color:var(--line);color:var(--text)}
     body[data-theme="light"] .pr-reset{background:var(--panel)}
-    body[data-theme="light"] .stamp .chip{background:#e5e7eb;color:#374151;border-color:#d1d5db}
+    body[data-theme="light"] .stamp .chip{background:transparent;border-color:#9ca3af;color:#1f2937}
     body[data-theme="light"] .notes-list .row{border-bottom-color:#e5e7eb}
     body[data-theme="light"] .tag.draft{color:#92400e;border-color:#f59e0b;background:#fef3c7}
+    body[data-theme="light"] .tag.private{color:#581c87;border-color:#a855f7;background:#f3e8ff}
     body[data-theme="light"] .alert{background:#e5e7eb;color:#374151;border-color:#d1d5db}
     body[data-theme="blue"] { --bg:#0c1424; --panel:#101c36; --panel2:#0e1a31; --text:#e0e7ff; --muted:#a0b3d9; --accent:#60a5fa; --line:#1e294b; }
     body[data-theme="green"] { --bg:#052e16; --panel:#064e3b; --panel2:#043a2c; --text:#ecfdf5; --muted:#a7f3d0; --accent:#4ade80; --line:#022c22; }
@@ -33,6 +34,7 @@
     .btn.ghost{background:transparent}
     .machines{display:grid;grid-template-columns:1fr;gap:12px}
     @media(min-width:900px){.machines{grid-template-columns:1fr 1fr}}
+    .machine.auto-collapsed .body { display: none; }
     .machine .title{display:flex;align-items:center;gap:10px}
     .machine .title h2{margin:0;font-size:26px;letter-spacing:.3px}
     .meta{color:var(--muted);font-size:12px;margin:6px 0}
@@ -50,13 +52,14 @@
     /* Notes & Plans */
     .notes-list .row{display:flex;gap:10px;align-items:flex-start;border-bottom:1px dashed #263446;padding:8px 0}
     .stamp{display:inline-flex;gap:6px;align-items:center}
-    .stamp .chip{background:#0b1220;border:1px solid #263446;border-radius:999px;padding:2px 6px}
-    .stamp .small{font-size:12px;color:#9aa8b6}
+    .stamp .chip{background:transparent;border:1px solid #4b5563;border-radius:6px;padding:2px 8px;font-size:13px;color:var(--muted)}
+    .stamp .small{font-size:13px;color:var(--muted)}
     .stamp .digits{font-variant-numeric:tabular-nums;letter-spacing:.2px}
     .notes-list .txt{flex:1}
     .notes-list .act{display:flex;gap:6px}
     .tag{display:inline-block;margin-left:6px;font-size:12px;padding:2px 6px;border-radius:999px;border:1px solid #3b4760}
     .tag.draft{color:#eab308;border-color:#a16207;background:#2a2208}
+    .tag.private{color:#a855f7;border-color:#7e22ce;background:#1e1b4b}
     .role-badge{font-size:12px;padding:3px 8px;border-radius:999px;font-weight:600;border:1px solid transparent}
     .role-senior-dev{color:white;background-color:#3b82f6}
     .role-teamleiter{color:white;background-color:#ec4899}
@@ -65,12 +68,13 @@
     .role-leiharbeiter{color:white;background-color:#9ca3af}
     .role-sanner-mitarbeiter{color:white;background-color:#22c55e}
     .role-user{color:white;background-color:#9ca3af}
-    .user-info-popup{position:absolute;top:100%;left:0;z-index:10;width:280px;padding-top:8px;display:none;}
+    .user-info-popup{position:absolute;top:100%;left:0;z-index:10;width:320px;padding-top:8px;display:none;}
     .loginbar:hover .user-info-popup{display:block;}
     .user-info-popup .panel{border-width:2px;}
     .user-info-popup-grid{display:grid;grid-template-columns:100px 1fr;gap:12px;align-items:center;}
     .user-info-popup img{width:100px;height:100px;border-radius:12px;object-fit:cover;}
     #urgent-notifications .alert{color:white; border-color:transparent;}
+    #urgent-notifications .alert.birthday { background: linear-gradient(45deg, #ec4899, #fde047); color: #1e293b; border-color: #fbcfe8; font-weight: bold; }
     /* Chat stream */
     .alerts{display:flex;flex-wrap:wrap;gap:8px}
     .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
@@ -85,7 +89,7 @@
       <div class="head">
         <div class="flex items-center gap-4">
           <div class="flex flex-col items-end p-2">
-            <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" style="width: 180px; height: 180px;">
+            <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" style="width: 350.6px; height: 183.6px;">
             <div id="liveClockContainer" class="text-right mt-2">
                 <div id="liveClock" class="text-2xl font-bold" style="font-variant-numeric: tabular-nums;"></div>
                 <div id="liveDate" class="text-xs opacity-70"></div>
@@ -103,7 +107,7 @@
                 <span id="loginRole" class="role-badge" style="display: none;"></span>
               </div>
               <div id="custom-login-select" class="relative">
-                <button id="custom-login-toggle" class="btn p-2">
+                <button id="custom-login-toggle" class="btn p-2" title="Zmień użytkownika">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                   </svg>
@@ -112,6 +116,11 @@
                   <!-- populated by JS -->
                 </div>
               </div>
+              <button id="createUserBtn" class="btn p-2" title="Stwórz nowego użytkownika">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 11a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1v-1z" />
+                </svg>
+              </button>
               <div class="user-info-popup">
               <div class="panel">
                 <div class="body user-info-popup-grid">
@@ -119,7 +128,11 @@
                   <div>
                     <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
                     <p id="popupUserRole" class="text-sm"></p>
-                    <p class="text-xs mt-2">Ostatnio zalogowany: <span id="popupLastLogin">teraz</span></p>
+                    <div class="text-xs mt-2 space-y-1">
+                      <p>Ostatnio widziany: <span id="popupLastSeen">...</span></p>
+                      <p>W firmie od: <span id="popupStartDate">...</span></p>
+                    </div>
+                    <button id="openProfileBtn" class="btn text-xs mt-2 w-full">Mój Profil</button>
                   </div>
                 </div>
               </div>
@@ -141,10 +154,6 @@
       </div>
       <div class="body">
         <h1 class="m-0" data-translate-key="appTitle">🏭 Kartonowy Napełniacz</h1>
-        <div class="mt-2">
-          <label for="terminalSelect" class="text-sm opacity-80">Wybierz Terminal:</label>
-          <select id="terminalSelect" class="btn"></select>
-        </div>
         <div id="statusLine" class="opacity-80 mt-1" data-translate-key="statusReady"></div>
         <div id="chatStream" class="alerts mt-2"></div>
       </div>
@@ -161,8 +170,15 @@
 
     <section id="machines" class="machines"></section>
 
-    <section class="panel mt-3">
-      <div class="head"><h2 class="m-0" data-translate-key="notesTitle">💬 CHAT</h2></div>
+    <section id="chat-panel" class="panel mt-3" style="position: absolute; width: 500px; z-index: 30; top: 250px; left: 20px;">
+      <div class="head flex items-center">
+        <div id="chat-drag-handle" class="cursor-move p-2 -ml-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <h2 class="m-0" data-translate-key="notesTitle">💬 CHAT</h2>
+      </div>
       <div class="body">
         <div class="flex gap-2 flex-wrap">
           <input id="noteInput" class="btn" style="flex:1" data-translate-key="placeholderNote" placeholder="Wpisz wiadomość...">
@@ -191,6 +207,10 @@
       </div>
     </section>
   </main>
+
+  <div id="terminal-selector-container" class="fixed bottom-5 left-5 z-20">
+    <select id="terminalSelect" class="btn" title="Wybierz Terminal"></select>
+  </div>
 
   <div id="userDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
     <div class="panel w-full max-w-md">
@@ -247,6 +267,108 @@
     </div>
   </div>
 
+  <div id="userProfileModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
+    <div class="panel w-full max-w-lg">
+      <div class="head">
+        <h2 class="m-0">Profil Użytkownika</h2>
+        <button id="userProfileModalClose" class="btn ghost">✖</button>
+      </div>
+      <div class="body">
+        <form id="userProfileForm" class="flex flex-col gap-4">
+          <p>Tutaj możesz zarządzać swoimi ustawieniami i preferencjami.</p>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="profileStartDate" class="text-sm opacity-70">Data rozpoczęcia pracy</label>
+              <input type="date" id="profileStartDate" class="btn w-full mt-1">
+            </div>
+            <div>
+              <label for="profileShift" class="text-sm opacity-70">Twoja zmiana</label>
+              <select id="profileShift" class="btn w-full mt-1">
+                <option value="green">Zmiana 1 (14-22)</option>
+                <option value="blue">Zmiana 3 (06-14)</option>
+                <option value="yellow">Zmiana 2 (22-06)</option>
+              </select>
+            </div>
+            <div>
+              <label for="profileFavMachine" class="text-sm opacity-70">Ulubiona maszyna</label>
+              <input type="text" id="profileFavMachine" class="btn w-full mt-1" placeholder="np. MA820061">
+            </div>
+            <div>
+              <label for="profileFavTerminal" class="text-sm opacity-70">Ulubiony terminal</label>
+              <select id="profileFavTerminal" class="btn w-full mt-1">
+                <!-- Populated by JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="border-t border-white/10 pt-4 mt-2">
+            <button type="submit" class="btn primary">Zapisz profil</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="createUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
+    <div class="panel w-full max-w-md">
+      <div class="head">
+        <h2 class="m-0">Stwórz Nowego Użytkownika</h2>
+        <button id="createUserModalClose" class="btn ghost">✖</button>
+      </div>
+      <div class="body">
+        <form id="createUserForm" class="flex flex-col gap-4">
+          <div>
+            <label for="newUserLogin" class="text-sm opacity-70">Login (np. SoG1234 lub LK51)</label>
+            <input type="text" id="newUserLogin" class="btn w-full mt-1" required>
+          </div>
+          <div>
+            <label for="newUserName" class="text-sm opacity-70">Imię i nazwisko</label>
+            <input type="text" id="newUserName" class="btn w-full mt-1" required>
+          </div>
+          <button type="submit" class="btn primary">Stwórz Użytkownika</button>
+          <p class="text-xs opacity-70 mt-1">Hasło dla użytkowników SoG zostanie wygenerowane automatycznie.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="broadcastModal" class="hidden fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+    <div class="panel w-full max-w-lg border-4 border-amber-400">
+      <div class="head">
+        <h2 class="m-0 text-amber-400">🚨 WAŻNE OGŁOSZENIE 🚨</h2>
+      </div>
+      <div class="body text-center">
+        <p id="broadcastModalMessage" class="text-lg my-4"></p>
+        <button id="broadcastAcknowledgeBtn" class="btn primary text-lg px-6 py-3">Zrozumiałem / Potwierdzam</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminEditUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
+    <div class="panel w-full max-w-md">
+      <div class="head">
+        <h2 class="m-0">Edytuj Użytkownika</h2>
+        <button id="adminEditUserModalClose" class="btn ghost">✖</button>
+      </div>
+      <div class="body">
+        <form id="adminEditUserForm" class="flex flex-col gap-4">
+          <p>Edytujesz dane dla użytkownika <strong id="adminEditUserLoginLabel"></strong>.</p>
+          <input type="hidden" id="adminEditUserUid">
+          <div>
+            <label for="adminEditUserName" class="text-sm opacity-70">Imię i nazwisko</label>
+            <input type="text" id="adminEditUserName" name="name" class="btn w-full mt-1" required>
+          </div>
+          <div>
+            <label for="adminEditUserAvatar" class="text-sm opacity-70">URL Avatara</label>
+            <input type="text" id="adminEditUserAvatar" name="avatar" class="btn w-full mt-1">
+          </div>
+          <button type="submit" class="btn primary">Zapisz zmiany</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <footer class="wrap" id="adminFooter" style="display: none;">
     <div class="panel mt-3">
       <div class="head">
@@ -275,6 +397,18 @@
           <div id="adminTerminalList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
         </div>
 
+        <div id="broadcastManagement" class="mt-4">
+          <h3 class="font-bold border-b border-white/10 pb-1">Wyślij Ogłoszenie Globalne</h3>
+          <form id="adminBroadcastForm" class="flex flex-col gap-2 mt-2">
+            <textarea id="adminBroadcastMessage" class="btn" rows="3" placeholder="Wiadomość do wszystkich terminali..."></textarea>
+            <button type="submit" class="btn primary">Wyślij Ogłoszenie</button>
+          </form>
+          <div id="adminBroadcastStatus" class="mt-2">
+            <h4 class="font-bold text-sm">Status ostatniego ogłoszenia:</h4>
+            <div id="adminBroadcastStatusList" class="notes-list text-xs"></div>
+          </div>
+        </div>
+
         <div id="userManagement" class="mt-4">
           <h3 class="font-bold border-b border-white/10 pb-1">Zarządzanie Użytkownikami</h3>
           <form id="adminAddUserForm" class="flex gap-2 mt-2 items-center flex-wrap">
@@ -289,6 +423,25 @@
         <div id="loginHistory" class="mt-4">
             <h3 class="font-bold border-b border-white/10 pb-1">Historia logowań</h3>
             <div id="loginHistoryList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
+        </div>
+
+        <div id="chatLogManagement" class="mt-4">
+            <h3 class="font-bold border-b border-white/10 pb-1">Pełny Log Chatu</h3>
+            <input id="adminChatFilter" class="btn w-full mt-2" placeholder="Filtruj po użytkowniku lub treści...">
+            <div id="adminChatLogList" class="notes-list mt-2 max-h-96 overflow-y-auto"></div>
+        </div>
+
+        <div id="cartonLogManagement" class="mt-4">
+            <h3 class="font-bold border-b border-white/10 pb-1 flex justify-between items-center">
+                <span>Ostatnio Zaksięgowane Kartony</span>
+                <button id="toggleCartonLogBtn" class="btn text-xs">Pokaż</button>
+            </h3>
+            <div id="adminCartonLogList" class="notes-list mt-2 max-h-96 overflow-y-auto hidden"></div>
+        </div>
+
+        <div id="plansLogManagement" class="mt-4">
+            <h3 class="font-bold border-b border-white/10 pb-1">Log Zmian w Planach</h3>
+            <div id="adminPlansLogList" class="notes-list mt-2 max-h-96 overflow-y-auto"></div>
         </div>
       </div>
     </div>
@@ -425,6 +578,7 @@
       'SoG1899': { name: 'James Corden', avatar: '' },
       'SoP1':    { name: 'Piotr Nowak', avatar: '' },
       'SoG2020': { name: 'User 2020', avatar: '' },
+      'LK50':    { name: 'Leihfirma Mitarbeiter', avatar: '' },
     };
 
     // Add default settings to each user in the initial list
@@ -433,6 +587,10 @@
             theme: 'dark',
             language: 'pl',
             selectedTerminal: 'all',
+            startDate: '',
+            favoriteMachine: '',
+            favoriteTerminal: '',
+            shift: 'green',
         };
     }
     // You can add specific overrides here if needed, e.g.:
@@ -495,6 +653,10 @@
         CFG.users[uid].settings.theme = CFG.users[uid].settings.theme || 'dark';
         CFG.users[uid].settings.language = CFG.users[uid].settings.language || 'pl';
         CFG.users[uid].settings.selectedTerminal = CFG.users[uid].settings.selectedTerminal || 'all';
+        CFG.users[uid].settings.startDate = CFG.users[uid].settings.startDate || '';
+        CFG.users[uid].settings.favoriteMachine = CFG.users[uid].settings.favoriteMachine || '';
+        CFG.users[uid].settings.favoriteTerminal = CFG.users[uid].settings.favoriteTerminal || '';
+        CFG.users[uid].settings.shift = CFG.users[uid].settings.shift || 'green';
       }
 
       if (CFG.users[CFG.currentUserUid]) {
@@ -614,7 +776,29 @@
         this.orders = orders;
         this.code=data.code; $('.code',this.root).textContent=this.code;
 
-        // --- NEW: Get references to containers ---
+        // --- Add terminal code badge ---
+        let terminalCode = '';
+        for (const terminal of (CFG.terminals || [])) {
+            if (terminal.machines.includes(this.code)) {
+                terminalCode = terminal.code;
+                break;
+            }
+        }
+        if (terminalCode) {
+            const titleEl = $('.title', this.root);
+            const terminalBadge = document.createElement('span');
+            terminalBadge.className = 'text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full cursor-pointer hover:bg-gray-600';
+            terminalBadge.textContent = terminalCode;
+            terminalBadge.title = 'Kopiuj kod terminala';
+            terminalBadge.onclick = () => {
+                navigator.clipboard.writeText(terminalCode).then(() => {
+                    setStatus(`Skopiowano kod terminala: ${terminalCode}`);
+                });
+            };
+            titleEl.appendChild(terminalBadge);
+        }
+
+        // --- Get references to containers ---
         this.fourCountersContainer = $('.four-counters-container', this.root);
         this.legacyContainer = $('.legacy-progress-container', this.root);
 
@@ -663,9 +847,16 @@
             this.favoriteBtn.classList.add('text-yellow-400');
         }
 
+        // --- NEW: Auto-collapse/expand logic ---
+        this.root.addEventListener('mouseenter', () => {
+            if (this.root.classList.contains('auto-collapsed')) {
+                this.root.classList.remove('auto-collapsed');
+            }
+        });
+
         container.appendChild(this.root);
 
-        // --- NEW: Conditional rendering logic ---
+        // --- Conditional rendering logic ---
         if (this.data.fourCountersEnabled) {
           this.legacyContainer.style.display = 'none';
           this.fourCountersContainer.style.display = 'block';
@@ -674,7 +865,6 @@
         } else {
           this.fourCountersContainer.style.display = 'none';
           this.legacyContainer.style.display = 'block';
-          // Old logic for machines without the 4-counter system
           this.pr = new Pruefung($('.pruef', this.root));
           let start=performance.now(), dur=(this.data.durationMin||25)*60000; const step=()=>{ const p=Math.min(1,(performance.now()-start)/dur); $('.bar',this.root).style.width=(p*100)+'%'; $('.label',this.root).textContent=Math.floor(p*100)+'%'; requestAnimationFrame(step) }; requestAnimationFrame(step);
         }
@@ -699,6 +889,7 @@
         this.render();
         persist();
         setStatus('Zapisano ' + key);
+        this.root.classList.add('auto-collapsed'); // NEW: Auto-collapse on save
       }
       render() {
         const order = this.orders[this.code] || {};
@@ -842,9 +1033,27 @@
         });
       }
 
-      handleCartonReset(cartonId, isDoubleClick) {
+      async handleCartonReset(cartonId, isDoubleClick) {
+          const CARTON_LOG_KEY = 'KN007_CARTON_LOG';
           const carton = this.data.cartons.find(c => c.id === cartonId);
           if (!carton) return;
+
+          // --- NEW: Log this event ---
+          if (carton.status === 'finished' || isDoubleClick) {
+              const logEntry = {
+                  ts: Date.now(),
+                  user: CFG.currentUserUid,
+                  userName: (USERS[CFG.currentUserUid] || {}).name,
+                  machineCode: this.code,
+                  veNumber: carton.veNumber,
+                  cartonNumber: carton.cartonNumber
+              };
+              const log = await loadShared(CARTON_LOG_KEY) || [];
+              log.push(logEntry);
+              if (log.length > 200) log.shift(); // Keep log to 200 entries
+              await saveShared(CARTON_LOG_KEY, log);
+          }
+          // --- End of new part ---
 
           if (isDoubleClick) {
               // Reset and restart this same carton
@@ -890,6 +1099,7 @@
           }
           this.renderFourCounters();
           persist();
+          updateLastSeen();
       }
 
       tickCartons() {
@@ -1001,20 +1211,47 @@
     function renderNotes(){
       const list=$('#notesList'); list.innerHTML='';
       NOTES.forEach(n=>{
-        const row=document.createElement('div'); row.className='row';
-        const tag = n.status==='DRAFT' ? '<span class="tag draft">DRAFT</span>' : '';
-        row.innerHTML=`<div class="meta">${makeStamp(n.ts, {uid:n.user,name:n.userName})} ${tag}</div>
-                       <div class="txt">${n.text}</div>
-                       <div class="act"></div>`;
+        const row=document.createElement('div');
+        row.className='row flex gap-3';
+
+        const user = USERS[n.user] || { name: '?', avatar: '' };
+        let avatarSrc = user.avatar;
+        if (!avatarSrc) {
+            const EMOJIS = ['😀', '😎', '🚀', '🦄', '🤖', '👾', '👽', '🤠', '🏴‍☠️'];
+            const hash = (n.user || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const emoji = EMOJIS[hash % EMOJIS.length];
+            avatarSrc = `https://placehold.co/40/121826/ffffff?text=${emoji}`;
+        }
+
+        const tag = n.status==='PRIVATE' ? '<span class="tag private">Prywatna</span>' : '';
+
+        row.innerHTML=`
+            <img src="${avatarSrc}" class="w-8 h-8 rounded-full self-start shrink-0">
+            <div class="flex-1">
+                <div class="meta">${makeStamp(n.ts, {uid:n.user,name:n.userName})} ${tag}</div>
+                <div class="txt text-base">${n.text}</div>
+            </div>
+            <div class="act"></div>`;
+
         const act=$('.act',row);
-        if(isAdmin()){
+        if(isAdmin() || n.user === CFG.currentUserUid){ // Allow editing for admin or message owner
           const bE=document.createElement('button'); bE.className='btn'; bE.textContent='✏️'; bE.title='Edytuj';
+          bE.onclick=async()=>{
+            const v=prompt('Edytuj notatkę', n.text);
+            if(v!=null){
+              n.text=v;
+              await saveNotes();
+              renderNotes();
+            }
+          };
+          act.append(bE);
+        }
+        if(isAdmin()){
           const bR=document.createElement('button'); bR.className='btn'; bR.textContent='↩️'; bR.title='Odpowiedz';
           const bD=document.createElement('button'); bD.className='btn'; bD.textContent='🗑️'; bD.title='Usuń';
-          bE.onclick=async()=>{ const v=prompt('Edytuj notatkę', n.text); if(v!=null){ n.text=v; await saveNotes(); renderNotes(); } };
           bR.onclick=async()=>{ const v=prompt('Odpowiedź', ''); if(v){ NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:`↪ ${v} (odpowiedź na #${n.id})`, status:'FINAL'}); await saveNotes(); renderNotes(); } };
           bD.onclick=async()=>{ if(confirm('Usunąć notatkę?')){ NOTES = NOTES.filter(x=>x.id!==n.id); await saveNotes(); renderNotes(); } };
-          act.append(bE,bR,bD);
+          act.append(bR,bD);
         }
         list.appendChild(row);
       });
@@ -1024,16 +1261,66 @@
       PLANS.forEach(p=>{
         const row=document.createElement('div'); row.className='row';
         row.innerHTML=`<div class="meta">${makeStamp(p.ts, {uid:p.user,name:p.userName}, true)}</div>
-                       <div class="txt">${p.text}</div>`;
+                       <div class="txt">${p.text}</div>
+                       <div class="act"></div>`;
+        const act = $('.act', row);
+        if(isAdmin()){
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn';
+            editBtn.textContent = '✏️';
+            editBtn.onclick = async () => {
+                const newText = prompt('Edytuj plan:', p.text);
+                if (newText && newText.trim() !== p.text) {
+                    if (!p.editHistory) p.editHistory = [];
+                    p.editHistory.push({
+                        ts: Date.now(),
+                        user: CFG.currentUserUid,
+                        oldText: p.text
+                    });
+                    p.text = newText;
+                    await savePlans();
+                    renderPlans();
+                }
+            };
+            act.appendChild(editBtn);
+        }
         list.appendChild(row);
       });
     }
     async function saveNotes(){ await saveShared(NOTES_KEY, NOTES); }
-    async function loadNotes(){ const db=await loadShared(NOTES_KEY); if(db){ NOTES=db; } renderNotes(); }
+    async function loadNotes(){
+        const db=await loadShared(NOTES_KEY);
+        if(db){
+            const existingIds = new Set(NOTES.map(n => n.id));
+            const newNotes = db.filter(n => !existingIds.has(n.id));
+
+            newNotes.forEach(n => {
+                if (n.user !== CFG.currentUserUid && n.status !== 'PRIVATE') {
+                    showChatNotification(n.userName, n.text);
+                }
+            });
+
+            NOTES=db;
+        }
+        renderNotes();
+    }
     async function savePlans(){ await saveShared(PLANS_KEY, PLANS); }
     async function loadPlans(){ const db=await loadShared(PLANS_KEY); if(db){ PLANS=db; } renderPlans(); }
 
     // --- login
+    function updateLastSeen() {
+        const settings = getCurrentUserSettings();
+        const now = new Date();
+        const selectedTerminalCode = settings.selectedTerminal || 'all';
+        const terminal = CFG.terminals.find(t => t.code === selectedTerminalCode);
+
+        settings.lastSeen = {
+            ts: now.toISOString(),
+            terminalName: terminal ? terminal.name : 'Wszystkie'
+        };
+        persist();
+    }
+
     function getUserRole(uid) {
         if (!uid) return null;
         const ROLES = {
@@ -1051,6 +1338,7 @@
     function showUser(){
       const uid = CFG.currentUserUid;
       const user = USERS[uid] || { name: 'Nieznany', avatar: '' };
+      const settings = user.settings || {};
 
       $('#loginName').textContent = user.name;
       $('#loginId').textContent = uid || '';
@@ -1082,6 +1370,24 @@
       // Update popup
       $('#popupUserName').textContent = user.name;
       $('#popupUserRole').textContent = role ? role.name : 'Użytkownik';
+
+      if (settings.lastSeen) {
+          const d = new Date(settings.lastSeen.ts);
+          const time = d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+          $('#popupLastSeen').textContent = `przy '${settings.lastSeen.terminalName}' o ${time}`;
+      } else {
+          $('#popupLastSeen').textContent = 'brak danych';
+      }
+
+      if (settings.startDate) {
+          try {
+            $('#popupStartDate').textContent = new Date(settings.startDate).toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit', year: 'numeric'});
+          } catch(e) {
+            $('#popupStartDate').textContent = settings.startDate; // fallback for invalid date
+          }
+      } else {
+          $('#popupStartDate').textContent = 'brak danych';
+      }
     }
 
     function showUserDetailsModal() {
@@ -1207,26 +1513,32 @@
           $('#addNote').click();
         }
       });
-      $('#addNote').onclick=async()=>{
-        const v=$('#noteInput').value.trim(); if(!v) return;
+      async function doAddNote(content) {
+        const v = content.trim(); if(!v) return;
         let status='FINAL';
+
         if(isAdmin()){
-          const code=prompt('Podaj kod (0..1000) aby opublikować do „chat”. Błędny -> DRAFT:','');
-          const n = parseInt(code,10);
-          if(!(n>=0 && n<=1000) || n!==ADMIN_PASS){
-            status='DRAFT';
-          } else {
-            status='FINAL';
-            chatPush(v);
+          const isPrivate = confirm('Czy ta wiadomość ma być prywatna (widoczna tylko w logach)?');
+          if (isPrivate) {
+            status = 'PRIVATE';
           }
         }
+
+        if (status !== 'PRIVATE') {
+            chatPush(v);
+        }
+
         NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:v, status});
-        $('#noteInput').value=''; await saveNotes(); renderNotes();
+        $('#noteInput').value='';
+        await saveNotes();
+        renderNotes();
+        updateLastSeen(); // New
       };
       $('#addPlan').onclick=async()=>{
         const v=$('#planInput').value.trim(); if(!v) return;
         PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:v});
         $('#planInput').value=''; await savePlans(); renderPlans();
+        updateLastSeen(); // New
       };
       $('#refreshNP').onclick=async()=>{ await loadNotes(); await loadPlans(); };
       loadNotes(); loadPlans();
@@ -1313,6 +1625,265 @@
         });
     }
 
+    function initDraggableChat() {
+        const chatPanel = $('#chat-panel');
+        const dragHandle = $('#chat-drag-handle');
+        if (!chatPanel || !dragHandle) return;
+
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        dragHandle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isDragging = true;
+
+            const rect = chatPanel.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            let newX = e.clientX - offsetX;
+            let newY = e.clientY - offsetY;
+
+            const maxX = window.innerWidth - chatPanel.offsetWidth;
+            const maxY = window.innerHeight - chatPanel.offsetHeight;
+
+            chatPanel.style.left = `${Math.max(0, Math.min(newX, maxX))}px`;
+            chatPanel.style.top = `${Math.max(0, Math.min(newY, maxY))}px`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            document.body.style.userSelect = 'auto';
+        });
+    }
+
+    function initUserProfileModal() {
+        const modal = $('#userProfileModal');
+        if (!modal) return;
+
+        const openBtn = $('#openProfileBtn');
+        const closeBtn = $('#userProfileModalClose');
+        const form = $('#userProfileForm');
+        const terminalSelect = $('#profileFavTerminal');
+
+        openBtn.onclick = () => {
+            const settings = getCurrentUserSettings();
+            // Populate form
+            $('#profileStartDate').value = settings.startDate || '';
+            $('#profileShift').value = settings.shift || 'green';
+            $('#profileFavMachine').value = settings.favoriteMachine || '';
+
+            // Populate terminal select
+            terminalSelect.innerHTML = '<option value="">Brak</option>';
+            (CFG.terminals || []).forEach(terminal => {
+                const option = document.createElement('option');
+                option.value = terminal.code;
+                option.textContent = `${terminal.name} (${terminal.code})`;
+                terminalSelect.appendChild(option);
+            });
+            terminalSelect.value = settings.favoriteTerminal || '';
+
+            modal.classList.remove('hidden');
+        };
+        closeBtn.onclick = () => modal.classList.add('hidden');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const settings = getCurrentUserSettings();
+            settings.startDate = $('#profileStartDate').value;
+            settings.shift = $('#profileShift').value;
+            settings.favoriteMachine = $('#profileFavMachine').value;
+            settings.favoriteTerminal = $('#profileFavTerminal').value;
+
+            persist();
+            modal.classList.add('hidden');
+            setStatus('Profil zaktualizowany!');
+        });
+    }
+
+    function initCreateUserModal() {
+        const modal = $('#createUserModal');
+        if (!modal) return;
+
+        const openBtn = $('#createUserBtn');
+        const closeBtn = $('#createUserModalClose');
+        const form = $('#createUserForm');
+
+        openBtn.onclick = () => modal.classList.remove('hidden');
+        closeBtn.onclick = () => modal.classList.add('hidden');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const loginInput = $('#newUserLogin');
+            const nameInput = $('#newUserName');
+            const login = loginInput.value.trim();
+            const name = nameInput.value.trim();
+
+            if (!login || !name) {
+                alert('Login i nazwa są wymagane.');
+                return;
+            }
+            if (USERS[login]) {
+                alert('Użytkownik o takim loginie już istnieje.');
+                return;
+            }
+
+            let password = undefined;
+            if (login.startsWith('SoG')) {
+                const numbers = login.replace(/[^0-9]/g, '');
+                if (numbers) {
+                    password = numbers.split('').reverse().join('');
+                }
+            }
+
+            USERS[login] = {
+                name: name,
+                avatar: '',
+                password: password,
+                settings: { theme: 'dark', language: 'pl', selectedTerminal: 'all' } // Add default settings
+            };
+            CFG.users = USERS;
+            persist();
+
+            loginInput.value = '';
+            nameInput.value = '';
+            modal.classList.add('hidden');
+
+            // Refresh the login dropdown to show the new user
+            initLogin();
+
+            alert(`Dodano użytkownika ${name}. Hasło: ${password || 'brak'}. Możesz się teraz zalogować.`);
+        });
+    }
+
+    function initBroadcasts() {
+        const BROADCAST_KEY = 'KN007_BROADCAST';
+        const modal = $('#broadcastModal');
+        const messageEl = $('#broadcastModalMessage');
+        const ackBtn = $('#broadcastAcknowledgeBtn');
+        const adminForm = $('#adminBroadcastForm');
+        const adminTextarea = $('#adminBroadcastMessage');
+        const adminStatusList = $('#adminBroadcastStatusList');
+
+        if (!modal || !adminForm) return; // Exit if key elements aren't found
+
+        // --- Admin: Sending a broadcast ---
+        adminForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = adminTextarea.value.trim();
+            if (!message) return;
+
+            const broadcast = {
+                id: `broadcast-${Date.now()}`,
+                message: message,
+                ts: new Date().toISOString(),
+                acknowledgedBy: {}
+            };
+
+            const success = await saveShared(BROADCAST_KEY, broadcast);
+            if (success) {
+                adminTextarea.value = '';
+                setStatus('Ogłoszenie wysłane!');
+                renderBroadcastStatus(broadcast); // Immediately update admin view
+            } else {
+                alert('Błąd: Nie udało się wysłać ogłoszenia.');
+            }
+        });
+
+        // --- Admin: Rendering status ---
+        function renderBroadcastStatus(broadcast) {
+            if (!isAdmin() || !adminStatusList) return;
+            adminStatusList.innerHTML = '';
+            if (!broadcast || !broadcast.id) {
+                adminStatusList.innerHTML = 'Brak aktywnych ogłoszeń.';
+                return;
+            }
+
+            for (const uid in USERS) {
+                const user = USERS[uid];
+                const ackTime = broadcast.acknowledgedBy[uid];
+                const status = ackTime
+                    ? `✅ Potwierdzono ${new Date(ackTime).toLocaleTimeString()}`
+                    : '⌛ Oczekuje...';
+                const row = document.createElement('div');
+                row.className = 'row !py-1';
+                row.innerHTML = `<div class="txt"><strong>${user.name}</strong> (${uid})</div><div class="act">${status}</div>`;
+                adminStatusList.appendChild(row);
+            }
+        }
+
+        // --- Client: Acknowledging a broadcast ---
+        ackBtn.addEventListener('click', async () => {
+            const broadcastId = modal.dataset.broadcastId;
+            if (!broadcastId) return;
+
+            const broadcast = await loadShared(BROADCAST_KEY);
+            if (broadcast && broadcast.id === broadcastId) {
+                broadcast.acknowledgedBy[CFG.currentUserUid] = new Date().toISOString();
+                await saveShared(BROADCAST_KEY, broadcast);
+                modal.classList.add('hidden');
+            } else {
+                // The broadcast changed while the modal was open, just close it.
+                modal.classList.add('hidden');
+            }
+        });
+
+        // --- All clients: Checking for broadcasts ---
+        async function checkBroadcast() {
+            const broadcast = await loadShared(BROADCAST_KEY);
+            if (broadcast && broadcast.id) {
+                // Update admin view if visible
+                if (isAdmin()) {
+                    renderBroadcastStatus(broadcast);
+                }
+                // Check if current user needs to see it
+                if (!broadcast.acknowledgedBy[CFG.currentUserUid]) {
+                    messageEl.textContent = broadcast.message;
+                    modal.dataset.broadcastId = broadcast.id;
+                    modal.classList.remove('hidden');
+                }
+            }
+        }
+
+        // Initial check and start interval
+        checkBroadcast();
+        setInterval(checkBroadcast, 10000); // Check every 10 seconds
+    }
+
+    function initAdminEditUserModal() {
+        const modal = $('#adminEditUserModal');
+        if (!modal) return;
+
+        const form = $('#adminEditUserForm');
+        const closeBtn = $('#adminEditUserModalClose');
+
+        closeBtn.onclick = () => modal.classList.add('hidden');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = $('#adminEditUserUid').value;
+            const user = USERS[uid];
+
+            if (user) {
+                user.name = $('#adminEditUserName').value;
+                user.avatar = $('#adminEditUserAvatar').value;
+                CFG.users = USERS;
+                persist();
+                renderAdminPanel(); // Re-render to show changes
+                modal.classList.add('hidden');
+                setStatus(`Zaktualizowano użytkownika ${uid}`);
+            } else {
+                alert('Błąd: Nie znaleziono użytkownika!');
+            }
+        });
+    }
+
     function renderAdminUserManagement() {
         const userList = $('#adminUserList');
         if (!userList) return;
@@ -1326,6 +1897,17 @@
             row.className = 'row !items-center';
             row.innerHTML = `<div class="txt text-sm"><strong>${user.name}</strong> (${uid})</div>`;
 
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn';
+            editBtn.textContent = '✏️ Edytuj';
+            editBtn.onclick = () => {
+                $('#adminEditUserUid').value = uid;
+                $('#adminEditUserLoginLabel').textContent = uid;
+                $('#adminEditUserName').value = user.name || '';
+                $('#adminEditUserAvatar').value = user.avatar || '';
+                $('#adminEditUserModal').classList.remove('hidden');
+            };
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn';
             deleteBtn.textContent = '🗑️ Usuń';
@@ -1337,7 +1919,11 @@
                     renderAdminPanel(); // Re-render the whole admin panel
                 }
             };
-            row.appendChild(deleteBtn);
+
+            const actDiv = document.createElement('div');
+            actDiv.className = 'act';
+            actDiv.append(editBtn, deleteBtn);
+            row.appendChild(actDiv);
             userList.appendChild(row);
         }
 
@@ -1444,6 +2030,121 @@
         };
     }
 
+    function initAdminPlansLog() {
+        const logList = $('#adminPlansLogList');
+        if (!logList) return;
+
+        loadShared(PLANS_KEY).then(plans => {
+            if (plans && plans.length > 0) {
+                logList.innerHTML = '';
+                plans.sort((a,b) => b.ts - a.ts); // Show newest plans first
+
+                plans.forEach(p => {
+                    const row = document.createElement('div');
+                    row.className = 'row flex-col !items-start';
+
+                    let historyHtml = '';
+                    if (p.editHistory && p.editHistory.length > 0) {
+                        historyHtml += '<div class="text-xs opacity-50 mt-2 pl-4 border-l-2 border-white/10">Historia zmian:<ul>';
+                        p.editHistory.forEach(h => {
+                            historyHtml += `<li class="mt-1"><strong>${new Date(h.ts).toLocaleString('pl-PL')}</strong> przez ${h.user}: <span class="line-through">${h.oldText}</span></li>`;
+                        });
+                        historyHtml += '</ul></div>';
+                    }
+
+                    row.innerHTML = `
+                        <div>
+                            <div class="meta">${makeStamp(p.ts, {uid: p.user, name: p.userName})}</div>
+                            <div class="txt">${p.text}</div>
+                        </div>
+                        ${historyHtml}
+                    `;
+                    logList.appendChild(row);
+                });
+            } else {
+                logList.innerHTML = '<p class="opacity-70">Brak planów.</p>';
+            }
+        });
+    }
+
+    function initAdminCartonLog() {
+        const CARTON_LOG_KEY = 'KN007_CARTON_LOG';
+        const toggleBtn = $('#toggleCartonLogBtn');
+        const logList = $('#adminCartonLogList');
+        if (!toggleBtn || !logList) return;
+
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = logList.classList.toggle('hidden');
+            toggleBtn.textContent = isHidden ? 'Pokaż' : 'Ukryj';
+        });
+
+        loadShared(CARTON_LOG_KEY).then(log => {
+            if (log && log.length > 0) {
+                logList.innerHTML = '';
+                log.sort((a,b) => b.ts - a.ts); // Newest first
+                log.forEach(entry => {
+                    const row = document.createElement('div');
+                    row.className = 'row !py-1 text-xs';
+                    row.innerHTML = `
+                        <div class="meta">${makeStamp(entry.ts, {uid: entry.user, name: entry.userName})}</div>
+                        <div class="txt">zaksięgował karton <strong>#${entry.cartonNumber}</strong> (VE ${entry.veNumber}) na maszynie <strong>${entry.machineCode}</strong>.</div>
+                    `;
+                    logList.appendChild(row);
+                });
+            } else {
+                logList.innerHTML = '<p class="opacity-70">Brak wpisów w logu.</p>';
+            }
+        });
+    }
+
+    function initAdminChatLog() {
+        const filterInput = $('#adminChatFilter');
+        const logList = $('#adminChatLogList');
+        if (!filterInput || !logList) return;
+
+        let allNotes = [];
+
+        async function renderLog() {
+            const filterText = filterInput.value.toLowerCase();
+
+            const filteredNotes = allNotes.filter(n => {
+                return (n.user && n.user.toLowerCase().includes(filterText)) ||
+                       (n.userName && n.userName.toLowerCase().includes(filterText)) ||
+                       (n.text && n.text.toLowerCase().includes(filterText));
+            });
+
+            logList.innerHTML = '';
+            if (filteredNotes.length === 0) {
+                logList.innerHTML = '<p class="opacity-70">Brak pasujących wiadomości.</p>';
+                return;
+            }
+
+            filteredNotes.forEach(n => {
+                const row = document.createElement('div');
+                row.className = 'row';
+                const statusTag = n.status === 'PRIVATE'
+                    ? '<span class="tag private">Prywatna</span>'
+                    : '<span class="tag" style="background-color: #22c55e; border-color: #16a34a;">Publiczna</span>';
+
+                row.innerHTML = `
+                    <div class="meta">${makeStamp(n.ts, {uid: n.user, name: n.userName})} ${statusTag}</div>
+                    <div class="txt text-sm">${n.text}</div>
+                `;
+                logList.appendChild(row);
+            });
+        }
+
+        filterInput.addEventListener('keyup', renderLog);
+
+        // Initial load
+        loadShared(NOTES_KEY).then(notes => {
+            if (notes) {
+                allNotes = notes.sort((a,b) => b.ts - a.ts); // Show newest first
+                renderLog();
+            }
+        });
+    }
+
     function renderAdminPanel() {
       const footer = $('#adminFooter');
       if (isAdmin()) {
@@ -1451,6 +2152,9 @@
         renderLoginHistory();
         renderAdminUserManagement();
         renderAdminTerminalManagement();
+        initAdminChatLog();
+        initAdminCartonLog();
+        initAdminPlansLog(); // New call
       } else {
         footer.style.display = 'none';
       }
@@ -1555,6 +2259,27 @@
         });
     }
 
+    function checkBirthdays() {
+        const today = new Date();
+        const currentDay = today.getDate();
+        const currentMonth = today.getMonth() + 1; // JS months are 0-indexed
+
+        for (const uid in USERS) {
+            const user = USERS[uid];
+            if (user.dob) {
+                const parts = user.dob.split(/[.\/-]/); // Handle different separators
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10);
+                    if (day === currentDay && month === currentMonth) {
+                        const message = `🎉 Dziś są urodziny ${user.name}! Złóż mu życzenia!`;
+                        showUrgentNotification(`birthday-${uid}`, message, 'birthday');
+                    }
+                }
+            }
+        }
+    }
+
     const activeNotifications = {};
     function showUrgentNotification(id, message, level) {
         const container = $('#urgent-notifications');
@@ -1579,6 +2304,21 @@
             activeNotifications[id].remove();
             delete activeNotifications[id];
         }
+    }
+
+    function showChatNotification(userName, message) {
+        const container = $('#urgent-notifications');
+        const el = document.createElement('div');
+        el.className = 'alert bg-blue-800/90 text-white'; // A different color for chat
+        el.innerHTML = `<span>💬 <strong>${userName}:</strong> ${message.substring(0, 50)}...</span>`;
+
+        container.prepend(el); // Use prepend to show newest at the top
+
+        setTimeout(() => {
+            el.style.transition = 'opacity .5s';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 500);
+        }, 5000); // Remove after 5 seconds
     }
 
     function updateLiveClock() {
@@ -1639,7 +2379,7 @@
       });
     }
 
-    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initTerminalSelector(); initCustomTimeModal(); initColorPicker(); updateLiveClock(); updateShiftIndicator(); setInterval(updateLiveClock, 1000); setInterval(updateShiftIndicator, 60000); }
+    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initTerminalSelector(); initCustomTimeModal(); initColorPicker(); initAdminEditUserModal(); initCreateUserModal(); initUserProfileModal(); initBroadcasts(); initDraggableChat(); updateLiveClock(); updateShiftIndicator(); checkBirthdays(); setInterval(updateLiveClock, 1000); setInterval(updateShiftIndicator, 60000); setInterval(loadNotes, 5000); setInterval(checkBirthdays, 3600000); }
     init();
   </script>
 </body>
