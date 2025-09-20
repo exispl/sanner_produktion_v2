@@ -74,6 +74,8 @@
     /* Chat stream */
     .alerts{display:flex;flex-wrap:wrap;gap:8px}
     .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
+    @keyframes blink { 50% { opacity: 0.6; } }
+    .blinking { animation: blink 1.5s linear infinite; }
   </style>
 </head>
 <body>
@@ -82,59 +84,66 @@
     <div class="panel">
       <div class="head">
         <div class="flex items-center gap-4">
-          <div class="flex flex-col items-center p-2">
+          <div class="flex flex-col items-end p-2">
             <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" style="width: 180px; height: 180px;">
             <span id="shiftYear" class="text-3xl font-bold mt-2">2025</span>
           </div>
-          <div class="loginbar flex items-center gap-3 relative">
-            <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
-            <div class="flex flex-col items-start">
-              <div>
-                <strong id="loginName">Kamil Kowalczyk</strong>
-                <small id="loginId" class="opacity-70">(SoG1917)</small>
-              </div>
-              <span id="loginRole" class="role-badge" style="display: none;"></span>
-            </div>
-            <div id="custom-login-select" class="relative">
-              <button id="custom-login-toggle" class="btn flex items-center gap-2">
-                <span>Zmień</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-              </button>
-              <div id="custom-login-options" class="hidden absolute right-0 top-full mt-2 w-64 panel z-20">
-                <!-- populated by JS -->
-              </div>
-            </div>
-
-            <div class="user-info-popup">
-            <div class="panel">
-              <div class="body user-info-popup-grid">
-                <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="loginbar flex items-center gap-3 relative">
+              <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
+              <div class="flex flex-col items-start">
                 <div>
-                  <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
-                  <p id="popupUserRole" class="text-sm"></p>
-                  <p class="text-xs mt-2">Ostatnio zalogowany: <span id="popupLastLogin">teraz</span></p>
+                  <strong id="loginName">Kamil Kowalczyk</strong>
+                  <small id="loginId" class="opacity-70">(SoG1917)</small>
+                </div>
+                <span id="loginRole" class="role-badge" style="display: none;"></span>
+              </div>
+              <div id="custom-login-select" class="relative">
+                <button id="custom-login-toggle" class="btn p-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                </button>
+                <div id="custom-login-options" class="hidden absolute right-0 top-full mt-2 w-64 panel z-20">
+                  <!-- populated by JS -->
+                </div>
+              </div>
+              <div class="user-info-popup">
+              <div class="panel">
+                <div class="body user-info-popup-grid">
+                  <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
+                  <div>
+                    <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
+                    <p id="popupUserRole" class="text-sm"></p>
+                    <p class="text-xs mt-2">Ostatnio zalogowany: <span id="popupLastLogin">teraz</span></p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <div id="langSwitcher" class="flex gap-1">
-              <button class="btn ghost text-xs" data-lang="pl">PL</button>
-              <button class="btn ghost text-xs" data-lang="en">EN</button>
-              <button class="btn ghost text-xs" data-lang="de">DE</button>
             </div>
-            <div id="themeSwitcher" class="flex items-center gap-2">
-              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
-              <button class="w-4 h-4 rounded-full border-2 border-black/20" style="background-color: #f3f4f6" data-theme="light" title="Light Theme"></button>
-              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0c1424" data-theme="blue" title="Blue Theme"></button>
-              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #052e16" data-theme="green" title="Green Theme"></button>
+            <div class="flex flex-col items-end gap-2">
+                <div id="langSwitcher" class="flex gap-1">
+                  <button class="btn ghost text-xs" data-lang="pl">PL</button>
+                  <button class="btn ghost text-xs" data-lang="en">EN</button>
+                  <button class="btn ghost text-xs" data-lang="de">DE</button>
+                </div>
+                <div id="themeSwitcher" class="flex items-center gap-2">
+                  <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
+                  <button class="w-4 h-4 rounded-full border-2 border-black/20" style="background-color: #f3f4f6" data-theme="light" title="Light Theme"></button>
+                  <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0c1424" data-theme="blue" title="Blue Theme"></button>
+                  <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #052e16" data-theme="green" title="Green Theme"></button>
+                </div>
+                <div class="badge">v0.007r</div>
             </div>
-            <div class="badge">v0.007r</div>
         </div>
       </div>
       <div class="body">
         <h1 class="m-0" data-translate-key="appTitle">🏭 Kartonowy Napełniacz</h1>
+        <div class="mt-2">
+          <label for="terminalSelect" class="text-sm opacity-80">Wybierz Terminal:</label>
+          <select id="terminalSelect" class="btn"></select>
+        </div>
         <div id="statusLine" class="opacity-80 mt-1" data-translate-key="statusReady"></div>
         <div id="chatStream" class="alerts mt-2"></div>
       </div>
@@ -244,6 +253,27 @@
       </div>
       <div class="body">
         <p>Tutaj znajdą się opcje administracyjne, takie jak zarządzanie użytkownikami i ich uprawnieniami.</p>
+        <div id="userManagement" class="mt-4">
+          <h3 class="font-bold border-b border-white/10 pb-1">Zarządzanie Użytkownikami</h3>
+          <form id="adminAddUserForm" class="flex gap-2 mt-2 items-center flex-wrap">
+            <input type="text" id="adminNewUserLogin" placeholder="Login (np. SoG1234)" class="btn text-sm" required>
+            <input type="text" id="adminNewUserName" placeholder="Imię i nazwisko" class="btn text-sm" required>
+            <button type="submit" class="btn primary text-sm">Dodaj Użytkownika</button>
+          </form>
+          <p class="text-xs opacity-70 mt-1">Hasło dla nowych użytkowników SoG zostanie wygenerowane automatycznie (odwrócone cyfry).</p>
+          <div id="adminUserList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
+        </div>
+
+        <div id="terminalManagement" class="mt-4">
+          <h3 class="font-bold border-b border-white/10 pb-1">Zarządzanie Terminalami</h3>
+          <form id="adminAddTerminalForm" class="flex gap-2 mt-2 items-center flex-wrap">
+            <input type="text" id="adminNewTerminalCode" placeholder="Kod (np. BB513)" class="btn text-sm" required>
+            <input type="text" id="adminNewTerminalName" placeholder="Nazwa terminala" class="btn text-sm" required>
+            <button type="submit" class="btn primary text-sm">Dodaj Terminal</button>
+          </form>
+          <div id="adminTerminalList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
+        </div>
+
         <div id="loginHistory" class="mt-4">
             <h3 class="font-bold border-b border-white/10 pb-1">Historia logowań</h3>
             <div id="loginHistoryList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
@@ -289,26 +319,30 @@
           </div>
         </div>
 
-        <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
-
-        <div class="flex justify-between items-center mt-2 text-sm">
-          <div data-translate-key="timeToComplete">Do ukończenia:</div>
-          <div class="font-bold text-lg completion-time">--:--</div>
-          <div class="completion-warning text-red-500 font-bold text-xl hidden">!</div>
+        <div class="four-counters-container">
+          <!-- New 2x2 carton grid will be rendered here by JS if enabled -->
         </div>
-
-        <div class="pruef">
-          <div class="pr-head">
-            <span data-translate-key="pruefungTime">🧪 Prüfung — czas:</span>
-            <div class="pr-buttons flex gap-2">
-              <button class="btn ghost" data-time="3600">1H</button>
-              <button class="btn ghost" data-time="7200">2H</button>
-              <button class="btn ghost" data-time="10800">3H</button>
-              <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
-            </div>
+        <div class="legacy-progress-container">
+          <!-- Fallback for machines without the new system -->
+          <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
+          <div class="flex justify-between items-center mt-2 text-sm">
+            <div data-translate-key="timeToComplete">Do ukończenia:</div>
+            <div class="font-bold text-lg completion-time">--:--</div>
+            <div class="completion-warning text-red-500 font-bold text-xl hidden">!</div>
           </div>
-          <div class="pr-bar">
-            <div class="pr-fill"></div><div class="pr-label">60:00</div><div class="pr-reset">Reset</div>
+          <div class="pruef">
+          <div class="pr-head justify-end">
+              <span data-translate-key="pruefungTime">🧪 Prüfung — czas:</span>
+              <div class="pr-buttons flex gap-2">
+                <button class="btn ghost" data-time="3600">1H</button>
+                <button class="btn ghost" data-time="7200">2H</button>
+                <button class="btn ghost" data-time="10800">3H</button>
+                <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
+              </div>
+            </div>
+            <div class="pr-bar">
+              <div class="pr-fill"></div><div class="pr-label">60:00</div><div class="pr-reset">Reset</div>
+            </div>
           </div>
         </div>
 
@@ -384,17 +418,59 @@
     const DEFAULTS={
       user: { uid: 'SoG1917' },
       users: USERS,
+      terminals: [
+        { code: 'BB511', name: 'Terminal Główny', machines: ['MA820061', 'MA820026', 'MA820019'] },
+        { code: 'BB512', name: 'Terminal przy \'63\'', machines: ['MA820063'] }
+      ],
       machines:[
-        { code:'MA820061', durationMin:25, pruef:3600 },
-        { code:'MA820062',  durationMin:22, pruef:3600 },
-        { code:'MA820063', durationMin:25, pruef:3600 },
-        { code:'MA820064', durationMin:25, pruef:3600 },
+        {
+          code:'MA820061', durationMin:22.5, pruef:3600,
+          fourCountersEnabled: true,
+          baseVeNumber: 2208881, baseCartonNumber: 239,
+          cartons: [
+            { id: 0, status: 'running', targetQuantity: 1500, currentQuantity: 0, veNumber: 2208881, cartonNumber: 239, timerStart: Date.now() },
+            { id: 1, status: 'idle', targetQuantity: 1500, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
+            { id: 2, status: 'idle', targetQuantity: 1500, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
+            { id: 3, status: 'idle', targetQuantity: 1500, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 }
+          ]
+        },
+        { code:'MA820062',  durationMin:18, pruef:3600, fourCountersEnabled: false },
+        {
+          code:'MA820063', durationMin:23, pruef:3600,
+          fourCountersEnabled: true,
+          baseVeNumber: 5000, baseCartonNumber: 100,
+          cartons: [
+            { id: 0, status: 'running', targetQuantity: 2000, currentQuantity: 0, veNumber: 5000, cartonNumber: 100, timerStart: Date.now() },
+            { id: 1, status: 'idle', targetQuantity: 2000, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
+            { id: 2, status: 'idle', targetQuantity: 2000, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
+            { id: 3, status: 'idle', targetQuantity: 2000, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 }
+          ]
+        },
+        { code:'MA820064', durationMin:25, pruef:3600, fourCountersEnabled: false },
+        { code:'MA820059', durationMin:25, pruef:3600, fourCountersEnabled: false },
+        { code:'MA820026', durationMin:25, pruef:3600, fourCountersEnabled: false },
+        { code:'MA820019', durationMin:25, pruef:3600, fourCountersEnabled: false },
       ],
       orders:{},
     };
     let CFG=JSON.parse(localStorage.getItem('KN007_CFG')||'null')||DEFAULTS;
-    // ensure USERS is up to date
+    // --- MIGRATION & DEFAULTS ENSURING
     if (CFG.users) { USERS = CFG.users; } else { CFG.users = USERS; }
+    if (!CFG.terminals) {
+      CFG.terminals = DEFAULTS.terminals;
+    }
+    // Simple check to see if the machine structure is the old one.
+    if (CFG.machines && CFG.machines.length > 0 && CFG.machines[0].durationMin && !CFG.machines[0].hasOwnProperty('fourCountersEnabled')) {
+      // It's an old structure. We can try to migrate or just reset. Reset is simpler.
+      // Let's create a map of old durations to preserve them.
+      const oldDurations = new Map(CFG.machines.map(m => [m.code, m.durationMin]));
+      DEFAULTS.machines.forEach(m => {
+        if (oldDurations.has(m.code)) {
+          m.durationMin = oldDurations.get(m.code);
+        }
+      });
+      CFG.machines = DEFAULTS.machines;
+    }
 
     const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
     const isAdmin=()=> CFG.user?.uid==='SoG1917';
@@ -469,6 +545,10 @@
         this.orders = orders;
         this.code=data.code; $('.code',this.root).textContent=this.code;
 
+        // --- NEW: Get references to containers ---
+        this.fourCountersContainer = $('.four-counters-container', this.root);
+        this.legacyContainer = $('.legacy-progress-container', this.root);
+
         if (!this.data.completionTimestamp) {
           this.data.completionTimestamp = Date.now() + (Math.floor(Math.random() * 14940) + 60) * 1000;
         }
@@ -514,10 +594,21 @@
             this.favoriteBtn.classList.add('text-yellow-400');
         }
 
-        this.bar=$('.bar',this.root); this.label=$('.label',this.root);
-        container.appendChild(this.root); this.pr=new Pruefung($('.pruef',this.root));
-        // simple progress demo
-        let start=performance.now(), dur=(data.durationMin||25)*60000; const step=()=>{ const p=Math.min(1,(performance.now()-start)/dur); this.bar.style.width=(p*100)+'%'; this.label.textContent=Math.floor(p*100)+'%'; requestAnimationFrame(step) }; requestAnimationFrame(step);
+        container.appendChild(this.root);
+
+        // --- NEW: Conditional rendering logic ---
+        if (this.data.fourCountersEnabled) {
+          this.legacyContainer.style.display = 'none';
+          this.fourCountersContainer.style.display = 'block';
+          this.renderFourCounters();
+          this.tickCartons();
+        } else {
+          this.fourCountersContainer.style.display = 'none';
+          this.legacyContainer.style.display = 'block';
+          // Old logic for machines without the 4-counter system
+          this.pr = new Pruefung($('.pruef', this.root));
+          let start=performance.now(), dur=(this.data.durationMin||25)*60000; const step=()=>{ const p=Math.min(1,(performance.now()-start)/dur); $('.bar',this.root).style.width=(p*100)+'%'; $('.label',this.root).textContent=Math.floor(p*100)+'%'; requestAnimationFrame(step) }; requestAnimationFrame(step);
+        }
 
         this.render();
         this.tickCompletion();
@@ -566,25 +657,177 @@
         persist();
       }
       tickCompletion() {
+        // This is for the legacy "time to complete" display, which is separate from the cartons.
+        // We can leave it running for all machines.
         const now = Date.now();
         const timeLeft = Math.max(0, Math.floor((this.data.completionTimestamp - now) / 1000));
         const hours = Math.floor(timeLeft / 3600);
         const minutes = Math.floor((timeLeft % 3600) / 60);
-        this.completionTimeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
 
-        const twoHours = 2 * 3600; const oneHour = 1 * 3600;
-        if (timeLeft > 0 && timeLeft < twoHours) {
-            this.completionWarningEl.classList.remove('hidden');
-            if (timeLeft < oneHour) {
-                showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu godziny!`, 'danger');
+        if (this.legacyContainer.style.display !== 'none') {
+            this.completionTimeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
+
+            const twoHours = 2 * 3600; const oneHour = 1 * 3600;
+            if (timeLeft > 0 && timeLeft < twoHours) {
+                this.completionWarningEl.classList.remove('hidden');
+                if (timeLeft < oneHour) {
+                    showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu godziny!`, 'danger');
+                } else {
+                    showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu 2 godzin!`, 'warning');
+                }
             } else {
-                showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu 2 godzin!`, 'warning');
+                this.completionWarningEl.classList.add('hidden');
+                hideUrgentNotification(this.code);
             }
-        } else {
-            this.completionWarningEl.classList.add('hidden');
-            hideUrgentNotification(this.code);
         }
         requestAnimationFrame(()=>this.tickCompletion());
+      }
+
+      renderFourCounters() {
+        this.fourCountersContainer.innerHTML = '<div class="grid grid-cols-2 gap-2 mt-3"></div>';
+        const grid = $('.grid', this.fourCountersContainer);
+
+        this.data.cartons.forEach(carton => {
+            const cartonEl = document.createElement('div');
+            cartonEl.className = 'carton-cell border border-white/10 rounded-lg p-2 flex flex-col relative h-32';
+
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar absolute bottom-0 left-0 right-0 top-0 bg-green-500/20';
+            progressBar.style.transformOrigin = 'bottom';
+            progressBar.style.transform = 'scaleY(0)';
+
+            const content = document.createElement('div');
+            content.className = 'relative z-10 flex flex-col h-full';
+            content.innerHTML = `
+              <div class="text-xs opacity-70">
+                <span class="ve-number">VE ${carton.veNumber || '...'}</span> / <span class="carton-number">#${carton.cartonNumber || '...'}</span>
+              </div>
+              <div class="text-lg font-bold text-center my-auto">
+                <span class="current-qty">${carton.currentQuantity}</span> / <span class="target-qty">${carton.targetQuantity}</span>
+              </div>
+              <div class="text-xs text-center opacity-70">
+                Status: <span class="status-text">${carton.status}</span>
+              </div>
+            `;
+
+            const resetButton = document.createElement('button');
+            resetButton.className = 'reset-btn absolute inset-0 flex items-center justify-center bg-black/70 text-white font-bold hidden z-20';
+            resetButton.textContent = 'RESET';
+
+            cartonEl.append(progressBar, content, resetButton);
+            grid.appendChild(cartonEl);
+
+            // --- Visual state logic ---
+            if (carton.status === 'finished') {
+                progressBar.style.transform = 'scaleY(1)';
+                progressBar.classList.add('bg-green-500/80', 'blinking');
+                resetButton.classList.remove('hidden');
+            } else if (carton.status === 'running') {
+                resetButton.classList.remove('hidden');
+                const totalTime = this.data.durationMin * 60 * 1000;
+                const elapsedTime = Date.now() - carton.timerStart;
+                const progress = Math.min(1, elapsedTime / totalTime);
+                progressBar.style.transform = `scaleY(${progress})`;
+            }
+
+            // --- Reset button logic ---
+            let clickTimeout = null;
+            resetButton.addEventListener('click', () => {
+                if (clickTimeout) {
+                    clearTimeout(clickTimeout);
+                    clickTimeout = null;
+                    this.handleCartonReset(carton.id, true); // Double click
+                } else {
+                    clickTimeout = setTimeout(() => {
+                        this.handleCartonReset(carton.id, false); // Single click
+                        clickTimeout = null;
+                    }, 250);
+                }
+            });
+        });
+      }
+
+      handleCartonReset(cartonId, isDoubleClick) {
+          const carton = this.data.cartons.find(c => c.id === cartonId);
+          if (!carton) return;
+
+          if (isDoubleClick) {
+              // Reset and restart this same carton
+              carton.status = 'running';
+              carton.timerStart = Date.now();
+              carton.currentQuantity = 0;
+          } else {
+              // Single click: finish this, start next
+              carton.status = 'waiting'; // It's done, waiting for the full cycle to restart
+
+              const allFinished = this.data.cartons.every(c => c.status === 'waiting' || c.status === 'finished');
+              if (allFinished) {
+                  // If all are done, reset all to idle and start the first one
+                  this.data.baseVeNumber += this.data.cartons.length;
+                  this.data.baseCartonNumber += this.data.cartons.length;
+                  const sequence = [0, 3, 2, 1];
+                  this.data.cartons.forEach((c, index) => {
+                      c.status = 'idle';
+                      c.timerStart = 0;
+                      c.currentQuantity = 0;
+                      if (c.id === sequence[0]) {
+                          c.status = 'running';
+                          c.timerStart = Date.now();
+                          c.veNumber = this.data.baseVeNumber;
+                          c.cartonNumber = this.data.baseCartonNumber;
+                      }
+                  });
+              } else {
+                  // Find current index in sequence and start the next one
+                  const sequence = [0, 3, 2, 1];
+                  const currentSeqIndex = sequence.indexOf(carton.id);
+                  const nextSeqIndex = (currentSeqIndex + 1) % sequence.length;
+                  const nextCartonId = sequence[nextSeqIndex];
+                  const nextCarton = this.data.cartons.find(c => c.id === nextCartonId);
+
+                  if (nextCarton.status === 'idle') {
+                      nextCarton.status = 'running';
+                      nextCarton.timerStart = Date.now();
+                      nextCarton.veNumber = (carton.veNumber || this.data.baseVeNumber) + 1;
+                      nextCarton.cartonNumber = (carton.cartonNumber || this.data.baseCartonNumber) + 1;
+                  }
+              }
+          }
+          this.renderFourCounters();
+          persist();
+      }
+
+      tickCartons() {
+        if (!this.data.fourCountersEnabled) return;
+        const runningCarton = this.data.cartons.find(c => c.status === 'running');
+
+        if (runningCarton) {
+            const totalTime = this.data.durationMin * 60 * 1000;
+            const elapsedTime = Date.now() - runningCarton.timerStart;
+            const progress = Math.min(1, elapsedTime / totalTime);
+
+            // Update UI - find corresponding element
+            const cartonEl = this.fourCountersContainer.querySelectorAll('.carton-cell')[runningCarton.id];
+            if (cartonEl) {
+                const progressBar = $('.progress-bar', cartonEl);
+                const currentQtyEl = $('.current-qty', cartonEl);
+
+                progressBar.style.transform = `scaleY(${progress})`;
+                const newQty = Math.floor(progress * runningCarton.targetQuantity);
+
+                if (newQty - parseInt(currentQtyEl.textContent) >= 1) {
+                    currentQtyEl.textContent = newQty;
+                }
+
+                if (progress >= 1) {
+                    runningCarton.status = 'finished';
+                    runningCarton.currentQuantity = runningCarton.targetQuantity;
+                    this.renderFourCounters();
+                    persist();
+                }
+            }
+        }
+        requestAnimationFrame(() => this.tickCartons());
       }
     }
 
@@ -603,7 +846,16 @@
 
       let hasMinimized = false;
 
-      const sortedMachines = (CFG.machines || []).sort((a, b) => {
+      let machinesToRender = CFG.machines || [];
+      if (CFG.selectedTerminal && CFG.selectedTerminal !== 'all') {
+        const selectedTerminalData = CFG.terminals.find(t => t.code === CFG.selectedTerminal);
+        if (selectedTerminalData) {
+          const machineCodesForTerminal = new Set(selectedTerminalData.machines);
+          machinesToRender = (CFG.machines || []).filter(m => machineCodesForTerminal.has(m.code));
+        }
+      }
+
+      const sortedMachines = machinesToRender.sort((a, b) => {
         if (a.favorite && !b.favorite) return -1;
         if (!a.favorite && b.favorite) return 1;
         return (a.code || '').localeCompare(b.code || '');
@@ -706,8 +958,20 @@
 
       $('#loginName').textContent = user.name;
       $('#loginId').textContent = uid || '';
-      const avatarSrc = user.avatar || 'https://placehold.co/40/0e1117/ffffff?text=' + (user.name?.[0] || '?');
+
+      let avatarSrc = user.avatar;
+      let popupAvatarSrc = user.avatar;
+
+      if (!avatarSrc) {
+        const EMOJIS = ['😀', '😎', '🚀', '🦄', '🤖', '👾', '👽', '🤠', '🏴‍☠️'];
+        const hash = (uid || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const emoji = EMOJIS[hash % EMOJIS.length];
+        avatarSrc = `https://placehold.co/40/121826/ffffff?text=${emoji}`;
+        popupAvatarSrc = `https://placehold.co/184/121826/ffffff?text=${emoji}`;
+      }
+
       $('#userAvatar').src = avatarSrc;
+      $('#popupUserAvatar').src = popupAvatarSrc;
 
       const role = getUserRole(uid);
       const roleEl = $('#loginRole');
@@ -720,7 +984,6 @@
       }
 
       // Update popup
-      $('#popupUserAvatar').src = user.avatar || 'https://placehold.co/184/0e1117/ffffff?text=' + (user.name?.[0] || '?');
       $('#popupUserName').textContent = user.name;
       $('#popupUserRole').textContent = role ? role.name : 'Użytkownik';
     }
@@ -842,6 +1105,7 @@
 
     // --- init buttons
     function initNotesPlans(){
+      $('#noteInput').addEventListener('keypress', e => { if (e.key === 'Enter') $('#addNote').click(); });
       $('#addNote').onclick=async()=>{
         const v=$('#noteInput').value.trim(); if(!v) return;
         let status='FINAL';
@@ -947,11 +1211,144 @@
         });
     }
 
+    function renderAdminUserManagement() {
+        const userList = $('#adminUserList');
+        if (!userList) return;
+
+        userList.innerHTML = '';
+        for (const uid in USERS) {
+            if (uid === 'SoG1917') continue; // Can't delete the main admin
+
+            const user = USERS[uid];
+            const row = document.createElement('div');
+            row.className = 'row !items-center';
+            row.innerHTML = `<div class="txt text-sm"><strong>${user.name}</strong> (${uid})</div>`;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn';
+            deleteBtn.textContent = '🗑️ Usuń';
+            deleteBtn.onclick = () => {
+                if (confirm(`Na pewno usunąć użytkownika ${user.name}?`)) {
+                    delete USERS[uid];
+                    CFG.users = USERS;
+                    persist();
+                    renderAdminPanel(); // Re-render the whole admin panel
+                }
+            };
+            row.appendChild(deleteBtn);
+            userList.appendChild(row);
+        }
+
+        $('#adminAddUserForm').onsubmit = (e) => {
+            e.preventDefault();
+            const loginInput = $('#adminNewUserLogin');
+            const nameInput = $('#adminNewUserName');
+            const login = loginInput.value.trim();
+            const name = nameInput.value.trim();
+
+            if (!login || !name) {
+                alert('Login i nazwa są wymagane.');
+                return;
+            }
+            if (USERS[login]) {
+                alert('Użytkownik o takim loginie już istnieje.');
+                return;
+            }
+
+            let password = undefined;
+            if (login.startsWith('SoG')) {
+                const numbers = login.replace(/[^0-9]/g, '');
+                if (numbers) {
+                    password = numbers.split('').reverse().join('');
+                }
+            }
+
+            USERS[login] = { name: name, avatar: '', password: password };
+            CFG.users = USERS;
+            persist();
+
+            loginInput.value = '';
+            nameInput.value = '';
+            renderAdminPanel();
+            alert(`Dodano użytkownika ${name}. Hasło: ${password || 'brak'}`);
+        };
+    }
+
+    function renderAdminTerminalManagement() {
+        const terminalList = $('#adminTerminalList');
+        if (!terminalList) return;
+
+        terminalList.innerHTML = '';
+        (CFG.terminals || []).forEach(terminal => {
+            const row = document.createElement('div');
+            row.className = 'row !items-center';
+            row.innerHTML = `
+                <div class="txt text-sm">
+                    <strong>${terminal.name}</strong> (${terminal.code})
+                    <div class="text-xs opacity-70">Maszyny: ${terminal.machines.join(', ') || 'brak'}</div>
+                </div>`;
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn';
+            editBtn.textContent = '✏️ Edytuj';
+            editBtn.onclick = () => {
+                const newName = prompt('Nowa nazwa terminala:', terminal.name);
+                const newMachines = prompt('Nowa lista maszyn (oddzielone przecinkami):', terminal.machines.join(','));
+                if (newName !== null) terminal.name = newName;
+                if (newMachines !== null) terminal.machines = newMachines.split(',').map(s => s.trim()).filter(Boolean);
+                persist();
+                renderAdminPanel();
+            };
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn';
+            deleteBtn.textContent = '🗑️ Usuń';
+            deleteBtn.onclick = () => {
+                if (confirm(`Na pewno usunąć terminal ${terminal.name}?`)) {
+                    CFG.terminals = CFG.terminals.filter(t => t.code !== terminal.code);
+                    persist();
+                    renderAdminPanel();
+                }
+            };
+            const actDiv = document.createElement('div');
+            actDiv.className = 'act';
+            actDiv.append(editBtn, deleteBtn);
+            row.appendChild(actDiv);
+            terminalList.appendChild(row);
+        });
+
+        $('#adminAddTerminalForm').onsubmit = (e) => {
+            e.preventDefault();
+            const codeInput = $('#adminNewTerminalCode');
+            const nameInput = $('#adminNewTerminalName');
+            const code = codeInput.value.trim();
+            const name = nameInput.value.trim();
+
+            if (!code || !name) {
+                alert('Kod i nazwa są wymagane.');
+                return;
+            }
+            if (CFG.terminals.some(t => t.code === code)) {
+                alert('Terminal o takim kodzie już istnieje.');
+                return;
+            }
+
+            CFG.terminals.push({ code: code, name: name, machines: [] });
+            persist();
+
+            codeInput.value = '';
+            nameInput.value = '';
+            renderAdminPanel();
+        };
+    }
+
     function renderAdminPanel() {
       const footer = $('#adminFooter');
       if (isAdmin()) {
         footer.style.display = 'block';
         renderLoginHistory();
+        renderAdminUserManagement();
+        renderAdminTerminalManagement();
       } else {
         footer.style.display = 'none';
       }
@@ -1087,7 +1484,29 @@
       shiftYearEl.style.color = color;
     }
 
-    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); updateShiftIndicator(); setInterval(updateShiftIndicator, 60000); }
+    function initTerminalSelector() {
+      const selectEl = $('#terminalSelect');
+      if (!selectEl) return;
+
+      selectEl.innerHTML = '<option value="all">Wszystkie</option>';
+
+      (CFG.terminals || []).forEach(terminal => {
+        const option = document.createElement('option');
+        option.value = terminal.code;
+        option.textContent = `${terminal.name} (${terminal.code})`;
+        selectEl.appendChild(option);
+      });
+
+      selectEl.value = CFG.selectedTerminal || 'all';
+
+      selectEl.addEventListener('change', () => {
+        CFG.selectedTerminal = selectEl.value;
+        persist();
+        renderAllMachines();
+      });
+    }
+
+    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initTerminalSelector(); initCustomTimeModal(); initColorPicker(); updateShiftIndicator(); setInterval(updateShiftIndicator, 60000); }
     init();
   </script>
 </body>
