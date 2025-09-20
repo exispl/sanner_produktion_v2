@@ -86,7 +86,10 @@
         <div class="flex items-center gap-4">
           <div class="flex flex-col items-end p-2">
             <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" style="width: 180px; height: 180px;">
-            <span id="shiftYear" class="text-3xl font-bold mt-2">2025</span>
+            <div id="liveClockContainer" class="text-right mt-2">
+                <div id="liveClock" class="text-2xl font-bold" style="font-variant-numeric: tabular-nums;"></div>
+                <div id="liveDate" class="text-xs opacity-70"></div>
+            </div>
           </div>
         </div>
         <div class="flex items-center gap-4">
@@ -123,10 +126,8 @@
             </div>
             </div>
             <div class="flex flex-col items-end gap-2">
-                <div id="langSwitcher" class="flex gap-1">
-                  <button class="btn ghost text-xs" data-lang="pl">PL</button>
-                  <button class="btn ghost text-xs" data-lang="en">EN</button>
-                  <button class="btn ghost text-xs" data-lang="de">DE</button>
+                <div id="langSwitcher" class="flex gap-2">
+                  <!-- Language flags will be populated by JS -->
                 </div>
                 <div id="themeSwitcher" class="flex items-center gap-2">
                   <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
@@ -274,6 +275,17 @@
           <div id="adminTerminalList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
         </div>
 
+        <div id="userManagement" class="mt-4">
+          <h3 class="font-bold border-b border-white/10 pb-1">Zarządzanie Użytkownikami</h3>
+          <form id="adminAddUserForm" class="flex gap-2 mt-2 items-center flex-wrap">
+            <input type="text" id="adminNewUserLogin" placeholder="Login (np. SoG1234)" class="btn text-sm" required>
+            <input type="text" id="adminNewUserName" placeholder="Imię i nazwisko" class="btn text-sm" required>
+            <button type="submit" class="btn primary text-sm">Dodaj Użytkownika</button>
+          </form>
+          <p class="text-xs opacity-70 mt-1">Hasło dla nowych użytkowników SoG zostanie wygenerowane automatycznie (odwrócone cyfry).</p>
+          <div id="adminUserList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
+        </div>
+
         <div id="loginHistory" class="mt-4">
             <h3 class="font-bold border-b border-white/10 pb-1">Historia logowań</h3>
             <div id="loginHistoryList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
@@ -415,14 +427,25 @@
       'SoG2020': { name: 'User 2020', avatar: '' },
     };
 
-    const DEFAULTS={
-      user: { uid: 'SoG1917' },
+    // Add default settings to each user in the initial list
+    for (const uid in USERS) {
+        USERS[uid].settings = {
+            theme: 'dark',
+            language: 'pl',
+            selectedTerminal: 'all',
+        };
+    }
+    // You can add specific overrides here if needed, e.g.:
+    // if (USERS['SoG2025']) USERS['SoG2025'].settings.language = 'en';
+
+    const DEFAULTS = {
+      currentUserUid: 'SoG1917',
       users: USERS,
       terminals: [
         { code: 'BB511', name: 'Terminal Główny', machines: ['MA820061', 'MA820026', 'MA820019'] },
         { code: 'BB512', name: 'Terminal przy \'63\'', machines: ['MA820063'] }
       ],
-      machines:[
+      machines: [
         {
           code:'MA820061', durationMin:22.5, pruef:3600,
           fourCountersEnabled: true,
@@ -454,15 +477,44 @@
       orders:{},
     };
     let CFG=JSON.parse(localStorage.getItem('KN007_CFG')||'null')||DEFAULTS;
-    // --- MIGRATION & DEFAULTS ENSURING
-    if (CFG.users) { USERS = CFG.users; } else { CFG.users = USERS; }
-    if (!CFG.terminals) {
-      CFG.terminals = DEFAULTS.terminals;
+
+    // --- MIGRATION & DEFAULTS ENSURING ---
+
+    // Migration to user-specific settings
+    if (CFG.user && CFG.user.uid && !CFG.currentUserUid) {
+      console.log('Migrating to user-specific settings...');
+      CFG.currentUserUid = CFG.user.uid;
+      const globalTheme = CFG.theme || 'dark';
+      const globalLang = CFG.language || 'pl';
+      const globalTerminal = CFG.selectedTerminal || 'all';
+
+      for (const uid in CFG.users) {
+        if (!CFG.users[uid].settings) {
+          CFG.users[uid].settings = {};
+        }
+        CFG.users[uid].settings.theme = CFG.users[uid].settings.theme || 'dark';
+        CFG.users[uid].settings.language = CFG.users[uid].settings.language || 'pl';
+        CFG.users[uid].settings.selectedTerminal = CFG.users[uid].settings.selectedTerminal || 'all';
+      }
+
+      if (CFG.users[CFG.currentUserUid]) {
+        CFG.users[CFG.currentUserUid].settings.theme = globalTheme;
+        CFG.users[CFG.currentUserUid].settings.language = globalLang;
+        CFG.users[CFG.currentUserUid].settings.selectedTerminal = globalTerminal;
+      }
+
+      delete CFG.user;
+      delete CFG.theme;
+      delete CFG.language;
+      delete CFG.selectedTerminal;
+      console.log('User-specific settings migration complete.');
     }
-    // Simple check to see if the machine structure is the old one.
+
+    if (CFG.users) { USERS = CFG.users; } else { CFG.users = USERS; }
+    if (!CFG.terminals) { CFG.terminals = DEFAULTS.terminals; }
+
+    // Migration for old machine structure
     if (CFG.machines && CFG.machines.length > 0 && CFG.machines[0].durationMin && !CFG.machines[0].hasOwnProperty('fourCountersEnabled')) {
-      // It's an old structure. We can try to migrate or just reset. Reset is simpler.
-      // Let's create a map of old durations to preserve them.
       const oldDurations = new Map(CFG.machines.map(m => [m.code, m.durationMin]));
       DEFAULTS.machines.forEach(m => {
         if (oldDurations.has(m.code)) {
@@ -472,8 +524,25 @@
       CFG.machines = DEFAULTS.machines;
     }
 
+    function getCurrentUser() {
+      if (!CFG.currentUserUid || !CFG.users[CFG.currentUserUid]) {
+        // Fallback to default user if something is wrong
+        return USERS[DEFAULTS.currentUserUid] || {};
+      }
+      return CFG.users[CFG.currentUserUid];
+    }
+
+    function getCurrentUserSettings() {
+      const user = getCurrentUser();
+      // Ensure settings object exists to prevent errors
+      if (!user.settings) {
+        user.settings = { theme: 'dark', language: 'pl', selectedTerminal: 'all' };
+      }
+      return user.settings;
+    }
+
     const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-    const isAdmin=()=> CFG.user?.uid==='SoG1917';
+    const isAdmin=()=> CFG.currentUserUid==='SoG1917';
     function persist(){ localStorage.setItem('KN007_CFG', JSON.stringify(CFG)); }
     function setStatus(t){ $('#statusLine').textContent='Status: '+t; }
 
@@ -700,7 +769,7 @@
             content.className = 'relative z-10 flex flex-col h-full';
             content.innerHTML = `
               <div class="text-xs opacity-70">
-                <span class="ve-number">VE ${carton.veNumber || '...'}</span> / <span class="carton-number">#${carton.cartonNumber || '...'}</span>
+                <span class="ve-number cursor-pointer" title="LPM: Kopiuj, PPM: Edytuj">VE ${carton.veNumber || '...'}</span> / <span class="carton-number">#${carton.cartonNumber || '...'}</span>
               </div>
               <div class="text-lg font-bold text-center my-auto">
                 <span class="current-qty">${carton.currentQuantity}</span> / <span class="target-qty">${carton.targetQuantity}</span>
@@ -715,6 +784,32 @@
             resetButton.textContent = 'RESET';
 
             cartonEl.append(progressBar, content, resetButton);
+
+            // --- NEW: VE Number interactions ---
+            const veNumberEl = $('.ve-number', content);
+            if (carton.veNumber) {
+                veNumberEl.addEventListener('click', () => {
+                    navigator.clipboard.writeText(carton.veNumber).then(() => {
+                        setStatus(`Skopiowano VE ${carton.veNumber}`);
+                    }).catch(err => {
+                        setStatus('Błąd kopiowania');
+                        console.error('Could not copy text: ', err);
+                    });
+                });
+
+                veNumberEl.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    const newVeNumber = prompt('Wprowadź nowy numer VE:', carton.veNumber);
+                    if (newVeNumber && !isNaN(newVeNumber)) {
+                        carton.veNumber = parseInt(newVeNumber, 10);
+                        persist();
+                        this.renderFourCounters(); // Re-render to show the new number
+                        setStatus(`Zmieniono VE na ${carton.veNumber}`);
+                    }
+                });
+            }
+
+
             grid.appendChild(cartonEl);
 
             // --- Visual state logic ---
@@ -847,8 +942,9 @@
       let hasMinimized = false;
 
       let machinesToRender = CFG.machines || [];
-      if (CFG.selectedTerminal && CFG.selectedTerminal !== 'all') {
-        const selectedTerminalData = CFG.terminals.find(t => t.code === CFG.selectedTerminal);
+      const settings = getCurrentUserSettings();
+      if (settings.selectedTerminal && settings.selectedTerminal !== 'all') {
+        const selectedTerminalData = CFG.terminals.find(t => t.code === settings.selectedTerminal);
         if (selectedTerminalData) {
           const machineCodesForTerminal = new Set(selectedTerminalData.machines);
           machinesToRender = (CFG.machines || []).filter(m => machineCodesForTerminal.has(m.code));
@@ -916,7 +1012,7 @@
           const bR=document.createElement('button'); bR.className='btn'; bR.textContent='↩️'; bR.title='Odpowiedz';
           const bD=document.createElement('button'); bD.className='btn'; bD.textContent='🗑️'; bD.title='Usuń';
           bE.onclick=async()=>{ const v=prompt('Edytuj notatkę', n.text); if(v!=null){ n.text=v; await saveNotes(); renderNotes(); } };
-          bR.onclick=async()=>{ const v=prompt('Odpowiedź', ''); if(v){ NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:`↪ ${v} (odpowiedź na #${n.id})`, status:'FINAL'}); await saveNotes(); renderNotes(); } };
+          bR.onclick=async()=>{ const v=prompt('Odpowiedź', ''); if(v){ NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:`↪ ${v} (odpowiedź na #${n.id})`, status:'FINAL'}); await saveNotes(); renderNotes(); } };
           bD.onclick=async()=>{ if(confirm('Usunąć notatkę?')){ NOTES = NOTES.filter(x=>x.id!==n.id); await saveNotes(); renderNotes(); } };
           act.append(bE,bR,bD);
         }
@@ -953,7 +1049,7 @@
     }
 
     function showUser(){
-      const uid = CFG.user?.uid;
+      const uid = CFG.currentUserUid;
       const user = USERS[uid] || { name: 'Nieznany', avatar: '' };
 
       $('#loginName').textContent = user.name;
@@ -992,7 +1088,7 @@
         const currentUser = USERS[CFG.user.uid];
         if (currentUser) {
             $('#detailsName').value = currentUser.name || '';
-            $('#detailsLang').value = CFG.language || 'pl';
+            $('#detailsLang').value = getCurrentUserSettings().language || 'pl';
         }
         $('#userDetailsModal').classList.remove('hidden');
     }
@@ -1057,7 +1153,7 @@
           }
 
           logLogin(selectedValue);
-          CFG.user.uid = selectedValue;
+          CFG.currentUserUid = selectedValue; // <-- Changed
           persist();
 
           const newCurrentUser = USERS[selectedValue];
@@ -1086,16 +1182,16 @@
       });
 
       // Check if we need to ask for details on initial load
-      const currentUser = USERS[CFG.user.uid];
+      const currentUser = USERS[CFG.currentUserUid]; // <-- Changed
       if (currentUser && !currentUser.details_filled) {
         showUserDetailsModal();
       }
 
       // Handle avatar change click
       $('#userAvatar').addEventListener('click', () => {
-        const newAvatar = prompt('Podaj nowy URL avatara:', USERS[CFG.user.uid].avatar || '');
+        const newAvatar = prompt('Podaj nowy URL avatara:', USERS[CFG.currentUserUid].avatar || ''); // <-- Changed
         if (newAvatar !== null) {
-          USERS[CFG.user.uid].avatar = newAvatar;
+          USERS[CFG.currentUserUid].avatar = newAvatar; // <-- Changed
           CFG.users = USERS;
           persist();
           showUser();
@@ -1105,7 +1201,12 @@
 
     // --- init buttons
     function initNotesPlans(){
-      $('#noteInput').addEventListener('keypress', e => { if (e.key === 'Enter') $('#addNote').click(); });
+      $('#noteInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault(); // Prevent form submission or line break in other inputs
+          $('#addNote').click();
+        }
+      });
       $('#addNote').onclick=async()=>{
         const v=$('#noteInput').value.trim(); if(!v) return;
         let status='FINAL';
@@ -1119,12 +1220,12 @@
             chatPush(v);
           }
         }
-        NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v, status});
+        NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:v, status});
         $('#noteInput').value=''; await saveNotes(); renderNotes();
       };
       $('#addPlan').onclick=async()=>{
         const v=$('#planInput').value.trim(); if(!v) return;
-        PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:v});
+        PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:v});
         $('#planInput').value=''; await savePlans(); renderPlans();
       };
       $('#refreshNP').onclick=async()=>{ await loadNotes(); await loadPlans(); };
@@ -1138,13 +1239,14 @@
 
       function applyTheme(theme) {
         body.dataset.theme = theme;
-        CFG.theme = theme;
+        getCurrentUserSettings().theme = theme;
         persist();
       }
 
       // Apply saved theme on load
-      if (CFG.theme) {
-        applyTheme(CFG.theme);
+      const savedTheme = getCurrentUserSettings().theme;
+      if (savedTheme) {
+        applyTheme(savedTheme);
       }
 
       themeButtons.forEach(button => {
@@ -1378,20 +1480,38 @@
                 }
             }
         });
-        CFG.language = lang;
+        getCurrentUserSettings().language = lang;
         persist();
 
+        // New part for highlighting flags
         $$('#langSwitcher button').forEach(btn => {
-            btn.classList.toggle('primary', btn.dataset.lang === lang);
+            if (btn.dataset.lang === lang) {
+                btn.classList.add('ring-2', 'ring-accent');
+                btn.classList.remove('opacity-50');
+            } else {
+                btn.classList.remove('ring-2', 'ring-accent');
+                btn.classList.add('opacity-50');
+            }
         });
     }
 
     function initLangSwitcher() {
-        const langButtons = $$('#langSwitcher button');
-        langButtons.forEach(button => {
-            button.addEventListener('click', () => setLanguage(button.dataset.lang));
-        });
-        setLanguage(CFG.language || 'pl');
+        const langContainer = $('#langSwitcher');
+        if (!langContainer) return;
+
+        const langMap = { pl: 'pl', en: 'gb', de: 'de', tr: 'tr', ar: 'sa' };
+
+        for (const lang in TRANSLATIONS) {
+            const countryCode = langMap[lang];
+            const btn = document.createElement('button');
+            btn.className = 'p-1 rounded-sm transition-all';
+            btn.dataset.lang = lang;
+            btn.title = lang.toUpperCase();
+            btn.innerHTML = `<img src="https://flagcdn.com/w40/${countryCode}.png" alt="${lang}" class="w-6 h-auto rounded-sm" style="min-height: 16px;">`;
+            btn.addEventListener('click', () => setLanguage(lang));
+            langContainer.appendChild(btn);
+        }
+        setLanguage(getCurrentUserSettings().language || 'pl');
     }
 
     function initCustomTimeModal() {
@@ -1461,9 +1581,22 @@
         }
     }
 
+    function updateLiveClock() {
+        const clockEl = $('#liveClock');
+        const dateEl = $('#liveDate');
+        if (!clockEl || !dateEl) return;
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('pl-PL');
+        const dateString = now.toLocaleDateString('pl-PL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        clockEl.textContent = timeString;
+        dateEl.textContent = dateString;
+    }
+
     function updateShiftIndicator() {
-      const shiftYearEl = $('#shiftYear');
-      if (!shiftYearEl) return;
+      const clockContainer = $('#liveClockContainer');
+      if (!clockContainer) return;
 
       const now = new Date();
       const hour = now.getHours();
@@ -1481,7 +1614,7 @@
       else {
         color = '#fde047';
       }
-      shiftYearEl.style.color = color;
+      clockContainer.style.color = color;
     }
 
     function initTerminalSelector() {
@@ -1497,16 +1630,16 @@
         selectEl.appendChild(option);
       });
 
-      selectEl.value = CFG.selectedTerminal || 'all';
+      selectEl.value = getCurrentUserSettings().selectedTerminal || 'all';
 
       selectEl.addEventListener('change', () => {
-        CFG.selectedTerminal = selectEl.value;
+        getCurrentUserSettings().selectedTerminal = selectEl.value;
         persist();
         renderAllMachines();
       });
     }
 
-    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initTerminalSelector(); initCustomTimeModal(); initColorPicker(); updateShiftIndicator(); setInterval(updateShiftIndicator, 60000); }
+    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initTerminalSelector(); initCustomTimeModal(); initColorPicker(); updateLiveClock(); updateShiftIndicator(); setInterval(updateLiveClock, 1000); setInterval(updateShiftIndicator, 60000); }
     init();
   </script>
 </body>
