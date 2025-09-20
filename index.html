@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Kartonowy Napełniacz — v0.007r</title>
+  <title>Kartonowy Napełniacz — v0.008r</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <style>
     :root{ --bg:#0e1117; --panel:#121826; --panel2:#0f1624; --text:#e5e7eb; --muted:#93a4b5; --accent:#22c55e; --line:#1f2937; --yellow:#fde047; }
     body[data-theme="light"] { --bg:#f3f4f6; --panel:#ffffff; --panel2:#f9fafb; --text:#111827; --muted:#6b7280; --accent:#16a34a; --line:#e5e7eb; }
@@ -16,14 +15,13 @@
     body[data-theme="light"] .progress, body[data-theme="light"] .pr-bar{background:#e5e7eb}
     body[data-theme="light"] .pr-head select.pr-select{background:var(--panel);border-color:var(--line);color:var(--text)}
     body[data-theme="light"] .pr-reset{background:var(--panel)}
-    body[data-theme="light"] .stamp .chip{background:transparent;border-color:#9ca3af;color:#1f2937}
+    body[data-theme="light"] .stamp .chip{background:#e5e7eb;color:#374151;border-color:#d1d5db}
     body[data-theme="light"] .notes-list .row{border-bottom-color:#e5e7eb}
     body[data-theme="light"] .tag.draft{color:#92400e;border-color:#f59e0b;background:#fef3c7}
-    body[data-theme="light"] .tag.private{color:#581c87;border-color:#a855f7;background:#f3e8ff}
     body[data-theme="light"] .alert{background:#e5e7eb;color:#374151;border-color:#d1d5db}
     body[data-theme="blue"] { --bg:#0c1424; --panel:#101c36; --panel2:#0e1a31; --text:#e0e7ff; --muted:#a0b3d9; --accent:#60a5fa; --line:#1e294b; }
     body[data-theme="green"] { --bg:#052e16; --panel:#064e3b; --panel2:#043a2c; --text:#ecfdf5; --muted:#a7f3d0; --accent:#4ade80; --line:#022c22; }
-    body{margin:0;background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);font:17px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif; transition: background .3s, color .3s;}
+    body{margin:0;background:linear-gradient(180deg,var(--panel),var(--panel2));color:var(--text);font:15px/1.45 system-ui,Segoe UI,Roboto,Arial,sans-serif; transition: background .3s, color .3s;}
     .wrap{max-width:1200px;margin:auto;padding:12px 16px}
     .panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
     .head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
@@ -34,32 +32,28 @@
     .btn.ghost{background:transparent}
     .machines{display:grid;grid-template-columns:1fr;gap:12px}
     @media(min-width:900px){.machines{grid-template-columns:1fr 1fr}}
-    .machine.auto-collapsed .body { display: none; }
     .machine .title{display:flex;align-items:center;gap:10px}
     .machine .title h2{margin:0;font-size:26px;letter-spacing:.3px}
-    .meta{color:var(--muted);font-size:12px;margin:6px 0}
+    .meta{color:var(--muted);font-size:14px;margin:6px 0}
     .progress{margin-top:6px;height:18px;border:1px solid var(--line);border-radius:12px;background:#0b1220;position:relative;overflow:hidden}
     .progress .bar{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg,#22c55e,#86efac);transition:width .25s ease}
     .progress .label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px}
-    /* Prüfung bigger + themed select with yellow text */
     .pruef{margin-top:10px}
     .pr-head{display:flex;gap:8px;align-items:center;margin-bottom:6px}
-    .pr-head select.pr-select{background:var(--panel2);border:1px solid var(--line);color:var(--yellow);padding:8px 10px;border-radius:10px}
-    .pr-bar{position:relative;height:68px;border:1px solid var(--line);border-radius:14px;background:#0b1220;overflow:hidden}
+    .pr-bar{position:relative;height:38px;border:1px solid var(--line);border-radius:14px;background:#0b1220;overflow:hidden}
     .pr-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,#22c55e,#84cc16);transition:width .5s linear}
-    .pr-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.3px}
-    .pr-reset{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:4px 8px;cursor:pointer}
-    /* Notes & Plans */
+    .pr-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;letter-spacing:.3px; font-variant-numeric: tabular-nums;}
+    .pr-reset{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:4px 8px;cursor:pointer; opacity: 0.7;}
+    .pr-reset:hover{opacity:1}
     .notes-list .row{display:flex;gap:10px;align-items:flex-start;border-bottom:1px dashed #263446;padding:8px 0}
     .stamp{display:inline-flex;gap:6px;align-items:center}
-    .stamp .chip{background:transparent;border:1px solid #4b5563;border-radius:6px;padding:2px 8px;font-size:13px;color:var(--muted)}
-    .stamp .small{font-size:13px;color:var(--muted)}
+    .stamp .chip{background:#0b1220;border:1px solid #263446;border-radius:999px;padding:2px 6px}
+    .stamp .small{font-size:12px;color:#9aa8b6}
     .stamp .digits{font-variant-numeric:tabular-nums;letter-spacing:.2px}
     .notes-list .txt{flex:1}
     .notes-list .act{display:flex;gap:6px}
     .tag{display:inline-block;margin-left:6px;font-size:12px;padding:2px 6px;border-radius:999px;border:1px solid #3b4760}
     .tag.draft{color:#eab308;border-color:#a16207;background:#2a2208}
-    .tag.private{color:#a855f7;border-color:#7e22ce;background:#1e1b4b}
     .role-badge{font-size:12px;padding:3px 8px;border-radius:999px;font-weight:600;border:1px solid transparent}
     .role-senior-dev{color:white;background-color:#3b82f6}
     .role-teamleiter{color:white;background-color:#ec4899}
@@ -68,18 +62,36 @@
     .role-leiharbeiter{color:white;background-color:#9ca3af}
     .role-sanner-mitarbeiter{color:white;background-color:#22c55e}
     .role-user{color:white;background-color:#9ca3af}
-    .user-info-popup{position:absolute;top:100%;left:0;z-index:10;width:320px;padding-top:8px;display:none;}
+    .user-info-popup{position:absolute;top:100%;left:0;z-index:10;width:280px;padding-top:8px;display:none;}
     .loginbar:hover .user-info-popup{display:block;}
     .user-info-popup .panel{border-width:2px;}
     .user-info-popup-grid{display:grid;grid-template-columns:100px 1fr;gap:12px;align-items:center;}
     .user-info-popup img{width:100px;height:100px;border-radius:12px;object-fit:cover;}
     #urgent-notifications .alert{color:white; border-color:transparent;}
-    #urgent-notifications .alert.birthday { background: linear-gradient(45deg, #ec4899, #fde047); color: #1e293b; border-color: #fbcfe8; font-weight: bold; }
-    /* Chat stream */
     .alerts{display:flex;flex-wrap:wrap;gap:8px}
     .alert{display:flex;gap:8px;align-items:center;border:1px solid #2e3b53;border-radius:10px;padding:6px 10px;background:#0b1220}
-    @keyframes blink { 50% { opacity: 0.6; } }
-    .blinking { animation: blink 1.5s linear infinite; }
+    .carton-grid-container { animation: fadeIn .5s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .carton-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .carton-box {
+        border: 1px solid var(--line); border-radius: 12px; padding: 10px; text-align: center;
+        cursor: pointer; background: var(--panel2); transition: background .2s, transform .2s, box-shadow .2s;
+        position: relative; overflow: hidden; min-height: 70px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+    }
+    .carton-box:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.2); }
+    .carton-box .timer { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .carton-box .status { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; color: var(--muted); }
+    .carton-box.active { background: linear-gradient(135deg, #15803d, #22c55e); color: white; border-color: #14532d; }
+    .carton-box.active .status { color: white; opacity: .8; }
+    .carton-box.waiting { background: linear-gradient(135deg, #a16207, #facc15); color: #422006; border-color: #78350f; }
+    .carton-box.waiting .status { color: #422006; opacity: .8; }
+    .carton-box.blinking { animation: blink 1s infinite; }
+    @keyframes blink { 50% { background: var(--panel); color: var(--text); } }
+    .carton-box.waiting.blinking { animation: blink-waiting 1s infinite; }
+    @keyframes blink-waiting { 50% { background: #452a0d; color: #facc15; } }
+    .ve-nummer-display { cursor: pointer; }
+    .ve-nummer-display:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -88,68 +100,46 @@
     <div class="panel">
       <div class="head">
         <div class="flex items-center gap-4">
-          <div class="flex flex-col items-end p-2">
-            <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" style="width: 350.6px; height: 183.6px;">
-            <div id="liveClockContainer" class="text-right mt-2">
-                <div id="liveClock" class="text-2xl font-bold" style="font-variant-numeric: tabular-nums;"></div>
-                <div id="liveDate" class="text-xs opacity-70"></div>
+          <img src="https://www.sanner-group.com/typo3conf/ext/sanner_site/Resources/Public/Icons/Sanner-Icons/Sanner-Logo-Claim.svg" alt="Sanner Logo" class="h-10">
+          <div class="loginbar flex items-center gap-3 relative">
+            <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
+            <div class="flex flex-col items-start">
+              <div>
+                <strong id="loginName">Kamil Kowalczyk</strong>
+                <small id="loginId" class="opacity-70">(SoG1917)</small>
+              </div>
+              <span id="loginRole" class="role-badge" style="display: none;"></span>
+            </div>
+            <button id="switchUserBtn" class="btn ghost text-xl p-1">👤</button>
+
+            <div class="user-info-popup">
+            <div class="panel">
+              <div class="body user-info-popup-grid">
+                <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
+                <div>
+                  <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
+                  <p id="popupUserRole" class="text-sm"></p>
+                  <p class="text-xs mt-2">Ostatnio zalogowany: <span id="popupLastLogin">teraz</span></p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div class="flex items-center gap-4">
-            <div class="loginbar flex items-center gap-3 relative">
-              <img id="userAvatar" src="https://placehold.co/40" alt="Avatar" class="w-8 h-8 rounded-full cursor-pointer">
-              <div class="flex flex-col items-start">
-                <div>
-                  <strong id="loginName">Kamil Kowalczyk</strong>
-                  <small id="loginId" class="opacity-70">(SoG1917)</small>
-                </div>
-                <span id="loginRole" class="role-badge" style="display: none;"></span>
-              </div>
-              <div id="custom-login-select" class="relative">
-                <button id="custom-login-toggle" class="btn p-2" title="Zmień użytkownika">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                  </svg>
-                </button>
-                <div id="custom-login-options" class="hidden absolute right-0 top-full mt-2 w-64 panel z-20">
-                  <!-- populated by JS -->
-                </div>
-              </div>
-              <button id="createUserBtn" class="btn p-2" title="Stwórz nowego użytkownika">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 11a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1v-1z" />
-                </svg>
-              </button>
-              <div class="user-info-popup">
-              <div class="panel">
-                <div class="body user-info-popup-grid">
-                  <img id="popupUserAvatar" src="https://placehold.co/184" alt="User Avatar">
-                  <div>
-                    <h3 id="popupUserName" class="font-bold text-lg">Imię Nazwisko</h3>
-                    <p id="popupUserRole" class="text-sm"></p>
-                    <div class="text-xs mt-2 space-y-1">
-                      <p>Ostatnio widziany: <span id="popupLastSeen">...</span></p>
-                      <p>W firmie od: <span id="popupStartDate">...</span></p>
-                    </div>
-                    <button id="openProfileBtn" class="btn text-xs mt-2 w-full">Mój Profil</button>
-                  </div>
-                </div>
-              </div>
+            <div id="langSwitcher" class="flex gap-1">
+              <button class="btn ghost text-xs" data-lang="pl">PL</button>
+              <button class="btn ghost text-xs" data-lang="en">EN</button>
+              <button class="btn ghost text-xs" data-lang="tr">TR</button>
+              <button class="btn ghost text-xs" data-lang="de">DE</button>
+              <button class="btn ghost text-xs" data-lang="ar">AR</button>
             </div>
+            <div id="themeSwitcher" class="flex items-center gap-2">
+              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
+              <button class="w-4 h-4 rounded-full border-2 border-black/20" style="background-color: #f3f4f6" data-theme="light" title="Light Theme"></button>
+              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0c1424" data-theme="blue" title="Blue Theme"></button>
+              <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #052e16" data-theme="green" title="Green Theme"></button>
             </div>
-            <div class="flex flex-col items-end gap-2">
-                <div id="langSwitcher" class="flex gap-2">
-                  <!-- Language flags will be populated by JS -->
-                </div>
-                <div id="themeSwitcher" class="flex items-center gap-2">
-                  <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0e1117" data-theme="dark" title="Dark Theme"></button>
-                  <button class="w-4 h-4 rounded-full border-2 border-black/20" style="background-color: #f3f4f6" data-theme="light" title="Light Theme"></button>
-                  <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #0c1424" data-theme="blue" title="Blue Theme"></button>
-                  <button class="w-4 h-4 rounded-full border-2 border-white/20" style="background-color: #052e16" data-theme="green" title="Green Theme"></button>
-                </div>
-                <div class="badge">v0.007r</div>
-            </div>
+            <div class="badge">v0.008r</div>
         </div>
       </div>
       <div class="body">
@@ -161,24 +151,27 @@
   </header>
 
   <main class="wrap">
-    <section id="minimized-machines-dock" class="panel mb-3 hidden">
-      <div class="head">
-        <h2 class="m-0">Zminimalizowane maszyny</h2>
-      </div>
-      <div id="minimized-machines-list" class="body flex flex-wrap gap-2"></div>
-    </section>
-
     <section id="machines" class="machines"></section>
 
-    <section id="chat-panel" class="panel mt-3" style="position: absolute; width: 500px; z-index: 30; top: 250px; left: 20px;">
-      <div class="head flex items-center">
-        <div id="chat-drag-handle" class="cursor-move p-2 -ml-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
+    <div id="newUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
+      <div class="panel w-full max-w-md">
+        <div class="head">
+          <h2 class="m-0" data-translate-key="createUserTitle">Tworzenie nowego użytkownika</h2>
+          <button id="closeModalBtn" class="btn ghost">✖</button>
         </div>
-        <h2 class="m-0" data-translate-key="notesTitle">💬 CHAT</h2>
+        <div class="body">
+          <form id="newUserForm" class="flex flex-col gap-4">
+            <input type="text" id="newLogin" name="login" class="btn" data-translate-key="placeholderLogin" placeholder="Login (np. SoGxxxx, LK12, 1234)" required pattern="^(SoG[0-9]{4}|LK[0-9]{2}|[0-9]{2}|[0-9]{4})$">
+            <input type="password" id="newPassword" name="password" class="btn" data-translate-key="placeholderPassword" placeholder="Hasło (opcjonalne)">
+            <input type="text" id="newName" name="name" class="btn" data-translate-key="placeholderName" placeholder="Imię i nazwisko" required>
+            <button type="submit" class="btn primary" data-translate-key="createUserBtn">Stwórz użytkownika</button>
+          </form>
+        </div>
       </div>
+    </div>
+
+    <section class="panel mt-3">
+      <div class="head"><h2 class="m-0" data-translate-key="notesTitle">💬 CHAT</h2></div>
       <div class="body">
         <div class="flex gap-2 flex-wrap">
           <input id="noteInput" class="btn" style="flex:1" data-translate-key="placeholderNote" placeholder="Wpisz wiadomość...">
@@ -199,18 +192,7 @@
         <div id="plansList" class="notes-list mt-2"></div>
       </div>
     </section>
-
-    <section id="hints-card" class="panel mt-3">
-      <div class="head"><h2 class="m-0">💡 Podpowiedzi</h2></div>
-      <div class="body">
-        <p>Tutaj pojawią się podpowiedzi i wskazówki.</p>
-      </div>
-    </section>
   </main>
-
-  <div id="terminal-selector-container" class="fixed bottom-5 left-5 z-20">
-    <select id="terminalSelect" class="btn" title="Wybierz Terminal"></select>
-  </div>
 
   <div id="userDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
     <div class="panel w-full max-w-md">
@@ -267,107 +249,32 @@
     </div>
   </div>
 
-  <div id="userProfileModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
-    <div class="panel w-full max-w-lg">
+  <div id="userSelectionModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
+    <div class="panel w-full max-w-sm">
       <div class="head">
-        <h2 class="m-0">Profil Użytkownika</h2>
-        <button id="userProfileModalClose" class="btn ghost">✖</button>
+        <h2 class="m-0" data-translate-key="userSelectionTitle">Wybierz użytkownika</h2>
+        <button id="closeUserSelectionModalBtn" class="btn ghost">✖</button>
       </div>
       <div class="body">
-        <form id="userProfileForm" class="flex flex-col gap-4">
-          <p>Tutaj możesz zarządzać swoimi ustawieniami i preferencjami.</p>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label for="profileStartDate" class="text-sm opacity-70">Data rozpoczęcia pracy</label>
-              <input type="date" id="profileStartDate" class="btn w-full mt-1">
-            </div>
-            <div>
-              <label for="profileShift" class="text-sm opacity-70">Twoja zmiana</label>
-              <select id="profileShift" class="btn w-full mt-1">
-                <option value="green">Zmiana 1 (14-22)</option>
-                <option value="blue">Zmiana 3 (06-14)</option>
-                <option value="yellow">Zmiana 2 (22-06)</option>
-              </select>
-            </div>
-            <div>
-              <label for="profileFavMachine" class="text-sm opacity-70">Ulubiona maszyna</label>
-              <input type="text" id="profileFavMachine" class="btn w-full mt-1" placeholder="np. MA820061">
-            </div>
-            <div>
-              <label for="profileFavTerminal" class="text-sm opacity-70">Ulubiony terminal</label>
-              <select id="profileFavTerminal" class="btn w-full mt-1">
-                <!-- Populated by JS -->
-              </select>
-            </div>
-          </div>
-
-          <div class="border-t border-white/10 pt-4 mt-2">
-            <button type="submit" class="btn primary">Zapisz profil</button>
-          </div>
-        </form>
+        <ul id="userSelectionList" class="space-y-2 max-h-96 overflow-y-auto">
+          <!-- User list will be populated here -->
+        </ul>
+        <hr class="border-white/10 my-4">
+        <button id="createNewUserBtn" class="btn w-full" data-translate-key="createNewUserBtn">+ Stwórz nowego użytkownika</button>
       </div>
     </div>
   </div>
 
-  <div id="createUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
-    <div class="panel w-full max-w-md">
-      <div class="head">
-        <h2 class="m-0">Stwórz Nowego Użytkownika</h2>
-        <button id="createUserModalClose" class="btn ghost">✖</button>
+  <template id="tpl-user-list-item">
+    <li class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer user-select-item">
+      <img src="https://placehold.co/40" alt="Avatar" class="w-10 h-10 rounded-full">
+      <div class="flex-grow">
+        <strong class="user-name"></strong>
+        <div class="text-sm opacity-70 user-id"></div>
       </div>
-      <div class="body">
-        <form id="createUserForm" class="flex flex-col gap-4">
-          <div>
-            <label for="newUserLogin" class="text-sm opacity-70">Login (np. SoG1234 lub LK51)</label>
-            <input type="text" id="newUserLogin" class="btn w-full mt-1" required>
-          </div>
-          <div>
-            <label for="newUserName" class="text-sm opacity-70">Imię i nazwisko</label>
-            <input type="text" id="newUserName" class="btn w-full mt-1" required>
-          </div>
-          <button type="submit" class="btn primary">Stwórz Użytkownika</button>
-          <p class="text-xs opacity-70 mt-1">Hasło dla użytkowników SoG zostanie wygenerowane automatycznie.</p>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div id="broadcastModal" class="hidden fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
-    <div class="panel w-full max-w-lg border-4 border-amber-400">
-      <div class="head">
-        <h2 class="m-0 text-amber-400">🚨 WAŻNE OGŁOSZENIE 🚨</h2>
-      </div>
-      <div class="body text-center">
-        <p id="broadcastModalMessage" class="text-lg my-4"></p>
-        <button id="broadcastAcknowledgeBtn" class="btn primary text-lg px-6 py-3">Zrozumiałem / Potwierdzam</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="adminEditUserModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-40">
-    <div class="panel w-full max-w-md">
-      <div class="head">
-        <h2 class="m-0">Edytuj Użytkownika</h2>
-        <button id="adminEditUserModalClose" class="btn ghost">✖</button>
-      </div>
-      <div class="body">
-        <form id="adminEditUserForm" class="flex flex-col gap-4">
-          <p>Edytujesz dane dla użytkownika <strong id="adminEditUserLoginLabel"></strong>.</p>
-          <input type="hidden" id="adminEditUserUid">
-          <div>
-            <label for="adminEditUserName" class="text-sm opacity-70">Imię i nazwisko</label>
-            <input type="text" id="adminEditUserName" name="name" class="btn w-full mt-1" required>
-          </div>
-          <div>
-            <label for="adminEditUserAvatar" class="text-sm opacity-70">URL Avatara</label>
-            <input type="text" id="adminEditUserAvatar" name="avatar" class="btn w-full mt-1">
-          </div>
-          <button type="submit" class="btn primary">Zapisz zmiany</button>
-        </form>
-      </div>
-    </div>
-  </div>
+      <span class="lock-icon text-lg"></span>
+    </li>
+  </template>
 
   <footer class="wrap" id="adminFooter" style="display: none;">
     <div class="panel mt-3">
@@ -376,72 +283,9 @@
       </div>
       <div class="body">
         <p>Tutaj znajdą się opcje administracyjne, takie jak zarządzanie użytkownikami i ich uprawnieniami.</p>
-        <div id="userManagement" class="mt-4">
-          <h3 class="font-bold border-b border-white/10 pb-1">Zarządzanie Użytkownikami</h3>
-          <form id="adminAddUserForm" class="flex gap-2 mt-2 items-center flex-wrap">
-            <input type="text" id="adminNewUserLogin" placeholder="Login (np. SoG1234)" class="btn text-sm" required>
-            <input type="text" id="adminNewUserName" placeholder="Imię i nazwisko" class="btn text-sm" required>
-            <button type="submit" class="btn primary text-sm">Dodaj Użytkownika</button>
-          </form>
-          <p class="text-xs opacity-70 mt-1">Hasło dla nowych użytkowników SoG zostanie wygenerowane automatycznie (odwrócone cyfry).</p>
-          <div id="adminUserList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
-        </div>
-
-        <div id="terminalManagement" class="mt-4">
-          <h3 class="font-bold border-b border-white/10 pb-1">Zarządzanie Terminalami</h3>
-          <form id="adminAddTerminalForm" class="flex gap-2 mt-2 items-center flex-wrap">
-            <input type="text" id="adminNewTerminalCode" placeholder="Kod (np. BB513)" class="btn text-sm" required>
-            <input type="text" id="adminNewTerminalName" placeholder="Nazwa terminala" class="btn text-sm" required>
-            <button type="submit" class="btn primary text-sm">Dodaj Terminal</button>
-          </form>
-          <div id="adminTerminalList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
-        </div>
-
-        <div id="broadcastManagement" class="mt-4">
-          <h3 class="font-bold border-b border-white/10 pb-1">Wyślij Ogłoszenie Globalne</h3>
-          <form id="adminBroadcastForm" class="flex flex-col gap-2 mt-2">
-            <textarea id="adminBroadcastMessage" class="btn" rows="3" placeholder="Wiadomość do wszystkich terminali..."></textarea>
-            <button type="submit" class="btn primary">Wyślij Ogłoszenie</button>
-          </form>
-          <div id="adminBroadcastStatus" class="mt-2">
-            <h4 class="font-bold text-sm">Status ostatniego ogłoszenia:</h4>
-            <div id="adminBroadcastStatusList" class="notes-list text-xs"></div>
-          </div>
-        </div>
-
-        <div id="userManagement" class="mt-4">
-          <h3 class="font-bold border-b border-white/10 pb-1">Zarządzanie Użytkownikami</h3>
-          <form id="adminAddUserForm" class="flex gap-2 mt-2 items-center flex-wrap">
-            <input type="text" id="adminNewUserLogin" placeholder="Login (np. SoG1234)" class="btn text-sm" required>
-            <input type="text" id="adminNewUserName" placeholder="Imię i nazwisko" class="btn text-sm" required>
-            <button type="submit" class="btn primary text-sm">Dodaj Użytkownika</button>
-          </form>
-          <p class="text-xs opacity-70 mt-1">Hasło dla nowych użytkowników SoG zostanie wygenerowane automatycznie (odwrócone cyfry).</p>
-          <div id="adminUserList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
-        </div>
-
         <div id="loginHistory" class="mt-4">
             <h3 class="font-bold border-b border-white/10 pb-1">Historia logowań</h3>
             <div id="loginHistoryList" class="notes-list mt-2 max-h-60 overflow-y-auto"></div>
-        </div>
-
-        <div id="chatLogManagement" class="mt-4">
-            <h3 class="font-bold border-b border-white/10 pb-1">Pełny Log Chatu</h3>
-            <input id="adminChatFilter" class="btn w-full mt-2" placeholder="Filtruj po użytkowniku lub treści...">
-            <div id="adminChatLogList" class="notes-list mt-2 max-h-96 overflow-y-auto"></div>
-        </div>
-
-        <div id="cartonLogManagement" class="mt-4">
-            <h3 class="font-bold border-b border-white/10 pb-1 flex justify-between items-center">
-                <span>Ostatnio Zaksięgowane Kartony</span>
-                <button id="toggleCartonLogBtn" class="btn text-xs">Pokaż</button>
-            </h3>
-            <div id="adminCartonLogList" class="notes-list mt-2 max-h-96 overflow-y-auto hidden"></div>
-        </div>
-
-        <div id="plansLogManagement" class="mt-4">
-            <h3 class="font-bold border-b border-white/10 pb-1">Log Zmian w Planach</h3>
-            <div id="adminPlansLogList" class="notes-list mt-2 max-h-96 overflow-y-auto"></div>
         </div>
       </div>
     </div>
@@ -450,125 +294,98 @@
   <template id="tpl-machine">
     <article class="panel machine">
       <div class="head">
-        <div class="title"><span>🤖</span><h2 class="code"></h2></div>
+        <div class="title"><span></span><h2 class="code"></h2></div>
         <div class="flex items-center gap-2">
-          <button class="btn ghost favorite-toggle" title="Ulubione">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
-          </button>
-          <button class="btn ghost text-lg font-bold minimize-toggle" title="Minimalizuj">_</button>
-          <button class="btn ghost settings-toggle">⚙️</button>
+            <span class="ve-nummer-display text-sm opacity-70" title="Kliknij lewym, aby skopiować. Kliknij prawym, aby edytować"></span>
+            <button class="btn ghost settings-toggle">⚙️</button>
         </div>
       </div>
       <div class="body">
         <div class="meta text-sm space-y-2">
-          <div class="border border-white/10 rounded-lg p-2">
-            <div class="flex justify-between">
-              <div class="flex gap-2">
-                <span data-translate-key="auftrag">Auftrag:</span>
-                <strong class="auf-val">—</strong>
-              </div>
-              <div class="flex gap-2">
-                <span data-translate-key="nextAuftrag">Następny Auftrag:</span>
-                <span class="nextauf-val">—</span>
-              </div>
+            <div class="border border-white/10 rounded-lg p-2">
+                <div class="flex justify-between items-center">
+                    <div class="flex gap-2 items-center">
+                        <span data-translate-key="auftrag">Auftrag:</span>
+                        <strong class="auf-val font-mono">—</strong>
+                    </div>
+                     <div class="flex gap-2 items-center">
+                        <span data-translate-key="nextAuftrag">Następny:</span>
+                        <span class="nextauf-val font-mono">—</span>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="flex gap-2 items-center px-2">
-            <span data-translate-key="model">Model:</span>
-            <strong class="mdl-val">—</strong>
-            <span class="w-4 h-4 rounded-full bg-white/50 border border-white/20 model-color-dot" title="Zmień kolor"></span>
-          </div>
-          <div class="border border-white/10 rounded-lg p-2">
-            <span data-translate-key="period">Okres:</span>
-            <span class="period-val">—</span>
-          </div>
+             <div class="flex gap-2 items-center px-2">
+                <span data-translate-key="model">Model:</span>
+                <strong class="mdl-val">—</strong>
+                <span class="w-4 h-4 rounded-full bg-white/50 border border-white/20 model-color-dot cursor-pointer" title="Zmień kolor"></span>
+            </div>
+            <div class="border border-white/10 rounded-lg p-2 text-center">
+                <span data-translate-key="period">Okres:</span>
+                <span class="period-val">—</span>
+            </div>
         </div>
 
-        <div class="four-counters-container">
-          <!-- New 2x2 carton grid will be rendered here by JS if enabled -->
+        <div class="progress-container">
+            <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
+            <div class="flex justify-between items-center mt-2 text-sm">
+                <div data-translate-key="timeToComplete">Do ukończenia:</div>
+                <div class="font-bold text-lg completion-time">--:--</div>
+                <div class="completion-warning text-red-500 font-bold text-xl hidden">!</div>
+            </div>
         </div>
-        <div class="legacy-progress-container">
-          <!-- Fallback for machines without the new system -->
-          <div class="progress mt-3"><div class="bar"></div><div class="label">0%</div></div>
-          <div class="flex justify-between items-center mt-2 text-sm">
-            <div data-translate-key="timeToComplete">Do ukończenia:</div>
-            <div class="font-bold text-lg completion-time">--:--</div>
-            <div class="completion-warning text-red-500 font-bold text-xl hidden">!</div>
+
+        <div class="carton-grid-container" style="display:none;">
+            <div class="carton-grid">
+                <div class="carton-box" data-id="1"><div class="timer">00:00</div><div class="status"></div></div>
+                <div class="carton-box" data-id="2"><div class="timer">00:00</div><div class="status"></div></div>
+                <div class="carton-box" data-id="3"><div class="timer">00:00</div><div class="status"></div></div>
+                <div class="carton-box" data-id="4"><div class="timer">00:00</div><div class="status"></div></div>
+            </div>
+            <div class="text-xs text-center opacity-60 mt-1" data-translate-key="cartonInstructions">Klik: zakończ/zacznij, 2-klik: reset.</div>
+        </div>
+
+        <div class="pruef">
+          <div class="pr-head">
+            <span data-translate-key="pruefungTime" class="whitespace-nowrap">🧪 Prüfung:</span>
+            <div class="pr-buttons flex gap-1">
+              <button class="btn ghost text-xs" data-time="3600">1H</button>
+              <button class="btn ghost text-xs" data-time="7200">2H</button>
+              <button class="btn ghost text-xs" data-time="10800">3H</button>
+              <button class="btn ghost text-xs" data-time="custom" data-translate-key="customTime">Własny</button>
+            </div>
           </div>
-          <div class="pruef">
-          <div class="pr-head justify-end">
-              <span data-translate-key="pruefungTime">🧪 Prüfung — czas:</span>
-              <div class="pr-buttons flex gap-2">
-                <button class="btn ghost" data-time="3600">1H</button>
-                <button class="btn ghost" data-time="7200">2H</button>
-                <button class="btn ghost" data-time="10800">3H</button>
-                <button class="btn ghost" data-time="custom" data-translate-key="customTime">WŁASNY</button>
-              </div>
-            </div>
-            <div class="pr-bar">
-              <div class="pr-fill"></div><div class="pr-label">60:00</div><div class="pr-reset">Reset</div>
-            </div>
+          <div class="pr-bar">
+            <div class="pr-fill"></div><div class="pr-label">00:00:00</div><div class="pr-reset" title="Resetuj timer">⟲</div>
           </div>
         </div>
 
         <div class="machine-settings hidden mt-4 space-y-2">
-          <h4 class="font-bold border-b border-white/10 pb-1">Ustawienia</h4>
+          <h4 class="font-bold border-b border-white/10 pb-1" data-translate-key="settingsTitle">Ustawienia</h4>
           <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm items-center">
-            <label>Model:</label>
+            <label data-translate-key="modelLabel">Model:</label>
             <input type="text" class="setting-input btn text-sm" data-source="order" data-key="model">
-            <label>Czas (min):</label>
+            <label data-translate-key="durationMinLabel">Czas (min):</label>
             <input type="number" class="setting-input btn text-sm w-24" data-source="machine" data-key="durationMin">
+            <label data-translate-key="fourCartonSystemLabel">System 4 kartonów:</label>
+            <input type="checkbox" class="setting-checkbox" data-source="machine" data-key="fourCartonSystem">
           </div>
-           <small class="text-xs opacity-60">Wciśnij ENTER, aby zapisać.</small>
+           <small class="text-xs opacity-60" data-translate-key="saveHint">Wciśnij ENTER w polu tekstowym, aby zapisać.</small>
         </div>
-
       </div>
     </article>
   </template>
 
   <script>
-    // --- basic state
-    const ORDERS_KEY='KN_ORDERS_V1';
     const NOTES_KEY='KN007_NOTES';
     const PLANS_KEY='KN007_PLANS';
-    const ADMIN_PASS = 4753; // kod 0..1000 wymagany do publikacji SoG1917
+    const ADMIN_PASS = 4753;
 
     const TRANSLATIONS = {
-      pl: {
-        appTitle: '🏭 Kartonowy Napełniacz', createUserTitle: 'Tworzenie nowego użytkownika',
-        placeholderLogin: 'Login (np. SoGxxxx lub LK12)', placeholderPassword: 'Hasło', placeholderName: 'Imię i nazwisko',
-        createUserBtn: 'Stwórz użytkownika', notesTitle: '💬 CHAT', placeholderNote: 'Wpisz wiadomość...', addNoteBtn: 'Wyślij',
-        plansTitle: '📌 Dalsze plany', placeholderPlan: 'Nowy pomysł / zadanie…', addPlanBtn: '+ Dodaj plan', refreshBtn: '↻ Odśwież z MySQL',
-        auftrag: 'Auftrag:', nextAuftrag: 'Następny Auftrag:', model: 'Model:', period: 'Okres:', pruefungTime: '🧪 Prüfung — czas:', customTime: 'WŁASNY',
-      },
-      en: {
-        appTitle: '🏭 Cardboard Filler', createUserTitle: 'Create new user',
-        placeholderLogin: 'Login (e.g. SoGxxxx or LK12)', placeholderPassword: 'Password', placeholderName: 'First and last name',
-        createUserBtn: 'Create User', notesTitle: '💬 CHAT', placeholderNote: 'Enter a message...', addNoteBtn: 'Send',
-        plansTitle: '📌 Future plans', placeholderPlan: 'New idea / task…', addPlanBtn: '+ Add plan', refreshBtn: '↻ Refresh from MySQL',
-        auftrag: 'Order:', nextAuftrag: 'Next Order:', model: 'Model:', period: 'Period:', pruefungTime: '🧪 Prüfung — time:', customTime: 'CUSTOM',
-      },
-      de: {
-        appTitle: '🏭 Karton-Füller', createUserTitle: 'Neuen Benutzer erstellen',
-        placeholderLogin: 'Login (z.B. SoGxxxx oder LK12)', placeholderPassword: 'Passwort', placeholderName: 'Vor- und Nachname',
-        createUserBtn: 'Benutzer erstellen', notesTitle: '💬 CHAT', placeholderNote: 'Nachricht eingeben…', addNoteBtn: 'Senden',
-        plansTitle: '📌 Weitere Pläne', placeholderPlan: 'Neue Idee / Aufgabe…', addPlanBtn: '+ Plan hinzufügen', refreshBtn: '↻ Von MySQL aktualisieren',
-        auftrag: 'Auftrag:', nextAuftrag: 'Nächster Auftrag:', model: 'Modell:', period: 'Zeitraum:', pruefungTime: '🧪 Prüfung — Zeit:', customTime: 'EIGENE',
-      },
-      tr: {
-        appTitle: '🏭 Karton Doldurucu', createUserTitle: 'Yeni kullanıcı oluştur',
-        placeholderLogin: 'Giriş (ör. SoGxxxx veya LK12)', placeholderPassword: 'Şifre', placeholderName: 'Ad ve soyad',
-        createUserBtn: 'Kullanıcı Oluştur', notesTitle: '💬 SOHBET', placeholderNote: 'Bir mesaj girin...', addNoteBtn: 'Gönder',
-        plansTitle: '📌 Gelecek planları', placeholderPlan: 'Yeni fikir / görev…', addPlanBtn: '+ Plan ekle', refreshBtn: '↻ MySQL\'den yenile',
-        auftrag: 'Sipariş:', nextAuftrag: 'Sonraki Sipariş:', model: 'Model:', period: 'Dönem:', pruefungTime: '🧪 Test — süre:', customTime: 'ÖZEL',
-      },
-      ar: {
-        appTitle: '🏭 حشو الكرتون', createUserTitle: 'إنشاء مستخدم جديد',
-        placeholderLogin: 'تسجيل الدخول (على سبيل المثال SoGxxxx أو LK12)', placeholderPassword: 'كلمة المرور', placeholderName: 'الاسم الأول والأخير',
-        createUserBtn: 'إنشاء مستخدم', notesTitle: '💬 دردشة', placeholderNote: 'أدخل رسالة…', addNoteBtn: 'إرسال',
-        plansTitle: '📌 خطط مستقبلية', placeholderPlan: 'فكرة / مهمة جديدة…', addPlanBtn: '+ إضافة خطة', refreshBtn: '↻ تحديث من MySQL',
-        auftrag: 'طلب:', nextAuftrag: 'الطلب التالي:', model: 'نموذج:', period: 'فترة:', pruefungTime: '🧪 فحص — الوقت:', customTime: 'مخصص',
-      }
+      pl: { appTitle: '🏭 Kartonowy Napełniacz', createUserTitle: 'Tworzenie nowego użytkownika', placeholderLogin: 'Login (np. SoGxxxx lub LK12)', placeholderPassword: 'Hasło', placeholderName: 'Imię i nazwisko', createUserBtn: 'Stwórz użytkownika', notesTitle: '💬 CHAT', placeholderNote: 'Wpisz wiadomość...', addNoteBtn: 'Wyślij', plansTitle: '📌 Dalsze plany', placeholderPlan: 'Nowy pomysł / zadanie…', addPlanBtn: '+ Dodaj plan', refreshBtn: '↻ Odśwież z MySQL', auftrag: 'Auftrag:', nextAuftrag: 'Następny:', model: 'Model:', period: 'Okres:', timeToComplete: 'Do ukończenia:', cartonInstructions: 'Klik: zakończ/zacznij, 2-klik: reset.', pruefungTime: '🧪 Prüfung:', customTime: 'Własny', settingsTitle: 'Ustawienia', modelLabel: 'Model:', durationMinLabel: 'Czas (min):', fourCartonSystemLabel: 'System 4 kartonów:', saveHint: 'Wciśnij ENTER w polu tekstowym, aby zapisać.' },
+      en: { appTitle: '🏭 Cardboard Filler', createUserTitle: 'Create new user', placeholderLogin: 'Login (e.g. SoGxxxx or LK12)', placeholderPassword: 'Password', placeholderName: 'First and last name', createUserBtn: 'Create User', notesTitle: '💬 CHAT', placeholderNote: 'Enter a message...', addNoteBtn: 'Send', plansTitle: '📌 Future plans', placeholderPlan: 'New idea / task…', addPlanBtn: '+ Add plan', refreshBtn: '↻ Refresh from MySQL', auftrag: 'Order:', nextAuftrag: 'Next:', model: 'Model:', period: 'Period:', timeToComplete: 'Time to complete:', cartonInstructions: 'Click: end/start, 2-click: reset.', pruefungTime: '🧪 Test:', customTime: 'Custom', settingsTitle: 'Settings', modelLabel: 'Model:', durationMinLabel: 'Time (min):', fourCartonSystemLabel: '4-carton system:', saveHint: 'Press ENTER in a text field to save.' },
+      de: { appTitle: '🏭 Karton-Füller', createUserTitle: 'Neuen Benutzer erstellen', placeholderLogin: 'Login (z.B. SoGxxxx oder LK12)', placeholderPassword: 'Passwort', placeholderName: 'Vor- und Nachname', createUserBtn: 'Benutzer erstellen', notesTitle: '💬 CHAT', placeholderNote: 'Nachricht eingeben…', addNoteBtn: 'Senden', plansTitle: '📌 Weitere Pläne', placeholderPlan: 'Neue Idee / Aufgabe…', addPlanBtn: '+ Plan hinzufügen', refreshBtn: '↻ Von MySQL aktualisieren', auftrag: 'Auftrag:', nextAuftrag: 'Nächster:', model: 'Modell:', period: 'Zeitraum:', timeToComplete: 'Bis zur Fertigstellung:', cartonInstructions: 'Klick: beenden/starten, 2-Klick: zurücksetzen.', pruefungTime: '🧪 Prüfung:', customTime: 'Eigene', settingsTitle: 'Einstellungen', modelLabel: 'Modell:', durationMinLabel: 'Zeit (min):', fourCartonSystemLabel: '4-Karton-System:', saveHint: 'Drücken Sie ENTER in einem Textfeld, um zu speichern.' },
+      tr: { appTitle: '🏭 Karton Doldurucu', createUserTitle: 'Yeni kullanıcı oluştur', placeholderLogin: 'Giriş (ör. SoGxxxx veya LK12)', placeholderPassword: 'Şifre', placeholderName: 'Ad ve soyad', createUserBtn: 'Kullanıcı Oluştur', notesTitle: '💬 SOHBET', placeholderNote: 'Bir mesaj girin...', addNoteBtn: 'Gönder', plansTitle: '📌 Gelecek planları', placeholderPlan: 'Yeni fikir / görev…', addPlanBtn: '+ Plan ekle', refreshBtn: '↻ MySQL\'den yenile', auftrag: 'Sipariş:', nextAuftrag: 'Sonraki:', model: 'Model:', period: 'Dönem:', timeToComplete: 'Tamamlanma süresi:', cartonInstructions: 'Tıkla: bitir/başlat, 2-tıkla: sıfırla.', pruefungTime: '🧪 Test:', customTime: 'Özel', settingsTitle: 'Ayarlar', modelLabel: 'Model:', durationMinLabel: 'Süre (dk):', fourCartonSystemLabel: '4-karton sistemi:', saveHint: 'Kaydetmek için bir metin alanında ENTER\'a basın.' },
+      ar: { appTitle: '🏭 حشو الكرتون', createUserTitle: 'إنشاء مستخدم جديد', placeholderLogin: 'تسجيل الدخول (على سبيل المثال SoGxxxx أو LK12)', placeholderPassword: 'كلمة المرور', placeholderName: 'الاسم الأول والأخير', createUserBtn: 'إنشاء مستخدم', notesTitle: '💬 دردشة', placeholderNote: 'أدخل رسالة…', addNoteBtn: 'إرسال', plansTitle: '📌 خطط مستقبلية', placeholderPlan: 'فكرة / مهمة جديدة…', addPlanBtn: '+ إضافة خطة', refreshBtn: '↻ تحديث من MySQL', auftrag: 'طلب:', nextAuftrag: 'التالي:', model: 'نموذج:', period: 'فترة:', timeToComplete: 'الوقت المتبقي:', cartonInstructions: 'انقر: إنهاء/بدء، نقرتان: إعادة تعيين.', pruefungTime: '🧪 فحص:', customTime: 'مخصص', settingsTitle: 'الإعدادات', modelLabel: 'نموذج:', durationMinLabel: 'الوقت (دقيقة):', fourCartonSystemLabel: 'نظام 4 كرتونات:', saveHint: 'اضغط على ENTER في حقل النص للحفظ.' }
     };
 
     let USERS = {
@@ -578,1808 +395,446 @@
       'SoG1899': { name: 'James Corden', avatar: '' },
       'SoP1':    { name: 'Piotr Nowak', avatar: '' },
       'SoG2020': { name: 'User 2020', avatar: '' },
-      'LK50':    { name: 'Leihfirma Mitarbeiter', avatar: '' },
     };
 
-    // Add default settings to each user in the initial list
-    for (const uid in USERS) {
-        USERS[uid].settings = {
-            theme: 'dark',
-            language: 'pl',
-            selectedTerminal: 'all',
-            startDate: '',
-            favoriteMachine: '',
-            favoriteTerminal: '',
-            shift: 'green',
-        };
-    }
-    // You can add specific overrides here if needed, e.g.:
-    // if (USERS['SoG2025']) USERS['SoG2025'].settings.language = 'en';
-
-    const DEFAULTS = {
-      currentUserUid: 'SoG1917',
+    const DEFAULTS={
+      version: 2,
+      user: { uid: 'SoG1917' },
       users: USERS,
-      terminals: [
-        { code: 'BB511', name: 'Terminal Główny', machines: ['MA820061', 'MA820026', 'MA820019'] },
-        { code: 'BB512', name: 'Terminal przy \'63\'', machines: ['MA820063'] }
-      ],
-      machines: [
-        {
-          code:'MA820061', durationMin:22.5, pruef:3600,
-          fourCountersEnabled: true,
-          baseVeNumber: 2208881, baseCartonNumber: 239,
-          cartons: [
-            { id: 0, status: 'running', targetQuantity: 1500, currentQuantity: 0, veNumber: 2208881, cartonNumber: 239, timerStart: Date.now() },
-            { id: 1, status: 'idle', targetQuantity: 1500, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
-            { id: 2, status: 'idle', targetQuantity: 1500, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
-            { id: 3, status: 'idle', targetQuantity: 1500, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 }
-          ]
-        },
-        { code:'MA820062',  durationMin:18, pruef:3600, fourCountersEnabled: false },
-        {
-          code:'MA820063', durationMin:23, pruef:3600,
-          fourCountersEnabled: true,
-          baseVeNumber: 5000, baseCartonNumber: 100,
-          cartons: [
-            { id: 0, status: 'running', targetQuantity: 2000, currentQuantity: 0, veNumber: 5000, cartonNumber: 100, timerStart: Date.now() },
-            { id: 1, status: 'idle', targetQuantity: 2000, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
-            { id: 2, status: 'idle', targetQuantity: 2000, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 },
-            { id: 3, status: 'idle', targetQuantity: 2000, currentQuantity: 0, veNumber: 0, cartonNumber: 0, timerStart: 0 }
-          ]
-        },
-        { code:'MA820064', durationMin:25, pruef:3600, fourCountersEnabled: false },
-        { code:'MA820059', durationMin:25, pruef:3600, fourCountersEnabled: false },
-        { code:'MA820026', durationMin:25, pruef:3600, fourCountersEnabled: false },
-        { code:'MA820019', durationMin:25, pruef:3600, fourCountersEnabled: false },
+      machines:[
+        { code:'MA820061', durationMin:25, fourCartonSystem: true },
+        { code:'MA820062', durationMin:22, fourCartonSystem: true },
+        { code:'MA820063', durationMin:25, fourCartonSystem: false },
+        { code:'MA820064', durationMin:25, fourCartonSystem: false },
       ],
       orders:{},
     };
     let CFG=JSON.parse(localStorage.getItem('KN007_CFG')||'null')||DEFAULTS;
-
-    // --- MIGRATION & DEFAULTS ENSURING ---
-
-    // Migration to user-specific settings
-    if (CFG.user && CFG.user.uid && !CFG.currentUserUid) {
-      console.log('Migrating to user-specific settings...');
-      CFG.currentUserUid = CFG.user.uid;
-      const globalTheme = CFG.theme || 'dark';
-      const globalLang = CFG.language || 'pl';
-      const globalTerminal = CFG.selectedTerminal || 'all';
-
-      for (const uid in CFG.users) {
-        if (!CFG.users[uid].settings) {
-          CFG.users[uid].settings = {};
-        }
-        CFG.users[uid].settings.theme = CFG.users[uid].settings.theme || 'dark';
-        CFG.users[uid].settings.language = CFG.users[uid].settings.language || 'pl';
-        CFG.users[uid].settings.selectedTerminal = CFG.users[uid].settings.selectedTerminal || 'all';
-        CFG.users[uid].settings.startDate = CFG.users[uid].settings.startDate || '';
-        CFG.users[uid].settings.favoriteMachine = CFG.users[uid].settings.favoriteMachine || '';
-        CFG.users[uid].settings.favoriteTerminal = CFG.users[uid].settings.favoriteTerminal || '';
-        CFG.users[uid].settings.shift = CFG.users[uid].settings.shift || 'green';
-      }
-
-      if (CFG.users[CFG.currentUserUid]) {
-        CFG.users[CFG.currentUserUid].settings.theme = globalTheme;
-        CFG.users[CFG.currentUserUid].settings.language = globalLang;
-        CFG.users[CFG.currentUserUid].settings.selectedTerminal = globalTerminal;
-      }
-
-      delete CFG.user;
-      delete CFG.theme;
-      delete CFG.language;
-      delete CFG.selectedTerminal;
-      console.log('User-specific settings migration complete.');
-    }
-
     if (CFG.users) { USERS = CFG.users; } else { CFG.users = USERS; }
-    if (!CFG.terminals) { CFG.terminals = DEFAULTS.terminals; }
-
-    // Migration for old machine structure
-    if (CFG.machines && CFG.machines.length > 0 && CFG.machines[0].durationMin && !CFG.machines[0].hasOwnProperty('fourCountersEnabled')) {
-      const oldDurations = new Map(CFG.machines.map(m => [m.code, m.durationMin]));
-      DEFAULTS.machines.forEach(m => {
-        if (oldDurations.has(m.code)) {
-          m.durationMin = oldDurations.get(m.code);
-        }
-      });
-      CFG.machines = DEFAULTS.machines;
-    }
-
-    function getCurrentUser() {
-      if (!CFG.currentUserUid || !CFG.users[CFG.currentUserUid]) {
-        // Fallback to default user if something is wrong
-        return USERS[DEFAULTS.currentUserUid] || {};
-      }
-      return CFG.users[CFG.currentUserUid];
-    }
-
-    function getCurrentUserSettings() {
-      const user = getCurrentUser();
-      // Ensure settings object exists to prevent errors
-      if (!user.settings) {
-        user.settings = { theme: 'dark', language: 'pl', selectedTerminal: 'all' };
-      }
-      return user.settings;
-    }
 
     const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-    const isAdmin=()=> CFG.currentUserUid==='SoG1917';
+    const isAdmin=()=> CFG.user?.uid==='SoG1917';
     function persist(){ localStorage.setItem('KN007_CFG', JSON.stringify(CFG)); }
-    function setStatus(t){ $('#statusLine').textContent='Status: '+t; }
+    function setStatus(t, duration = 3000){ const el = $('#statusLine'); el.textContent='Status: '+t; setTimeout(() => el.textContent = '', duration); }
 
-    // --- kv storage via php
     async function saveShared(key,json){ try{ const res=await fetch('storage.php?a=set&key='+encodeURIComponent(key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(json)}); const j=await res.json(); return !!j.ok; }catch(e){ console.error(e); return false; } }
     async function loadShared(key){ try{ const res=await fetch('storage.php?a=get&key='+encodeURIComponent(key)); const j=await res.json(); return j.v?JSON.parse(j.v):null; }catch(e){ console.error(e); return null; } }
 
-    // --- machines (minimal for 0.007 look)
     let activePruefung = null;
-    class Pruefung{ constructor(root){ this.root=root; this.fill=$('.pr-fill',root); this.label=$('.pr-label',root); this.buttons=$$('.pr-buttons button',root); this.reset=$('.pr-reset',root); this.bar=$('.pr-bar', root);
-        this.total=3600; this.start=Date.now(); this.bind(); this.tick(); }
-      bind(){
-        this.buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.buttons.forEach(b => b.classList.remove('primary'));
-                btn.classList.add('primary');
-                const v = btn.dataset.time;
-                if (v === 'custom') {
-                    const m = prompt('Wpisz czas w minutach:', '60');
-                    this.setTime(m);
-                } else {
-                    this.total = parseInt(v, 10);
-                    this.start = Date.now();
-                }
+    class Pruefung {
+        constructor(root, machineData) {
+            this.root = root;
+            this.machineData = machineData;
+            this.fill = $('.pr-fill', root);
+            this.label = $('.pr-label', root);
+            this.buttons = $$('.pr-buttons button', root);
+            this.reset = $('.pr-reset', root);
+            this.bar = $('.pr-bar', root);
+            this.total = this.machineData.pruefTotal || 3600;
+            this.start = this.machineData.pruefStart || 0;
+            if (this.start === 0) { this.start = Date.now(); this.machineData.pruefStart = this.start; persist(); }
+            this.bind(); this.tick();
+        }
+        bind() {
+            this.buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const v = btn.dataset.time;
+                    if (v === 'custom') { activePruefung = this; $('#customTimeModal').classList.remove('hidden'); $('#customTimeInput').focus(); }
+                    else { this.setTime(parseInt(v, 10) / 60); }
+                });
             });
-        });
-        this.reset.addEventListener('click',()=>{ this.start=Date.now(); this.buttons.forEach(b => b.classList.remove('primary')); });
-        this.bar.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            activePruefung = this;
-            $('#customTimeModal').classList.remove('hidden');
-            $('#customTimeInput').focus();
-        });
-      }
-      setTime(minutes) {
-        this.total = Math.max(60, (parseInt(minutes, 10) || 0) * 60);
-        this.start = Date.now();
-        this.buttons.forEach(b => b.classList.remove('primary'));
-      }
-      tick(){ const el=Math.min(this.total, Math.floor((Date.now()-this.start)/1000)); const left=this.total-el; const pct=this.total > 0 ? Math.floor(el/this.total*100) : 0;
-        this.fill.style.width=pct+'%'; const mm=String(Math.floor(left/60)).padStart(2,'0'), ss=String(left%60).padStart(2,'0'); this.label.textContent=`${mm}:${ss}`;
-        requestAnimationFrame(()=>this.tick()); }
+            this.reset.addEventListener('click', (e) => { e.stopPropagation(); if (confirm('Czy na pewno chcesz zresetować timer Prüfung?')) { this.start = Date.now(); this.machineData.pruefStart = this.start; persist(); } });
+            this.bar.addEventListener('contextmenu', (e) => { e.preventDefault(); activePruefung = this; $('#customTimeModal').classList.remove('hidden'); $('#customTimeInput').focus(); });
+        }
+        setTime(minutes) {
+            this.total = Math.max(60, (parseInt(minutes, 10) || 0) * 60);
+            this.start = Date.now();
+            this.machineData.pruefTotal = this.total;
+            this.machineData.pruefStart = this.start;
+            persist();
+            this.buttons.forEach(b => b.classList.remove('primary'));
+        }
+        tick() {
+            const el = Math.min(this.total, Math.floor((Date.now() - this.start) / 1000));
+            const left = this.total - el;
+            if (left <= 0) {
+                this.fill.style.width = '100%'; this.label.textContent = 'ZAKOŃCZONO';
+                if (!this.root.classList.contains('pruef-ended')) { this.root.classList.add('pruef-ended'); this.fill.style.background = '#ef4444'; }
+            } else {
+                this.root.classList.remove('pruef-ended'); this.fill.style.background = '';
+                const pct = this.total > 0 ? Math.floor(el / this.total * 100) : 0;
+                this.fill.style.width = pct + '%';
+                const hh = String(Math.floor(left / 3600)).padStart(2, '0');
+                const mm = String(Math.floor((left % 3600) / 60)).padStart(2, '0');
+                const ss = String(left % 60).padStart(2, '0');
+                this.label.textContent = `${hh}:${mm}:${ss}`;
+            }
+            const currentTotalHours = this.total / 3600;
+            this.buttons.forEach(b => { if (b.dataset.time) { b.classList.toggle('primary', parseInt(b.dataset.time, 10) / 3600 === currentTotalHours); } });
+            requestAnimationFrame(() => this.tick());
+        }
     }
 
     let activeMachineForColor = null;
-    let sortableInstance = null;
-
-    function initDragAndDrop() {
-      if (sortableInstance) {
-        sortableInstance.destroy();
-      }
-      const container = $('#machines');
-      if (!container) return;
-
-      sortableInstance = new Sortable(container, {
-        animation: 150,
-        ghostClass: 'opacity-50',
-        onEnd: function (evt) {
-          const machineElements = $$('.machine', container);
-          const newOrderCodes = machineElements.map(el => $('.code', el).textContent);
-          const machineMap = new Map(CFG.machines.map(m => [m.code, m]));
-          CFG.machines = newOrderCodes.map(code => machineMap.get(code));
-          persist();
+    class Machine {
+        constructor(container, data, orders) {
+            this.root = $('#tpl-machine').content.firstElementChild.cloneNode(true);
+            this.container = container;
+            this.data = data;
+            this.orders = orders;
+            this.code = data.code;
+            this.lastClickTime = 0;
+            this.data.durationMin = this.data.durationMin || 25;
+            this.titleIconEl = $('.title span', this.root);
+            $('.code', this.root).textContent = this.code;
+            this.veNummerEl = $('.ve-nummer-display', this.root);
+            this.dot = $('.model-color-dot', this.root);
+            this.settingsToggle = $('.settings-toggle', this.root);
+            this.settingsPanel = $('.machine-settings', this.root);
+            this.settingsInputs = $$('.setting-input', this.settingsPanel);
+            this.settingsCheckboxes = $$('.setting-checkbox', this.settingsPanel);
+            this.progressContainer = $('.progress-container', this.root);
+            this.cartonGridContainer = $('.carton-grid-container', this.root);
+            this.bar = $('.bar', this.root);
+            this.label = $('.label', this.root);
+            this.completionTimeEl = $('.completion-time', this.root);
+            this.completionWarningEl = $('.completion-warning', this.root);
+            this.cartonBoxes = $$('.carton-box', this.root);
+            this.pr = new Pruefung($('.pruef', this.root), this.data);
+            this.bindEvents();
+            this.render();
+            this.tick();
+            this.container.appendChild(this.root);
         }
-      });
-    }
-    class Machine{ constructor(container,data,orders){ this.root=$('#tpl-machine').content.firstElementChild.cloneNode(true);
-        this.data = data;
-        this.orders = orders;
-        this.code=data.code; $('.code',this.root).textContent=this.code;
-
-        // --- Add terminal code badge ---
-        let terminalCode = '';
-        for (const terminal of (CFG.terminals || [])) {
-            if (terminal.machines.includes(this.code)) {
-                terminalCode = terminal.code;
-                break;
-            }
-        }
-        if (terminalCode) {
-            const titleEl = $('.title', this.root);
-            const terminalBadge = document.createElement('span');
-            terminalBadge.className = 'text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full cursor-pointer hover:bg-gray-600';
-            terminalBadge.textContent = terminalCode;
-            terminalBadge.title = 'Kopiuj kod terminala';
-            terminalBadge.onclick = () => {
-                navigator.clipboard.writeText(terminalCode).then(() => {
-                    setStatus(`Skopiowano kod terminala: ${terminalCode}`);
+        bindEvents() {
+            this.dot.addEventListener('contextmenu', (e) => { e.preventDefault(); activeMachineForColor = this; const picker = $('#colorPicker'); picker.style.left = e.pageX + 'px'; picker.style.top = e.pageY + 'px'; picker.classList.remove('hidden'); });
+            this.settingsToggle.addEventListener('click', () => this.settingsPanel.classList.toggle('hidden'));
+            this.settingsInputs.forEach(input => { input.addEventListener('keyup', (e) => { if (e.key === 'Enter') this.saveSetting(input); }); });
+            this.settingsCheckboxes.forEach(checkbox => { checkbox.addEventListener('change', () => this.saveSetting(checkbox)); });
+            this.cartonBoxes.forEach(box => {
+                box.addEventListener('click', () => {
+                    const clickTime = Date.now();
+                    const cartonId = parseInt(box.dataset.id, 10);
+                    if (clickTime - this.lastClickTime < 300) { this.handleCartonDoubleClick(cartonId); }
+                    else { this.handleCartonSingleClick(cartonId); }
+                    this.lastClickTime = clickTime;
                 });
-            };
-            titleEl.appendChild(terminalBadge);
-        }
-
-        // --- Get references to containers ---
-        this.fourCountersContainer = $('.four-counters-container', this.root);
-        this.legacyContainer = $('.legacy-progress-container', this.root);
-
-        if (!this.data.completionTimestamp) {
-          this.data.completionTimestamp = Date.now() + (Math.floor(Math.random() * 14940) + 60) * 1000;
-        }
-
-        this.dot = $('.model-color-dot', this.root);
-        this.dot.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            activeMachineForColor = this;
-            const picker = $('#colorPicker');
-            picker.style.left = e.pageX + 'px';
-            picker.style.top = e.pageY + 'px';
-            picker.classList.remove('hidden');
-        });
-
-        this.completionTimeEl = $('.completion-time', this.root);
-        this.completionWarningEl = $('.completion-warning', this.root);
-
-        this.settingsToggle = $('.settings-toggle', this.root);
-        this.settingsPanel = $('.machine-settings', this.root);
-        this.settingsInputs = $$('.setting-input', this.settingsPanel);
-
-        this.settingsToggle.addEventListener('click', () => this.settingsPanel.classList.toggle('hidden'));
-        this.settingsInputs.forEach(input => {
-            input.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') this.saveSetting(input);
             });
-        });
-
-        this.minimizeBtn = $('.minimize-toggle', this.root);
-        this.minimizeBtn.addEventListener('click', () => {
-            this.data.minimized = true;
-            persist();
-            renderAllMachines();
-        });
-
-        this.favoriteBtn = $('.favorite-toggle', this.root);
-        this.favoriteBtn.addEventListener('click', () => {
-            this.data.favorite = !this.data.favorite;
-            persist();
-            renderAllMachines();
-        });
-        if (this.data.favorite) {
-            this.favoriteBtn.classList.add('text-yellow-400');
+            this.veNummerEl.addEventListener('click', (e) => { e.preventDefault(); navigator.clipboard.writeText(this.data.veNummer || '').then(() => { setStatus(`Skopiowano VE numer: ${this.data.veNummer}`); }); });
+            this.veNummerEl.addEventListener('contextmenu', (e) => { e.preventDefault(); const newVe = prompt('Wprowadź nowy numer VE:', this.data.veNummer || ''); if (newVe !== null) { this.data.veNummer = newVe.trim(); this.render(); persist(); } });
         }
-
-        // --- NEW: Auto-collapse/expand logic ---
-        this.root.addEventListener('mouseenter', () => {
-            if (this.root.classList.contains('auto-collapsed')) {
-                this.root.classList.remove('auto-collapsed');
-            }
-        });
-
-        container.appendChild(this.root);
-
-        // --- Conditional rendering logic ---
-        if (this.data.fourCountersEnabled) {
-          this.legacyContainer.style.display = 'none';
-          this.fourCountersContainer.style.display = 'block';
-          this.renderFourCounters();
-          this.tickCartons();
-        } else {
-          this.fourCountersContainer.style.display = 'none';
-          this.legacyContainer.style.display = 'block';
-          this.pr = new Pruefung($('.pruef', this.root));
-          let start=performance.now(), dur=(this.data.durationMin||25)*60000; const step=()=>{ const p=Math.min(1,(performance.now()-start)/dur); $('.bar',this.root).style.width=(p*100)+'%'; $('.label',this.root).textContent=Math.floor(p*100)+'%'; requestAnimationFrame(step) }; requestAnimationFrame(step);
-        }
-
-        this.render();
-        this.tickCompletion();
-    }
-      saveSetting(input) {
-        const key = input.dataset.key;
-        const source = input.dataset.source;
-        let value = input.value;
-        if(input.type === 'number') value = parseFloat(value) || 0;
-
-        if (source === 'machine') {
-            this.data[key] = value;
-        } else if (source === 'order') {
-            if (!this.orders[this.code]) this.orders[this.code] = genOrder();
-            this.orders[this.code][key] = value;
-        }
-
-        input.blur();
-        this.render();
-        persist();
-        setStatus('Zapisano ' + key);
-        this.root.classList.add('auto-collapsed'); // NEW: Auto-collapse on save
-      }
-      render() {
-        const order = this.orders[this.code] || {};
-        $('.auf-val',this.root).textContent = order.auftrag || '—';
-        $('.mdl-val',this.root).textContent = order.model || '—';
-        $('.period-val',this.root).textContent = order.period || '—';
-        $('.nextauf-val',this.root).textContent = order.next || '—';
-
-        this.dot.style.backgroundColor = this.data.color || '#94a3b8';
-
-        // Populate settings inputs
-        this.settingsInputs.forEach(input => {
-            const key = input.dataset.key;
-            const source = input.dataset.source;
+        saveSetting(element) {
+            const key = element.dataset.key;
+            const source = element.dataset.source;
+            let value;
+            if (element.type === 'checkbox') { value = element.checked; }
+            else if (element.type === 'number') { value = parseFloat(element.value) || 0; }
+            else { value = element.value; }
             if (source === 'machine') {
-                input.value = this.data[key] || '';
+                this.data[key] = value;
+                if (key === 'durationMin') { this.data.cartons.forEach(c => { if (c.status === 'idle') c.duration = value * 60; }); }
             } else if (source === 'order') {
-                input.value = order[key] || '';
+                if (!this.orders[this.code]) this.orders[this.code] = genOrder();
+                this.orders[this.code][key] = value;
             }
-        });
-      }
-      setColor(color) {
-        this.data.color = color;
-        this.render();
-        persist();
-      }
-      tickCompletion() {
-        // This is for the legacy "time to complete" display, which is separate from the cartons.
-        // We can leave it running for all machines.
-        const now = Date.now();
-        const timeLeft = Math.max(0, Math.floor((this.data.completionTimestamp - now) / 1000));
-        const hours = Math.floor(timeLeft / 3600);
-        const minutes = Math.floor((timeLeft % 3600) / 60);
-
-        if (this.legacyContainer.style.display !== 'none') {
-            this.completionTimeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
-
-            const twoHours = 2 * 3600; const oneHour = 1 * 3600;
-            if (timeLeft > 0 && timeLeft < twoHours) {
-                this.completionWarningEl.classList.remove('hidden');
-                if (timeLeft < oneHour) {
-                    showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu godziny!`, 'danger');
-                } else {
-                    showUrgentNotification(this.code, `Koniec Auftragu ${this.code} w ciągu 2 godzin!`, 'warning');
-                }
-            } else {
-                this.completionWarningEl.classList.add('hidden');
-                hideUrgentNotification(this.code);
-            }
+            if (element.type !== 'checkbox') element.blur();
+            this.render(); persist(); setStatus(`Zapisano ${key} dla ${this.code}`);
         }
-        requestAnimationFrame(()=>this.tickCompletion());
-      }
-
-      renderFourCounters() {
-        this.fourCountersContainer.innerHTML = '<div class="grid grid-cols-2 gap-2 mt-3"></div>';
-        const grid = $('.grid', this.fourCountersContainer);
-
-        this.data.cartons.forEach(carton => {
-            const cartonEl = document.createElement('div');
-            cartonEl.className = 'carton-cell border border-white/10 rounded-lg p-2 flex flex-col relative h-32';
-
-            const progressBar = document.createElement('div');
-            progressBar.className = 'progress-bar absolute bottom-0 left-0 right-0 top-0 bg-green-500/20';
-            progressBar.style.transformOrigin = 'bottom';
-            progressBar.style.transform = 'scaleY(0)';
-
-            const content = document.createElement('div');
-            content.className = 'relative z-10 flex flex-col h-full';
-            content.innerHTML = `
-              <div class="text-xs opacity-70">
-                <span class="ve-number cursor-pointer" title="LPM: Kopiuj, PPM: Edytuj">VE ${carton.veNumber || '...'}</span> / <span class="carton-number">#${carton.cartonNumber || '...'}</span>
-              </div>
-              <div class="text-lg font-bold text-center my-auto">
-                <span class="current-qty">${carton.currentQuantity}</span> / <span class="target-qty">${carton.targetQuantity}</span>
-              </div>
-              <div class="text-xs text-center opacity-70">
-                Status: <span class="status-text">${carton.status}</span>
-              </div>
-            `;
-
-            const resetButton = document.createElement('button');
-            resetButton.className = 'reset-btn absolute inset-0 flex items-center justify-center bg-black/70 text-white font-bold hidden z-20';
-            resetButton.textContent = 'RESET';
-
-            cartonEl.append(progressBar, content, resetButton);
-
-            // --- NEW: VE Number interactions ---
-            const veNumberEl = $('.ve-number', content);
-            if (carton.veNumber) {
-                veNumberEl.addEventListener('click', () => {
-                    navigator.clipboard.writeText(carton.veNumber).then(() => {
-                        setStatus(`Skopiowano VE ${carton.veNumber}`);
-                    }).catch(err => {
-                        setStatus('Błąd kopiowania');
-                        console.error('Could not copy text: ', err);
-                    });
-                });
-
-                veNumberEl.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    const newVeNumber = prompt('Wprowadź nowy numer VE:', carton.veNumber);
-                    if (newVeNumber && !isNaN(newVeNumber)) {
-                        carton.veNumber = parseInt(newVeNumber, 10);
-                        persist();
-                        this.renderFourCounters(); // Re-render to show the new number
-                        setStatus(`Zmieniono VE na ${carton.veNumber}`);
-                    }
-                });
-            }
-
-
-            grid.appendChild(cartonEl);
-
-            // --- Visual state logic ---
-            if (carton.status === 'finished') {
-                progressBar.style.transform = 'scaleY(1)';
-                progressBar.classList.add('bg-green-500/80', 'blinking');
-                resetButton.classList.remove('hidden');
-            } else if (carton.status === 'running') {
-                resetButton.classList.remove('hidden');
-                const totalTime = this.data.durationMin * 60 * 1000;
-                const elapsedTime = Date.now() - carton.timerStart;
-                const progress = Math.min(1, elapsedTime / totalTime);
-                progressBar.style.transform = `scaleY(${progress})`;
-            }
-
-            // --- Reset button logic ---
-            let clickTimeout = null;
-            resetButton.addEventListener('click', () => {
-                if (clickTimeout) {
-                    clearTimeout(clickTimeout);
-                    clickTimeout = null;
-                    this.handleCartonReset(carton.id, true); // Double click
-                } else {
-                    clickTimeout = setTimeout(() => {
-                        this.handleCartonReset(carton.id, false); // Single click
-                        clickTimeout = null;
-                    }, 250);
+        handleCartonSingleClick(cartonId) {
+            const carton = this.data.cartons.find(c => c.id === cartonId); if (!carton) return;
+            if (carton.status === 'active') { carton.status = 'done'; const waitingCarton = this.data.cartons.find(c => c.status === 'waiting'); if (waitingCarton) { waitingCarton.status = 'active'; waitingCarton.startTime = Date.now(); } }
+            else if (carton.status === 'idle') { const isAnyActive = this.data.cartons.some(c => c.status === 'active'); const isAnyWaiting = this.data.cartons.some(c => c.status === 'waiting'); if (isAnyActive) { if (!isAnyWaiting) { carton.status = 'waiting'; } } else { carton.status = 'active'; carton.startTime = Date.now(); } }
+            this.render(); persist();
+        }
+        handleCartonDoubleClick(cartonId) {
+            const carton = this.data.cartons.find(c => c.id === cartonId); if (!carton) return;
+            carton.status = 'idle'; carton.startTime = 0; carton.duration = (this.data.durationMin || 25) * 60;
+            const wasActive = this.root.querySelector(`[data-id="${cartonId}"]`).classList.contains('active');
+            if (wasActive) { const waitingCarton = this.data.cartons.find(c => c.status === 'waiting'); if (waitingCarton) { waitingCarton.status = 'active'; waitingCarton.startTime = Date.now(); } }
+            this.render(); persist();
+        }
+        render() {
+            const order = this.orders[this.code] || {};
+            $('.auf-val', this.root).textContent = order.auftrag || '—';
+            $('.mdl-val', this.root).textContent = order.model || '—';
+            $('.period-val', this.root).textContent = order.period || '—';
+            $('.nextauf-val', this.root).textContent = order.next || '—';
+            this.veNummerEl.textContent = this.data.veNummer ? `VE: ${this.data.veNummer}` : 'VE: ---';
+            this.dot.style.backgroundColor = this.data.color || '#94a3b8';
+            this.titleIconEl.textContent = this.data.fourCartonSystem ? '📦' : '🤖';
+            this.settingsInputs.forEach(input => { const key = input.dataset.key; const source = input.dataset.source; if (source === 'machine') input.value = this.data[key] || ''; else if (source === 'order') input.value = order[key] || ''; });
+            this.settingsCheckboxes.forEach(checkbox => { const key = checkbox.dataset.key; const source = checkbox.dataset.source; if (source === 'machine') checkbox.checked = !!this.data[key]; });
+            if (this.data.fourCartonSystem) { this.progressContainer.style.display = 'none'; this.cartonGridContainer.style.display = 'block'; this.renderCartonGrid(); }
+            else { this.progressContainer.style.display = 'block'; this.cartonGridContainer.style.display = 'none'; this.renderProgressBar(); }
+        }
+        renderCartonGrid() {
+            const allDone = this.data.cartons.every(c => c.status === 'done');
+            if (allDone) { this.data.cartons.forEach(c => { c.status = 'idle'; c.startTime = 0; }); }
+            this.cartonBoxes.forEach(box => {
+                const cartonId = parseInt(box.dataset.id, 10);
+                const carton = this.data.cartons.find(c => c.id === cartonId); if (!carton) return;
+                const timerEl = $('.timer', box); const statusEl = $('.status', box);
+                box.classList.remove('active', 'waiting', 'blinking');
+                let timeLeft = 0, elapsed = 0;
+                switch (carton.status) {
+                    case 'active': box.classList.add('active'); statusEl.textContent = 'W TRAKCIE'; elapsed = (Date.now() - carton.startTime) / 1000; timeLeft = Math.max(0, carton.duration - elapsed); if (timeLeft < 300) box.classList.add('blinking'); break;
+                    case 'waiting': box.classList.add('waiting'); statusEl.textContent = 'OCZEKUJE'; timeLeft = carton.duration; break;
+                    case 'done': statusEl.textContent = 'UKOŃCZONO'; timerEl.textContent = '✓'; return;
+                    default: statusEl.textContent = 'GOTOWY'; timeLeft = carton.duration; break;
                 }
+                const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                const seconds = String(Math.floor(timeLeft % 60)).padStart(2, '0');
+                timerEl.textContent = `${minutes}:${seconds}`;
             });
-        });
-      }
-
-      async handleCartonReset(cartonId, isDoubleClick) {
-          const CARTON_LOG_KEY = 'KN007_CARTON_LOG';
-          const carton = this.data.cartons.find(c => c.id === cartonId);
-          if (!carton) return;
-
-          // --- NEW: Log this event ---
-          if (carton.status === 'finished' || isDoubleClick) {
-              const logEntry = {
-                  ts: Date.now(),
-                  user: CFG.currentUserUid,
-                  userName: (USERS[CFG.currentUserUid] || {}).name,
-                  machineCode: this.code,
-                  veNumber: carton.veNumber,
-                  cartonNumber: carton.cartonNumber
-              };
-              const log = await loadShared(CARTON_LOG_KEY) || [];
-              log.push(logEntry);
-              if (log.length > 200) log.shift(); // Keep log to 200 entries
-              await saveShared(CARTON_LOG_KEY, log);
-          }
-          // --- End of new part ---
-
-          if (isDoubleClick) {
-              // Reset and restart this same carton
-              carton.status = 'running';
-              carton.timerStart = Date.now();
-              carton.currentQuantity = 0;
-          } else {
-              // Single click: finish this, start next
-              carton.status = 'waiting'; // It's done, waiting for the full cycle to restart
-
-              const allFinished = this.data.cartons.every(c => c.status === 'waiting' || c.status === 'finished');
-              if (allFinished) {
-                  // If all are done, reset all to idle and start the first one
-                  this.data.baseVeNumber += this.data.cartons.length;
-                  this.data.baseCartonNumber += this.data.cartons.length;
-                  const sequence = [0, 3, 2, 1];
-                  this.data.cartons.forEach((c, index) => {
-                      c.status = 'idle';
-                      c.timerStart = 0;
-                      c.currentQuantity = 0;
-                      if (c.id === sequence[0]) {
-                          c.status = 'running';
-                          c.timerStart = Date.now();
-                          c.veNumber = this.data.baseVeNumber;
-                          c.cartonNumber = this.data.baseCartonNumber;
-                      }
-                  });
-              } else {
-                  // Find current index in sequence and start the next one
-                  const sequence = [0, 3, 2, 1];
-                  const currentSeqIndex = sequence.indexOf(carton.id);
-                  const nextSeqIndex = (currentSeqIndex + 1) % sequence.length;
-                  const nextCartonId = sequence[nextSeqIndex];
-                  const nextCarton = this.data.cartons.find(c => c.id === nextCartonId);
-
-                  if (nextCarton.status === 'idle') {
-                      nextCarton.status = 'running';
-                      nextCarton.timerStart = Date.now();
-                      nextCarton.veNumber = (carton.veNumber || this.data.baseVeNumber) + 1;
-                      nextCarton.cartonNumber = (carton.cartonNumber || this.data.baseCartonNumber) + 1;
-                  }
-              }
-          }
-          this.renderFourCounters();
-          persist();
-          updateLastSeen();
-      }
-
-      tickCartons() {
-        if (!this.data.fourCountersEnabled) return;
-        const runningCarton = this.data.cartons.find(c => c.status === 'running');
-
-        if (runningCarton) {
-            const totalTime = this.data.durationMin * 60 * 1000;
-            const elapsedTime = Date.now() - runningCarton.timerStart;
-            const progress = Math.min(1, elapsedTime / totalTime);
-
-            // Update UI - find corresponding element
-            const cartonEl = this.fourCountersContainer.querySelectorAll('.carton-cell')[runningCarton.id];
-            if (cartonEl) {
-                const progressBar = $('.progress-bar', cartonEl);
-                const currentQtyEl = $('.current-qty', cartonEl);
-
-                progressBar.style.transform = `scaleY(${progress})`;
-                const newQty = Math.floor(progress * runningCarton.targetQuantity);
-
-                if (newQty - parseInt(currentQtyEl.textContent) >= 1) {
-                    currentQtyEl.textContent = newQty;
-                }
-
-                if (progress >= 1) {
-                    runningCarton.status = 'finished';
-                    runningCarton.currentQuantity = runningCarton.targetQuantity;
-                    this.renderFourCounters();
-                    persist();
-                }
-            }
         }
-        requestAnimationFrame(() => this.tickCartons());
-      }
-    }
-
-    function genOrder(){ const rnd=String(Math.floor(Math.random()*10000)).padStart(4,'0'); const s=new Date(); const e=new Date(); e.setDate(s.getDate()+5);
-      const F=d=>`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
-      return { auftrag:'1012'+rnd, model:'DASG-1 (201044)', period:`od ${F(s)} do ${F(e)}`, next:'' };
-    }
-
-    function renderAllMachines() {
-      const machinesContainer = $('#machines');
-      const minimizedContainer = $('#minimized-machines-list');
-      const minimizedDock = $('#minimized-machines-dock');
-
-      machinesContainer.innerHTML = '';
-      minimizedContainer.innerHTML = '';
-
-      let hasMinimized = false;
-
-      let machinesToRender = CFG.machines || [];
-      const settings = getCurrentUserSettings();
-      if (settings.selectedTerminal && settings.selectedTerminal !== 'all') {
-        const selectedTerminalData = CFG.terminals.find(t => t.code === settings.selectedTerminal);
-        if (selectedTerminalData) {
-          const machineCodesForTerminal = new Set(selectedTerminalData.machines);
-          machinesToRender = (CFG.machines || []).filter(m => machineCodesForTerminal.has(m.code));
+        renderProgressBar() {
+            if (!this.data.completionTimestamp) { this.data.completionTimestamp = Date.now() + (this.data.durationMin * 60 * 1000); }
+            const now = Date.now(); const startTime = this.data.completionTimestamp - (this.data.durationMin * 60 * 1000);
+            const totalDuration = this.data.completionTimestamp - startTime; const elapsed = now - startTime;
+            const p = Math.min(1, elapsed / totalDuration);
+            this.bar.style.width = (p * 100) + '%'; this.label.textContent = Math.floor(p * 100) + '%';
+            const timeLeft = Math.max(0, Math.floor((this.data.completionTimestamp - now) / 1000));
+            const hours = Math.floor(timeLeft / 3600); const minutes = Math.floor((timeLeft % 3600) / 60);
+            this.completionTimeEl.textContent = `${String(hours)}h ${String(minutes).padStart(2, '0')}m`;
         }
-      }
-
-      const sortedMachines = machinesToRender.sort((a, b) => {
-        if (a.favorite && !b.favorite) return -1;
-        if (!a.favorite && b.favorite) return 1;
-        return (a.code || '').localeCompare(b.code || '');
-      });
-
-      sortedMachines.forEach(machineData => {
-        if (!machineData.code) return; // Skip invalid machine data
-
-        if (machineData.minimized) {
-          hasMinimized = true;
-          const chip = document.createElement('button');
-          chip.className = 'btn';
-          chip.textContent = machineData.code;
-          chip.onclick = () => {
-            machineData.minimized = false;
-            persist();
-            renderAllMachines();
-          };
-          minimizedContainer.appendChild(chip);
-        } else {
-          new Machine(machinesContainer, machineData, CFG.orders || {});
+        tick() {
+            if (this.data.fourCartonSystem) { this.renderCartonGrid(); } else { this.renderProgressBar(); }
+            requestAnimationFrame(() => this.tick());
         }
-      });
-
-      minimizedDock.classList.toggle('hidden', !hasMinimized);
-      initDragAndDrop();
+        setColor(color) { this.data.color = color; this.render(); persist(); }
     }
 
-    // --- stamps
-    function makeStamp(ts,user,smaller=false){
-      const d=new Date(ts);
-      const dd=String(d.getDate()).padStart(2,'0'), mm=String(d.getMonth()+1).padStart(2,'0'), yyyy=d.getFullYear();
-      const hh=String(d.getHours()).padStart(2,'0'), min=String(d.getMinutes()).padStart(2,'0');
-      const small=smaller?' small':'';
-      return `<span class="stamp">
-        <span class="chip small digits${small}">[${dd}/${mm}/${yyyy}]</span>
-        <span class="chip small digits${small}">[${hh}:${min}]</span>
-        <span class="chip small">${user.uid} (${user.name})</span>
-      </span>`;
-    }
+    function genOrder(){ const rnd=String(Math.floor(Math.random()*10000)).padStart(4,'0'); const s=new Date(); const e=new Date(); e.setDate(s.getDate()+5); const F=d=>`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`; return { auftrag:'1012'+rnd, model:'DASG-1 (201044)', period:`od ${F(s)} do ${F(e)}`, next:'' }; }
+    function renderMachines(){ const box=$('#machines'); box.innerHTML=''; (CFG.machines||[]).forEach(m=> new Machine(box,m, CFG.orders||{})); }
 
-    // --- chat stream
+    function makeStamp(ts,user,smaller=false){ const d=new Date(ts); const dd=String(d.getDate()).padStart(2,'0'), mm=String(d.getMonth()+1).padStart(2,'0'), yyyy=d.getFullYear(); const hh=String(d.getHours()).padStart(2,'0'), min=String(d.getMinutes()).padStart(2,'0'); const small=smaller?' small':''; return `<span class="stamp"><span class="chip small digits${small}">[${dd}/${mm}/${yyyy}]</span><span class="chip small digits${small}">[${hh}:${min}]</span><span class="chip small">${user.uid} (${user.name})</span></span>`; }
     function chatPush(text){ const el=document.createElement('div'); el.className='alert'; el.innerHTML=`<span>💬 ${text}</span> <button class="btn ghost">✖</button>`; $('.btn',el).onclick=()=>el.remove(); $('#chatStream').prepend(el); }
 
-    // --- notes / plans
     let NOTES=[], PLANS=[];
     function renderNotes(){
       const list=$('#notesList'); list.innerHTML='';
-      NOTES.forEach(n=>{
-        const row=document.createElement('div');
-        row.className='row flex gap-3';
-
-        const user = USERS[n.user] || { name: '?', avatar: '' };
-        let avatarSrc = user.avatar;
-        if (!avatarSrc) {
-            const EMOJIS = ['😀', '😎', '🚀', '🦄', '🤖', '👾', '👽', '🤠', '🏴‍☠️'];
-            const hash = (n.user || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            const emoji = EMOJIS[hash % EMOJIS.length];
-            avatarSrc = `https://placehold.co/40/121826/ffffff?text=${emoji}`;
-        }
-
-        const tag = n.status==='PRIVATE' ? '<span class="tag private">Prywatna</span>' : '';
-
-        row.innerHTML=`
-            <img src="${avatarSrc}" class="w-8 h-8 rounded-full self-start shrink-0">
-            <div class="flex-1">
-                <div class="meta">${makeStamp(n.ts, {uid:n.user,name:n.userName})} ${tag}</div>
-                <div class="txt text-base">${n.text}</div>
-            </div>
-            <div class="act"></div>`;
-
-        const act=$('.act',row);
-        if(isAdmin() || n.user === CFG.currentUserUid){ // Allow editing for admin or message owner
-          const bE=document.createElement('button'); bE.className='btn'; bE.textContent='✏️'; bE.title='Edytuj';
-          bE.onclick=async()=>{
-            const v=prompt('Edytuj notatkę', n.text);
-            if(v!=null){
-              n.text=v;
-              await saveNotes();
-              renderNotes();
-            }
-          };
-          act.append(bE);
-        }
-        if(isAdmin()){
-          const bR=document.createElement('button'); bR.className='btn'; bR.textContent='↩️'; bR.title='Odpowiedz';
-          const bD=document.createElement('button'); bD.className='btn'; bD.textContent='🗑️'; bD.title='Usuń';
-          bR.onclick=async()=>{ const v=prompt('Odpowiedź', ''); if(v){ NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:`↪ ${v} (odpowiedź na #${n.id})`, status:'FINAL'}); await saveNotes(); renderNotes(); } };
-          bD.onclick=async()=>{ if(confirm('Usunąć notatkę?')){ NOTES = NOTES.filter(x=>x.id!==n.id); await saveNotes(); renderNotes(); } };
-          act.append(bR,bD);
-        }
-        list.appendChild(row);
-      });
+      NOTES.forEach(n=>{ const row=document.createElement('div'); row.className='row'; const tag = n.status==='DRAFT' ? '<span class="tag draft">DRAFT</span>' : ''; row.innerHTML=`<div class="meta">${makeStamp(n.ts, {uid:n.user,name:n.userName})} ${tag}</div><div class="txt">${n.text}</div><div class="act"></div>`; const act=$('.act',row); if(isAdmin()){ const bE=document.createElement('button'); bE.className='btn'; bE.textContent='✏️'; bE.title='Edytuj'; const bR=document.createElement('button'); bR.className='btn'; bR.textContent='↩️'; bR.title='Odpowiedz'; const bD=document.createElement('button'); bD.className='btn'; bD.textContent='🗑️'; bD.title='Usuń'; bE.onclick=async()=>{ const v=prompt('Edytuj notatkę', n.text); if(v!=null){ n.text=v; await saveNotes(); renderNotes(); } }; bR.onclick=async()=>{ const v=prompt('Odpowiedź', ''); if(v){ NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName:CFG.user.name, text:`↪ ${v} (odpowiedź na #${n.id})`, status:'FINAL'}); await saveNotes(); renderNotes(); } }; bD.onclick=async()=>{ if(confirm('Usunąć notatkę?')){ NOTES = NOTES.filter(x=>x.id!==n.id); await saveNotes(); renderNotes(); } }; act.append(bE,bR,bD); } list.appendChild(row); });
     }
-    function renderPlans(){
-      const list=$('#plansList'); list.innerHTML='';
-      PLANS.forEach(p=>{
-        const row=document.createElement('div'); row.className='row';
-        row.innerHTML=`<div class="meta">${makeStamp(p.ts, {uid:p.user,name:p.userName}, true)}</div>
-                       <div class="txt">${p.text}</div>
-                       <div class="act"></div>`;
-        const act = $('.act', row);
-        if(isAdmin()){
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn';
-            editBtn.textContent = '✏️';
-            editBtn.onclick = async () => {
-                const newText = prompt('Edytuj plan:', p.text);
-                if (newText && newText.trim() !== p.text) {
-                    if (!p.editHistory) p.editHistory = [];
-                    p.editHistory.push({
-                        ts: Date.now(),
-                        user: CFG.currentUserUid,
-                        oldText: p.text
-                    });
-                    p.text = newText;
-                    await savePlans();
-                    renderPlans();
-                }
-            };
-            act.appendChild(editBtn);
-        }
-        list.appendChild(row);
-      });
-    }
+    function renderPlans(){ const list=$('#plansList'); list.innerHTML=''; PLANS.forEach(p=>{ const row=document.createElement('div'); row.className='row'; row.innerHTML=`<div class="meta">${makeStamp(p.ts, {uid:p.user,name:p.userName}, true)}</div><div class="txt">${p.text}</div>`; list.appendChild(row); }); }
     async function saveNotes(){ await saveShared(NOTES_KEY, NOTES); }
-    async function loadNotes(){
-        const db=await loadShared(NOTES_KEY);
-        if(db){
-            const existingIds = new Set(NOTES.map(n => n.id));
-            const newNotes = db.filter(n => !existingIds.has(n.id));
-
-            newNotes.forEach(n => {
-                if (n.user !== CFG.currentUserUid && n.status !== 'PRIVATE') {
-                    showChatNotification(n.userName, n.text);
-                }
-            });
-
-            NOTES=db;
-        }
-        renderNotes();
-    }
+    async function loadNotes(){ const db=await loadShared(NOTES_KEY); if(db){ NOTES=db; } renderNotes(); }
     async function savePlans(){ await saveShared(PLANS_KEY, PLANS); }
     async function loadPlans(){ const db=await loadShared(PLANS_KEY); if(db){ PLANS=db; } renderPlans(); }
 
-    // --- login
-    function updateLastSeen() {
-        const settings = getCurrentUserSettings();
-        const now = new Date();
-        const selectedTerminalCode = settings.selectedTerminal || 'all';
-        const terminal = CFG.terminals.find(t => t.code === selectedTerminalCode);
-
-        settings.lastSeen = {
-            ts: now.toISOString(),
-            terminalName: terminal ? terminal.name : 'Wszystkie'
-        };
-        persist();
-    }
-
     function getUserRole(uid) {
         if (!uid) return null;
-        const ROLES = {
-            'SoG1917': { name: 'Senior Developer', className: 'role-senior-dev' },
-            'SoG2025': { name: 'TeamLeiter', className: 'role-teamleiter' },
-            'SoG2020': { name: 'Einrichter', className: 'role-einrichter' },
-        };
+        const ROLES = { 'SoG1917': { name: 'Senior Developer', className: 'role-senior-dev' }, 'SoG2025': { name: 'TeamLeiter', className: 'role-teamleiter' }, 'SoG2020': { name: 'Einrichter', className: 'role-einrichter' }, };
         if (ROLES[uid]) return ROLES[uid];
         if (uid.startsWith('SoG')) return { name: 'Administrator', className: 'role-admin' };
         if (uid.startsWith('LK')) return { name: 'Leiharbeiter', className: 'role-leiharbeiter' };
         if (uid.startsWith('SoP')) return { name: 'Administrator', className: 'role-admin' };
         return { name: 'Użytkownik', className: 'role-user' };
     }
-
     function showUser(){
-      const uid = CFG.currentUserUid;
-      const user = USERS[uid] || { name: 'Nieznany', avatar: '' };
-      const settings = user.settings || {};
-
-      $('#loginName').textContent = user.name;
-      $('#loginId').textContent = uid || '';
-
-      let avatarSrc = user.avatar;
-      let popupAvatarSrc = user.avatar;
-
-      if (!avatarSrc) {
-        const EMOJIS = ['😀', '😎', '🚀', '🦄', '🤖', '👾', '👽', '🤠', '🏴‍☠️'];
-        const hash = (uid || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const emoji = EMOJIS[hash % EMOJIS.length];
-        avatarSrc = `https://placehold.co/40/121826/ffffff?text=${emoji}`;
-        popupAvatarSrc = `https://placehold.co/184/121826/ffffff?text=${emoji}`;
-      }
-
+      const uid = CFG.user?.uid; const user = USERS[uid] || { name: 'Nieznany', avatar: '' };
+      $('#loginName').textContent = user.name; $('#loginId').textContent = uid || '';
+      const avatarSrc = user.avatar || 'https://placehold.co/40/0e1117/ffffff?text=' + (user.name?.[0] || '?');
       $('#userAvatar').src = avatarSrc;
-      $('#popupUserAvatar').src = popupAvatarSrc;
-
-      const role = getUserRole(uid);
-      const roleEl = $('#loginRole');
-      if (role) {
-        roleEl.textContent = role.name;
-        roleEl.className = 'role-badge ' + role.className;
-        roleEl.style.display = 'inline-block';
-      } else {
-        roleEl.style.display = 'none';
-      }
-
-      // Update popup
-      $('#popupUserName').textContent = user.name;
-      $('#popupUserRole').textContent = role ? role.name : 'Użytkownik';
-
-      if (settings.lastSeen) {
-          const d = new Date(settings.lastSeen.ts);
-          const time = d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-          $('#popupLastSeen').textContent = `przy '${settings.lastSeen.terminalName}' o ${time}`;
-      } else {
-          $('#popupLastSeen').textContent = 'brak danych';
-      }
-
-      if (settings.startDate) {
-          try {
-            $('#popupStartDate').textContent = new Date(settings.startDate).toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit', year: 'numeric'});
-          } catch(e) {
-            $('#popupStartDate').textContent = settings.startDate; // fallback for invalid date
-          }
-      } else {
-          $('#popupStartDate').textContent = 'brak danych';
-      }
+      const role = getUserRole(uid); const roleEl = $('#loginRole');
+      if (role) { roleEl.textContent = role.name; roleEl.className = 'role-badge ' + role.className; roleEl.style.display = 'inline-block'; } else { roleEl.style.display = 'none'; }
+      $('#popupUserAvatar').src = user.avatar || 'https://placehold.co/184/0e1117/ffffff?text=' + (user.name?.[0] || '?');
+      $('#popupUserName').textContent = user.name; $('#popupUserRole').textContent = role ? role.name : 'Użytkownik';
     }
-
-    function showUserDetailsModal() {
+    function showUserDetailsModal() { const currentUser = USERS[CFG.user.uid]; if (currentUser) { $('#detailsName').value = currentUser.name || ''; $('#detailsLang').value = CFG.language || 'pl'; } $('#userDetailsModal').classList.remove('hidden'); }
+    function initUserDetailsModal() { $('#userDetailsForm').addEventListener('submit', (e) => { e.preventDefault(); const user = USERS[CFG.user.uid]; if (user) { user.name = $('#detailsName').value; user.dob = $('#detailsDob').value; user.details_filled = true; const selectedLang = $('#detailsLang').value; setLanguage(selectedLang); CFG.users = USERS; persist(); showUser(); $('#userDetailsModal').classList.add('hidden'); window.location.reload(); } }); }
+    function initLogin() {
+        showUser();
         const currentUser = USERS[CFG.user.uid];
-        if (currentUser) {
-            $('#detailsName').value = currentUser.name || '';
-            $('#detailsLang').value = getCurrentUserSettings().language || 'pl';
+        if (currentUser && !currentUser.details_filled) {
+            showUserDetailsModal();
         }
-        $('#userDetailsModal').classList.remove('hidden');
-    }
 
-    function initUserDetailsModal() {
-        $('#userDetailsForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = USERS[CFG.user.uid];
-            if (user) {
-                user.name = $('#detailsName').value;
-                user.dob = $('#detailsDob').value; // Just store it as text
-                user.details_filled = true;
+        const switchUserBtn = $('#switchUserBtn');
+        const userSelectionModal = $('#userSelectionModal');
+        if (!switchUserBtn || !userSelectionModal) return;
 
-                const selectedLang = $('#detailsLang').value;
-                setLanguage(selectedLang); // This also persists the language choice
+        const closeUserSelectionModalBtn = $('#closeUserSelectionModalBtn');
+        const userSelectionList = $('#userSelectionList');
+        const createNewUserBtn = $('#createNewUserBtn');
+        const userItemTpl = $('#tpl-user-list-item');
 
-                CFG.users = USERS;
-                persist();
+        function renderUserSelectionList() {
+            userSelectionList.innerHTML = '';
+            for (const uid in USERS) {
+                const user = USERS[uid];
+                const item = userItemTpl.content.firstElementChild.cloneNode(true);
 
-                // Re-render user info in header and reload
+                item.dataset.uid = uid;
+                $('.user-name', item).textContent = user.name;
+                $('.user-id', item).textContent = uid;
+                $('img', item).src = user.avatar || 'https://placehold.co/40/0e1117/ffffff?text=' + (user.name?.[0] || '?');
+                if (user.password) {
+                    $('.lock-icon', item).textContent = '🔒';
+                }
+
+                item.addEventListener('click', () => handleUserSelection(uid));
+
+                userSelectionList.appendChild(item);
+            }
+        }
+
+        function handleUserSelection(uid) {
+            if (uid === CFG.user.uid) {
+                userSelectionModal.classList.add('hidden');
+                return;
+            }
+
+            const userToLogin = USERS[uid];
+            if (userToLogin && userToLogin.password) {
+                const pass = prompt(`Wprowadź hasło dla ${uid}:`);
+                if (pass !== userToLogin.password) {
+                    alert('Błędne hasło!');
+                    return;
+                }
+            }
+
+            logLogin(uid);
+            CFG.user.uid = uid;
+            persist();
+
+            userSelectionModal.classList.add('hidden');
+
+            const newCurrentUser = USERS[uid];
+            if (newCurrentUser && !newCurrentUser.details_filled) {
                 showUser();
-                $('#userDetailsModal').classList.add('hidden');
+                showUserDetailsModal();
+            } else {
                 window.location.reload();
             }
+        }
+
+        switchUserBtn.addEventListener('click', () => {
+            renderUserSelectionList();
+            userSelectionModal.classList.remove('hidden');
         });
-    }
 
-    function initLogin(){
-      showUser(); // Show the currently logged-in user.
+        closeUserSelectionModalBtn.addEventListener('click', () => {
+            userSelectionModal.classList.add('hidden');
+        });
 
-      const toggleBtn = $('#custom-login-toggle');
-      const optionsContainer = $('#custom-login-options');
+        createNewUserBtn.addEventListener('click', () => {
+            userSelectionModal.classList.add('hidden');
+            $('#newUserModal').classList.remove('hidden');
+        });
 
-      if (!toggleBtn || !optionsContainer) return;
-
-      // Populate options
-      optionsContainer.innerHTML = '';
-      for (const uid in USERS) {
-        const user = USERS[uid];
-        const optionEl = document.createElement('div');
-        optionEl.className = 'flex items-center gap-3 p-2 hover:bg-white/10 cursor-pointer';
-        optionEl.dataset.uid = uid;
-
-        const avatarSrc = user.avatar || `https://placehold.co/40/0e1117/ffffff?text=${user.name?.[0] || '?'}`;
-
-        optionEl.innerHTML = `
-          <img src="${avatarSrc}" class="w-8 h-8 rounded-full">
-          <span>${user.name} (${uid})</span>
-        `;
-
-        // Handle user selection
-        optionEl.addEventListener('click', () => {
-          const selectedValue = uid;
-          const userToLogin = USERS[selectedValue];
-
-          if (userToLogin && userToLogin.password) {
-            const pass = prompt(`Wprowadź hasło dla ${selectedValue}:`);
-            if (pass !== userToLogin.password) {
-              alert('Błędne hasło!');
-              return;
+        $('#userAvatar').addEventListener('click', () => {
+            const newAvatar = prompt('Podaj nowy URL avatara:', USERS[CFG.user.uid].avatar || '');
+            if (newAvatar !== null) {
+                USERS[CFG.user.uid].avatar = newAvatar;
+                CFG.users = USERS;
+                persist();
+                showUser();
             }
-          }
-
-          logLogin(selectedValue);
-          CFG.currentUserUid = selectedValue; // <-- Changed
-          persist();
-
-          const newCurrentUser = USERS[selectedValue];
-          if (newCurrentUser && !newCurrentUser.details_filled) {
-              showUser();
-              showUserDetailsModal();
-          } else {
-              window.location.reload();
-          }
         });
 
-        optionsContainer.appendChild(optionEl);
-      }
+        $('#closeModalBtn').onclick = () => {
+            $('#newUserModal').classList.add('hidden');
+        };
 
-      // Toggle dropdown visibility
-      toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        optionsContainer.classList.toggle('hidden');
-      });
-
-      // Close dropdown on outside click
-      document.addEventListener('click', () => {
-        if (!optionsContainer.classList.contains('hidden')) {
-          optionsContainer.classList.add('hidden');
-        }
-      });
-
-      // Check if we need to ask for details on initial load
-      const currentUser = USERS[CFG.currentUserUid]; // <-- Changed
-      if (currentUser && !currentUser.details_filled) {
-        showUserDetailsModal();
-      }
-
-      // Handle avatar change click
-      $('#userAvatar').addEventListener('click', () => {
-        const newAvatar = prompt('Podaj nowy URL avatara:', USERS[CFG.currentUserUid].avatar || ''); // <-- Changed
-        if (newAvatar !== null) {
-          USERS[CFG.currentUserUid].avatar = newAvatar; // <-- Changed
-          CFG.users = USERS;
-          persist();
-          showUser();
-        }
-      });
+        $('#newUserForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const login = $('#newLogin').value;
+            const password = $('#newPassword').value;
+            const name = $('#newName').value;
+            if (!/^(SoG[0-9]{4}|LK[0-9]{2}|[0-9]{2}|[0-9]{4})$/.test(login)) {
+                alert('Format loginu jest nieprawidłowy. Użyj formatu SoGxxxx, LKxx, xx lub xxxx.');
+                return;
+            }
+            if (USERS[login]) {
+                alert('Użytkownik o takim loginie już istnieje.');
+                return;
+            }
+            USERS[login] = { name: name, avatar: '', password: password || undefined };
+            CFG.users = USERS;
+            logLogin(login);
+            CFG.user.uid = login;
+            persist();
+            $('#newUserModal').classList.add('hidden');
+            $('#newUserForm').reset();
+            showUser();
+            showUserDetailsModal();
+        });
     }
 
-    // --- init buttons
     function initNotesPlans(){
-      $('#noteInput').addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault(); // Prevent form submission or line break in other inputs
-          $('#addNote').click();
-        }
-      });
-      async function doAddNote(content) {
-        const v = content.trim(); if(!v) return;
-        let status='FINAL';
+      const noteInput = $('#noteInput');
+      const addNoteBtn = $('#addNote');
+      const currentUser = USERS[CFG.user.uid] || {};
 
-        if(isAdmin()){
-          const isPrivate = confirm('Czy ta wiadomość ma być prywatna (widoczna tylko w logach)?');
-          if (isPrivate) {
-            status = 'PRIVATE';
+      const sendNote = async () => {
+        const v = noteInput.value.trim();
+        if (!v) return;
+
+        let status = 'FINAL';
+        if (isAdmin()) {
+          const code = prompt('Podaj kod (0..1000) aby opublikować do „chat”. Błędny -> DRAFT:', '');
+          const n = parseInt(code, 10);
+          if (!(n >= 0 && n <= 1000) || n !== ADMIN_PASS) {
+            status = 'DRAFT';
+          } else {
+            status = 'FINAL';
+            chatPush(v);
           }
         }
 
-        if (status !== 'PRIVATE') {
-            chatPush(v);
-        }
-
-        NOTES.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:v, status});
-        $('#noteInput').value='';
+        NOTES.push({ id: Date.now() + Math.random(), ts: Date.now(), user: CFG.user.uid, userName: currentUser.name, text: v, status });
+        noteInput.value = '';
         await saveNotes();
         renderNotes();
-        updateLastSeen(); // New
       };
+
+      addNoteBtn.onclick = sendNote;
+
+      noteInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendNote();
+        }
+      });
+
       $('#addPlan').onclick=async()=>{
         const v=$('#planInput').value.trim(); if(!v) return;
-        PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.currentUserUid, userName:(USERS[CFG.currentUserUid] || {}).name, text:v});
+        PLANS.push({id:Date.now()+Math.random(), ts:Date.now(), user:CFG.user.uid, userName: currentUser.name, text:v});
         $('#planInput').value=''; await savePlans(); renderPlans();
-        updateLastSeen(); // New
       };
       $('#refreshNP').onclick=async()=>{ await loadNotes(); await loadPlans(); };
       loadNotes(); loadPlans();
     }
 
-    // --- machines render
-    function initThemeSwitcher() {
-      const themeButtons = $$('#themeSwitcher button');
-      const body = document.body;
+    function initThemeSwitcher() { const body = document.body; function applyTheme(theme) { body.dataset.theme = theme; CFG.theme = theme; persist(); } if (CFG.theme) { applyTheme(CFG.theme); } $$('#themeSwitcher button').forEach(button => { button.addEventListener('click', () => { applyTheme(button.dataset.theme); }); }); }
+    function getTerminalId() { let terminal = localStorage.getItem('KN007_TERMINAL'); if (!terminal) { const terminalName = 'Terminal' + String(Math.floor(Math.random() * 900) + 100).padStart(3, '0'); const terminalKey = Math.random().toString(36).substring(2, 7); terminal = `${terminalName} (${terminalKey})`; localStorage.setItem('KN007_TERMINAL', terminal); } return terminal; }
+    function logLogin(uid) { const user = USERS[uid]; if (!user) return; const history = JSON.parse(localStorage.getItem('KN007_LOGINS') || '[]'); const now = new Date(); const terminalId = getTerminalId(); const role = getUserRole(uid); const logEntry = { ts: now.toISOString(), user: `${uid} (${user.name || 'N/A'})`, terminal: terminalId, accountType: role ? role.name : 'Użytkownik' }; history.unshift(logEntry); if (history.length > 100) { history.pop(); } localStorage.setItem('KN007_LOGINS', JSON.stringify(history)); }
+    function renderLoginHistory() { if (!isAdmin()) return; const list = $('#loginHistoryList'); if (!list) return; const history = JSON.parse(localStorage.getItem('KN007_LOGINS') || '[]'); if (history.length === 0) { list.innerHTML = '<p class="opacity-70">Brak historii logowań.</p>'; return; } list.innerHTML = ''; history.forEach(entry => { const d = new Date(entry.ts); const date = d.toLocaleDateString('pl-PL'); const time = d.toLocaleTimeString('pl-PL'); const logHtml = `<div class="row !items-center"><div class="txt text-sm">Użytkownik <strong>${entry.user}</strong> zalogował się dnia ${date} o godz. ${time} z <strong>${entry.terminal}</strong> na konto <strong>${entry.accountType}</strong>.</div></div>`; list.insertAdjacentHTML('beforeend', logHtml); }); }
+    function renderAdminPanel() { const footer = $('#adminFooter'); if (isAdmin()) { footer.style.display = 'block'; renderLoginHistory(); } else { footer.style.display = 'none'; } }
+    function setLanguage(lang) { if (!TRANSLATIONS[lang]) return; document.documentElement.lang = lang; document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; if (lang === 'ar') { document.body.style.fontSize = '17px'; } else { document.body.style.fontSize = '15px'; } $$('[data-translate-key]').forEach(el => { const key = el.dataset.translateKey; const translation = TRANSLATIONS[lang][key]; if (translation) { if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') { el.placeholder = translation; } else { const safeContent = document.createTextNode(translation); const icon = el.querySelector('span'); el.innerHTML = ''; if(icon) el.appendChild(icon); el.appendChild(safeContent); } } }); CFG.language = lang; persist(); $$('#langSwitcher button').forEach(btn => { btn.classList.toggle('primary', btn.dataset.lang === lang); }); }
+    function initLangSwitcher() { $$('#langSwitcher button').forEach(button => { button.addEventListener('click', () => setLanguage(button.dataset.lang)); }); setLanguage(CFG.language || 'pl'); }
+    function initCustomTimeModal() { const modal = $('#customTimeModal'); const form = $('#customTimeForm'); const input = $('#customTimeInput'); const closeBtn = $('#closeTimeModalBtn'); form.addEventListener('submit', (e) => { e.preventDefault(); if (activePruefung) { activePruefung.setTime(input.value); } modal.classList.add('hidden'); activePruefung = null; }); closeBtn.onclick = () => { modal.classList.add('hidden'); activePruefung = null; }; }
+    function initColorPicker() { const picker = $('#colorPicker'); $$('button', picker).forEach(button => { button.addEventListener('click', (e) => { e.stopPropagation(); const color = button.dataset.color; if (activeMachineForColor) { activeMachineForColor.setColor(color); } picker.classList.add('hidden'); activeMachineForColor = null; }); }); document.addEventListener('click', (e) => { if (!picker.contains(e.target) && activeMachineForColor) { picker.classList.add('hidden'); activeMachineForColor = null; } }); }
 
-      function applyTheme(theme) {
-        body.dataset.theme = theme;
-        getCurrentUserSettings().theme = theme;
-        persist();
-      }
-
-      // Apply saved theme on load
-      const savedTheme = getCurrentUserSettings().theme;
-      if (savedTheme) {
-        applyTheme(savedTheme);
-      }
-
-      themeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const theme = button.dataset.theme;
-          applyTheme(theme);
-        });
-      });
-    }
-
-    function getTerminalId() {
-        let terminal = localStorage.getItem('KN007_TERMINAL');
-        if (!terminal) {
-            const terminalName = 'Terminal' + String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
-            const terminalKey = Math.random().toString(36).substring(2, 7); // e.g., 't12er'
-            terminal = `${terminalName} (${terminalKey})`;
-            localStorage.setItem('KN007_TERMINAL', terminal);
-        }
-        return terminal;
-    }
-
-    function logLogin(uid) {
-        const user = USERS[uid];
-        if (!user) return;
-
-        const history = JSON.parse(localStorage.getItem('KN007_LOGINS') || '[]');
-        const now = new Date();
-        const terminalId = getTerminalId();
-        const role = getUserRole(uid);
-
-        const logEntry = {
-            ts: now.toISOString(),
-            user: `${uid} (${user.name || 'N/A'})`,
-            terminal: terminalId,
-            accountType: role ? role.name : 'Użytkownik'
-        };
-
-        history.unshift(logEntry); // Add to the beginning
-        if (history.length > 100) { // Keep history to 100 entries
-            history.pop();
-        }
-        localStorage.setItem('KN007_LOGINS', JSON.stringify(history));
-    }
-
-    function renderLoginHistory() {
-        if (!isAdmin()) return;
-
-        const list = $('#loginHistoryList');
-        if (!list) return;
-
-        const history = JSON.parse(localStorage.getItem('KN007_LOGINS') || '[]');
-        if (history.length === 0) {
-            list.innerHTML = '<p class="opacity-70">Brak historii logowań.</p>';
-            return;
-        }
-
-        list.innerHTML = '';
-        history.forEach(entry => {
-            const d = new Date(entry.ts);
-            const date = d.toLocaleDateString('pl-PL');
-            const time = d.toLocaleTimeString('pl-PL');
-            const logHtml = `<div class="row !items-center"><div class="txt text-sm">Użytkownik <strong>${entry.user}</strong> zalogował się dnia ${date} o godz. ${time} z <strong>${entry.terminal}</strong> na konto <strong>${entry.accountType}</strong>.</div></div>`;
-            list.insertAdjacentHTML('beforeend', logHtml);
-        });
-    }
-
-    function initDraggableChat() {
-        const chatPanel = $('#chat-panel');
-        const dragHandle = $('#chat-drag-handle');
-        if (!chatPanel || !dragHandle) return;
-
-        let isDragging = false;
-        let offsetX, offsetY;
-
-        dragHandle.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            isDragging = true;
-
-            const rect = chatPanel.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-
-            document.body.style.userSelect = 'none';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-
-            let newX = e.clientX - offsetX;
-            let newY = e.clientY - offsetY;
-
-            const maxX = window.innerWidth - chatPanel.offsetWidth;
-            const maxY = window.innerHeight - chatPanel.offsetHeight;
-
-            chatPanel.style.left = `${Math.max(0, Math.min(newX, maxX))}px`;
-            chatPanel.style.top = `${Math.max(0, Math.min(newY, maxY))}px`;
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            document.body.style.userSelect = 'auto';
-        });
-    }
-
-    function initUserProfileModal() {
-        const modal = $('#userProfileModal');
-        if (!modal) return;
-
-        const openBtn = $('#openProfileBtn');
-        const closeBtn = $('#userProfileModalClose');
-        const form = $('#userProfileForm');
-        const terminalSelect = $('#profileFavTerminal');
-
-        openBtn.onclick = () => {
-            const settings = getCurrentUserSettings();
-            // Populate form
-            $('#profileStartDate').value = settings.startDate || '';
-            $('#profileShift').value = settings.shift || 'green';
-            $('#profileFavMachine').value = settings.favoriteMachine || '';
-
-            // Populate terminal select
-            terminalSelect.innerHTML = '<option value="">Brak</option>';
-            (CFG.terminals || []).forEach(terminal => {
-                const option = document.createElement('option');
-                option.value = terminal.code;
-                option.textContent = `${terminal.name} (${terminal.code})`;
-                terminalSelect.appendChild(option);
+    function migrateCfg() {
+        let changed = false;
+        if (!CFG.version || CFG.version < 2) {
+            (CFG.machines || []).forEach(m => {
+                if (m.fourCartonSystem === undefined) { m.fourCartonSystem = false; changed = true; }
+                if (!m.cartons || m.cartons.length !== 4) {
+                    m.cartons = [ { id: 1, status: 'idle', startTime: 0, duration: (m.durationMin || 25) * 60 }, { id: 2, status: 'idle', startTime: 0, duration: (m.durationMin || 25) * 60 }, { id: 3, status: 'idle', startTime: 0, duration: (m.durationMin || 25) * 60 }, { id: 4, status: 'idle', startTime: 0, duration: (m.durationMin || 25) * 60 }, ];
+                    changed = true;
+                }
+                if (m.pruef) { m.pruefTotal = m.pruef; delete m.pruef; changed = true; }
+                if (!m.pruefStart) { m.pruefStart = 0; changed = true; }
             });
-            terminalSelect.value = settings.favoriteTerminal || '';
-
-            modal.classList.remove('hidden');
-        };
-        closeBtn.onclick = () => modal.classList.add('hidden');
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const settings = getCurrentUserSettings();
-            settings.startDate = $('#profileStartDate').value;
-            settings.shift = $('#profileShift').value;
-            settings.favoriteMachine = $('#profileFavMachine').value;
-            settings.favoriteTerminal = $('#profileFavTerminal').value;
-
-            persist();
-            modal.classList.add('hidden');
-            setStatus('Profil zaktualizowany!');
-        });
-    }
-
-    function initCreateUserModal() {
-        const modal = $('#createUserModal');
-        if (!modal) return;
-
-        const openBtn = $('#createUserBtn');
-        const closeBtn = $('#createUserModalClose');
-        const form = $('#createUserForm');
-
-        openBtn.onclick = () => modal.classList.remove('hidden');
-        closeBtn.onclick = () => modal.classList.add('hidden');
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const loginInput = $('#newUserLogin');
-            const nameInput = $('#newUserName');
-            const login = loginInput.value.trim();
-            const name = nameInput.value.trim();
-
-            if (!login || !name) {
-                alert('Login i nazwa są wymagane.');
-                return;
-            }
-            if (USERS[login]) {
-                alert('Użytkownik o takim loginie już istnieje.');
-                return;
-            }
-
-            let password = undefined;
-            if (login.startsWith('SoG')) {
-                const numbers = login.replace(/[^0-9]/g, '');
-                if (numbers) {
-                    password = numbers.split('').reverse().join('');
-                }
-            }
-
-            USERS[login] = {
-                name: name,
-                avatar: '',
-                password: password,
-                settings: { theme: 'dark', language: 'pl', selectedTerminal: 'all' } // Add default settings
-            };
-            CFG.users = USERS;
-            persist();
-
-            loginInput.value = '';
-            nameInput.value = '';
-            modal.classList.add('hidden');
-
-            // Refresh the login dropdown to show the new user
-            initLogin();
-
-            alert(`Dodano użytkownika ${name}. Hasło: ${password || 'brak'}. Możesz się teraz zalogować.`);
-        });
-    }
-
-    function initBroadcasts() {
-        const BROADCAST_KEY = 'KN007_BROADCAST';
-        const modal = $('#broadcastModal');
-        const messageEl = $('#broadcastModalMessage');
-        const ackBtn = $('#broadcastAcknowledgeBtn');
-        const adminForm = $('#adminBroadcastForm');
-        const adminTextarea = $('#adminBroadcastMessage');
-        const adminStatusList = $('#adminBroadcastStatusList');
-
-        if (!modal || !adminForm) return; // Exit if key elements aren't found
-
-        // --- Admin: Sending a broadcast ---
-        adminForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const message = adminTextarea.value.trim();
-            if (!message) return;
-
-            const broadcast = {
-                id: `broadcast-${Date.now()}`,
-                message: message,
-                ts: new Date().toISOString(),
-                acknowledgedBy: {}
-            };
-
-            const success = await saveShared(BROADCAST_KEY, broadcast);
-            if (success) {
-                adminTextarea.value = '';
-                setStatus('Ogłoszenie wysłane!');
-                renderBroadcastStatus(broadcast); // Immediately update admin view
-            } else {
-                alert('Błąd: Nie udało się wysłać ogłoszenia.');
-            }
-        });
-
-        // --- Admin: Rendering status ---
-        function renderBroadcastStatus(broadcast) {
-            if (!isAdmin() || !adminStatusList) return;
-            adminStatusList.innerHTML = '';
-            if (!broadcast || !broadcast.id) {
-                adminStatusList.innerHTML = 'Brak aktywnych ogłoszeń.';
-                return;
-            }
-
-            for (const uid in USERS) {
-                const user = USERS[uid];
-                const ackTime = broadcast.acknowledgedBy[uid];
-                const status = ackTime
-                    ? `✅ Potwierdzono ${new Date(ackTime).toLocaleTimeString()}`
-                    : '⌛ Oczekuje...';
-                const row = document.createElement('div');
-                row.className = 'row !py-1';
-                row.innerHTML = `<div class="txt"><strong>${user.name}</strong> (${uid})</div><div class="act">${status}</div>`;
-                adminStatusList.appendChild(row);
-            }
-        }
-
-        // --- Client: Acknowledging a broadcast ---
-        ackBtn.addEventListener('click', async () => {
-            const broadcastId = modal.dataset.broadcastId;
-            if (!broadcastId) return;
-
-            const broadcast = await loadShared(BROADCAST_KEY);
-            if (broadcast && broadcast.id === broadcastId) {
-                broadcast.acknowledgedBy[CFG.currentUserUid] = new Date().toISOString();
-                await saveShared(BROADCAST_KEY, broadcast);
-                modal.classList.add('hidden');
-            } else {
-                // The broadcast changed while the modal was open, just close it.
-                modal.classList.add('hidden');
-            }
-        });
-
-        // --- All clients: Checking for broadcasts ---
-        async function checkBroadcast() {
-            const broadcast = await loadShared(BROADCAST_KEY);
-            if (broadcast && broadcast.id) {
-                // Update admin view if visible
-                if (isAdmin()) {
-                    renderBroadcastStatus(broadcast);
-                }
-                // Check if current user needs to see it
-                if (!broadcast.acknowledgedBy[CFG.currentUserUid]) {
-                    messageEl.textContent = broadcast.message;
-                    modal.dataset.broadcastId = broadcast.id;
-                    modal.classList.remove('hidden');
-                }
-            }
-        }
-
-        // Initial check and start interval
-        checkBroadcast();
-        setInterval(checkBroadcast, 10000); // Check every 10 seconds
-    }
-
-    function initAdminEditUserModal() {
-        const modal = $('#adminEditUserModal');
-        if (!modal) return;
-
-        const form = $('#adminEditUserForm');
-        const closeBtn = $('#adminEditUserModalClose');
-
-        closeBtn.onclick = () => modal.classList.add('hidden');
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const uid = $('#adminEditUserUid').value;
-            const user = USERS[uid];
-
-            if (user) {
-                user.name = $('#adminEditUserName').value;
-                user.avatar = $('#adminEditUserAvatar').value;
-                CFG.users = USERS;
-                persist();
-                renderAdminPanel(); // Re-render to show changes
-                modal.classList.add('hidden');
-                setStatus(`Zaktualizowano użytkownika ${uid}`);
-            } else {
-                alert('Błąd: Nie znaleziono użytkownika!');
-            }
-        });
-    }
-
-    function renderAdminUserManagement() {
-        const userList = $('#adminUserList');
-        if (!userList) return;
-
-        userList.innerHTML = '';
-        for (const uid in USERS) {
-            if (uid === 'SoG1917') continue; // Can't delete the main admin
-
-            const user = USERS[uid];
-            const row = document.createElement('div');
-            row.className = 'row !items-center';
-            row.innerHTML = `<div class="txt text-sm"><strong>${user.name}</strong> (${uid})</div>`;
-
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn';
-            editBtn.textContent = '✏️ Edytuj';
-            editBtn.onclick = () => {
-                $('#adminEditUserUid').value = uid;
-                $('#adminEditUserLoginLabel').textContent = uid;
-                $('#adminEditUserName').value = user.name || '';
-                $('#adminEditUserAvatar').value = user.avatar || '';
-                $('#adminEditUserModal').classList.remove('hidden');
-            };
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn';
-            deleteBtn.textContent = '🗑️ Usuń';
-            deleteBtn.onclick = () => {
-                if (confirm(`Na pewno usunąć użytkownika ${user.name}?`)) {
-                    delete USERS[uid];
-                    CFG.users = USERS;
-                    persist();
-                    renderAdminPanel(); // Re-render the whole admin panel
-                }
-            };
-
-            const actDiv = document.createElement('div');
-            actDiv.className = 'act';
-            actDiv.append(editBtn, deleteBtn);
-            row.appendChild(actDiv);
-            userList.appendChild(row);
-        }
-
-        $('#adminAddUserForm').onsubmit = (e) => {
-            e.preventDefault();
-            const loginInput = $('#adminNewUserLogin');
-            const nameInput = $('#adminNewUserName');
-            const login = loginInput.value.trim();
-            const name = nameInput.value.trim();
-
-            if (!login || !name) {
-                alert('Login i nazwa są wymagane.');
-                return;
-            }
-            if (USERS[login]) {
-                alert('Użytkownik o takim loginie już istnieje.');
-                return;
-            }
-
-            let password = undefined;
-            if (login.startsWith('SoG')) {
-                const numbers = login.replace(/[^0-9]/g, '');
-                if (numbers) {
-                    password = numbers.split('').reverse().join('');
-                }
-            }
-
-            USERS[login] = { name: name, avatar: '', password: password };
-            CFG.users = USERS;
-            persist();
-
-            loginInput.value = '';
-            nameInput.value = '';
-            renderAdminPanel();
-            alert(`Dodano użytkownika ${name}. Hasło: ${password || 'brak'}`);
-        };
-    }
-
-    function renderAdminTerminalManagement() {
-        const terminalList = $('#adminTerminalList');
-        if (!terminalList) return;
-
-        terminalList.innerHTML = '';
-        (CFG.terminals || []).forEach(terminal => {
-            const row = document.createElement('div');
-            row.className = 'row !items-center';
-            row.innerHTML = `
-                <div class="txt text-sm">
-                    <strong>${terminal.name}</strong> (${terminal.code})
-                    <div class="text-xs opacity-70">Maszyny: ${terminal.machines.join(', ') || 'brak'}</div>
-                </div>`;
-
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn';
-            editBtn.textContent = '✏️ Edytuj';
-            editBtn.onclick = () => {
-                const newName = prompt('Nowa nazwa terminala:', terminal.name);
-                const newMachines = prompt('Nowa lista maszyn (oddzielone przecinkami):', terminal.machines.join(','));
-                if (newName !== null) terminal.name = newName;
-                if (newMachines !== null) terminal.machines = newMachines.split(',').map(s => s.trim()).filter(Boolean);
-                persist();
-                renderAdminPanel();
-            };
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn';
-            deleteBtn.textContent = '🗑️ Usuń';
-            deleteBtn.onclick = () => {
-                if (confirm(`Na pewno usunąć terminal ${terminal.name}?`)) {
-                    CFG.terminals = CFG.terminals.filter(t => t.code !== terminal.code);
-                    persist();
-                    renderAdminPanel();
-                }
-            };
-            const actDiv = document.createElement('div');
-            actDiv.className = 'act';
-            actDiv.append(editBtn, deleteBtn);
-            row.appendChild(actDiv);
-            terminalList.appendChild(row);
-        });
-
-        $('#adminAddTerminalForm').onsubmit = (e) => {
-            e.preventDefault();
-            const codeInput = $('#adminNewTerminalCode');
-            const nameInput = $('#adminNewTerminalName');
-            const code = codeInput.value.trim();
-            const name = nameInput.value.trim();
-
-            if (!code || !name) {
-                alert('Kod i nazwa są wymagane.');
-                return;
-            }
-            if (CFG.terminals.some(t => t.code === code)) {
-                alert('Terminal o takim kodzie już istnieje.');
-                return;
-            }
-
-            CFG.terminals.push({ code: code, name: name, machines: [] });
-            persist();
-
-            codeInput.value = '';
-            nameInput.value = '';
-            renderAdminPanel();
-        };
-    }
-
-    function initAdminPlansLog() {
-        const logList = $('#adminPlansLogList');
-        if (!logList) return;
-
-        loadShared(PLANS_KEY).then(plans => {
-            if (plans && plans.length > 0) {
-                logList.innerHTML = '';
-                plans.sort((a,b) => b.ts - a.ts); // Show newest plans first
-
-                plans.forEach(p => {
-                    const row = document.createElement('div');
-                    row.className = 'row flex-col !items-start';
-
-                    let historyHtml = '';
-                    if (p.editHistory && p.editHistory.length > 0) {
-                        historyHtml += '<div class="text-xs opacity-50 mt-2 pl-4 border-l-2 border-white/10">Historia zmian:<ul>';
-                        p.editHistory.forEach(h => {
-                            historyHtml += `<li class="mt-1"><strong>${new Date(h.ts).toLocaleString('pl-PL')}</strong> przez ${h.user}: <span class="line-through">${h.oldText}</span></li>`;
-                        });
-                        historyHtml += '</ul></div>';
-                    }
-
-                    row.innerHTML = `
-                        <div>
-                            <div class="meta">${makeStamp(p.ts, {uid: p.user, name: p.userName})}</div>
-                            <div class="txt">${p.text}</div>
-                        </div>
-                        ${historyHtml}
-                    `;
-                    logList.appendChild(row);
-                });
-            } else {
-                logList.innerHTML = '<p class="opacity-70">Brak planów.</p>';
-            }
-        });
-    }
-
-    function initAdminCartonLog() {
-        const CARTON_LOG_KEY = 'KN007_CARTON_LOG';
-        const toggleBtn = $('#toggleCartonLogBtn');
-        const logList = $('#adminCartonLogList');
-        if (!toggleBtn || !logList) return;
-
-        toggleBtn.addEventListener('click', () => {
-            const isHidden = logList.classList.toggle('hidden');
-            toggleBtn.textContent = isHidden ? 'Pokaż' : 'Ukryj';
-        });
-
-        loadShared(CARTON_LOG_KEY).then(log => {
-            if (log && log.length > 0) {
-                logList.innerHTML = '';
-                log.sort((a,b) => b.ts - a.ts); // Newest first
-                log.forEach(entry => {
-                    const row = document.createElement('div');
-                    row.className = 'row !py-1 text-xs';
-                    row.innerHTML = `
-                        <div class="meta">${makeStamp(entry.ts, {uid: entry.user, name: entry.userName})}</div>
-                        <div class="txt">zaksięgował karton <strong>#${entry.cartonNumber}</strong> (VE ${entry.veNumber}) na maszynie <strong>${entry.machineCode}</strong>.</div>
-                    `;
-                    logList.appendChild(row);
-                });
-            } else {
-                logList.innerHTML = '<p class="opacity-70">Brak wpisów w logu.</p>';
-            }
-        });
-    }
-
-    function initAdminChatLog() {
-        const filterInput = $('#adminChatFilter');
-        const logList = $('#adminChatLogList');
-        if (!filterInput || !logList) return;
-
-        let allNotes = [];
-
-        async function renderLog() {
-            const filterText = filterInput.value.toLowerCase();
-
-            const filteredNotes = allNotes.filter(n => {
-                return (n.user && n.user.toLowerCase().includes(filterText)) ||
-                       (n.userName && n.userName.toLowerCase().includes(filterText)) ||
-                       (n.text && n.text.toLowerCase().includes(filterText));
-            });
-
-            logList.innerHTML = '';
-            if (filteredNotes.length === 0) {
-                logList.innerHTML = '<p class="opacity-70">Brak pasujących wiadomości.</p>';
-                return;
-            }
-
-            filteredNotes.forEach(n => {
-                const row = document.createElement('div');
-                row.className = 'row';
-                const statusTag = n.status === 'PRIVATE'
-                    ? '<span class="tag private">Prywatna</span>'
-                    : '<span class="tag" style="background-color: #22c55e; border-color: #16a34a;">Publiczna</span>';
-
-                row.innerHTML = `
-                    <div class="meta">${makeStamp(n.ts, {uid: n.user, name: n.userName})} ${statusTag}</div>
-                    <div class="txt text-sm">${n.text}</div>
-                `;
-                logList.appendChild(row);
-            });
-        }
-
-        filterInput.addEventListener('keyup', renderLog);
-
-        // Initial load
-        loadShared(NOTES_KEY).then(notes => {
-            if (notes) {
-                allNotes = notes.sort((a,b) => b.ts - a.ts); // Show newest first
-                renderLog();
-            }
-        });
-    }
-
-    function renderAdminPanel() {
-      const footer = $('#adminFooter');
-      if (isAdmin()) {
-        footer.style.display = 'block';
-        renderLoginHistory();
-        renderAdminUserManagement();
-        renderAdminTerminalManagement();
-        initAdminChatLog();
-        initAdminCartonLog();
-        initAdminPlansLog(); // New call
-      } else {
-        footer.style.display = 'none';
-      }
-    }
-
-    function setLanguage(lang) {
-        if (!TRANSLATIONS[lang]) return;
-        document.documentElement.lang = lang;
-        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-        if (lang === 'ar') { document.body.style.fontSize = '17px'; }
-        else { document.body.style.fontSize = '15px'; }
-
-        $$('[data-translate-key]').forEach(el => {
-            const key = el.dataset.translateKey;
-            const translation = TRANSLATIONS[lang][key];
-            if (translation) {
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                    el.placeholder = translation;
-                } else {
-                    // Sanitize to prevent HTML injection if keys are ever dynamic
-                    const safeContent = document.createTextNode(translation);
-                    // Handle elements with children (like the title H1)
-                    const icon = el.querySelector('span');
-                    el.innerHTML = ''; // Clear existing content
-                    if(icon) el.appendChild(icon);
-                    el.appendChild(safeContent);
-                }
-            }
-        });
-        getCurrentUserSettings().language = lang;
-        persist();
-
-        // New part for highlighting flags
-        $$('#langSwitcher button').forEach(btn => {
-            if (btn.dataset.lang === lang) {
-                btn.classList.add('ring-2', 'ring-accent');
-                btn.classList.remove('opacity-50');
-            } else {
-                btn.classList.remove('ring-2', 'ring-accent');
-                btn.classList.add('opacity-50');
-            }
-        });
-    }
-
-    function initLangSwitcher() {
-        const langContainer = $('#langSwitcher');
-        if (!langContainer) return;
-
-        const langMap = { pl: 'pl', en: 'gb', de: 'de', tr: 'tr', ar: 'sa' };
-
-        for (const lang in TRANSLATIONS) {
-            const countryCode = langMap[lang];
-            const btn = document.createElement('button');
-            btn.className = 'p-1 rounded-sm transition-all';
-            btn.dataset.lang = lang;
-            btn.title = lang.toUpperCase();
-            btn.innerHTML = `<img src="https://flagcdn.com/w40/${countryCode}.png" alt="${lang}" class="w-6 h-auto rounded-sm" style="min-height: 16px;">`;
-            btn.addEventListener('click', () => setLanguage(lang));
-            langContainer.appendChild(btn);
-        }
-        setLanguage(getCurrentUserSettings().language || 'pl');
-    }
-
-    function initCustomTimeModal() {
-        const modal = $('#customTimeModal');
-        const form = $('#customTimeForm');
-        const input = $('#customTimeInput');
-        const closeBtn = $('#closeTimeModalBtn');
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (activePruefung) {
-                activePruefung.setTime(input.value);
-            }
-            modal.classList.add('hidden');
-            activePruefung = null;
-        });
-        closeBtn.onclick = () => {
-            modal.classList.add('hidden');
-            activePruefung = null;
-        };
-    }
-
-    function initColorPicker() {
-        const picker = $('#colorPicker');
-        $$('button', picker).forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const color = button.dataset.color;
-                if (activeMachineForColor) {
-                    activeMachineForColor.setColor(color);
-                }
-                picker.classList.add('hidden');
-                activeMachineForColor = null;
-            });
-        });
-        document.addEventListener('click', (e) => {
-            if (!picker.contains(e.target) && activeMachineForColor) {
-                picker.classList.add('hidden');
-                activeMachineForColor = null;
-            }
-        });
-    }
-
-    function checkBirthdays() {
-        const today = new Date();
-        const currentDay = today.getDate();
-        const currentMonth = today.getMonth() + 1; // JS months are 0-indexed
-
-        for (const uid in USERS) {
-            const user = USERS[uid];
-            if (user.dob) {
-                const parts = user.dob.split(/[.\/-]/); // Handle different separators
-                if (parts.length === 3) {
-                    const day = parseInt(parts[0], 10);
-                    const month = parseInt(parts[1], 10);
-                    if (day === currentDay && month === currentMonth) {
-                        const message = `🎉 Dziś są urodziny ${user.name}! Złóż mu życzenia!`;
-                        showUrgentNotification(`birthday-${uid}`, message, 'birthday');
-                    }
-                }
-            }
+            CFG.version = 2;
+            if (changed) persist();
+            console.log('Migrated CFG to version 2');
         }
     }
 
-    const activeNotifications = {};
-    function showUrgentNotification(id, message, level) {
-        const container = $('#urgent-notifications');
-        const existing = $(`#notification-${id}`, container);
-        const newClass = level === 'danger' ? 'bg-red-800/90' : 'bg-orange-500/90';
-        if (existing) {
-            if (!existing.classList.contains(newClass)) {
-                existing.className = `alert ${newClass} transition-all`;
-                existing.innerHTML = `<strong>PILNE:</strong> ${message}`;
-            }
-            return;
-        }
-        const el = document.createElement('div');
-        el.id = `notification-${id}`;
-        el.className = `alert ${newClass}`;
-        el.innerHTML = `<strong>PILNE:</strong> ${message}`;
-        container.appendChild(el);
-        activeNotifications[id] = el;
-    }
-    function hideUrgentNotification(id) {
-        if (activeNotifications[id]) {
-            activeNotifications[id].remove();
-            delete activeNotifications[id];
-        }
-    }
-
-    function showChatNotification(userName, message) {
-        const container = $('#urgent-notifications');
-        const el = document.createElement('div');
-        el.className = 'alert bg-blue-800/90 text-white'; // A different color for chat
-        el.innerHTML = `<span>💬 <strong>${userName}:</strong> ${message.substring(0, 50)}...</span>`;
-
-        container.prepend(el); // Use prepend to show newest at the top
-
-        setTimeout(() => {
-            el.style.transition = 'opacity .5s';
-            el.style.opacity = '0';
-            setTimeout(() => el.remove(), 500);
-        }, 5000); // Remove after 5 seconds
-    }
-
-    function updateLiveClock() {
-        const clockEl = $('#liveClock');
-        const dateEl = $('#liveDate');
-        if (!clockEl || !dateEl) return;
-
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('pl-PL');
-        const dateString = now.toLocaleDateString('pl-PL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-        clockEl.textContent = timeString;
-        dateEl.textContent = dateString;
-    }
-
-    function updateShiftIndicator() {
-      const clockContainer = $('#liveClockContainer');
-      if (!clockContainer) return;
-
-      const now = new Date();
-      const hour = now.getHours();
-
-      let color;
-      // Shift 1: 14:00 - 21:59 -> Green (#22c55e)
-      if (hour >= 14 && hour < 22) {
-        color = '#22c55e';
-      }
-      // Shift 3: 06:00 - 13:59 -> Blue (#60a5fa)
-      else if (hour >= 6 && hour < 14) {
-        color = '#60a5fa';
-      }
-      // Shift 2: 22:00 - 05:59 -> Yellow (#fde047)
-      else {
-        color = '#fde047';
-      }
-      clockContainer.style.color = color;
-    }
-
-    function initTerminalSelector() {
-      const selectEl = $('#terminalSelect');
-      if (!selectEl) return;
-
-      selectEl.innerHTML = '<option value="all">Wszystkie</option>';
-
-      (CFG.terminals || []).forEach(terminal => {
-        const option = document.createElement('option');
-        option.value = terminal.code;
-        option.textContent = `${terminal.name} (${terminal.code})`;
-        selectEl.appendChild(option);
-      });
-
-      selectEl.value = getCurrentUserSettings().selectedTerminal || 'all';
-
-      selectEl.addEventListener('change', () => {
-        getCurrentUserSettings().selectedTerminal = selectEl.value;
-        persist();
-        renderAllMachines();
-      });
-    }
-
-    function init(){ initThemeSwitcher(); initLangSwitcher(); renderAllMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initTerminalSelector(); initCustomTimeModal(); initColorPicker(); initAdminEditUserModal(); initCreateUserModal(); initUserProfileModal(); initBroadcasts(); initDraggableChat(); updateLiveClock(); updateShiftIndicator(); checkBirthdays(); setInterval(updateLiveClock, 1000); setInterval(updateShiftIndicator, 60000); setInterval(loadNotes, 5000); setInterval(checkBirthdays, 3600000); }
+    function init(){ migrateCfg(); initThemeSwitcher(); initLangSwitcher(); renderMachines(); initLogin(); initNotesPlans(); initUserDetailsModal(); renderAdminPanel(); initCustomTimeModal(); initColorPicker(); }
     init();
   </script>
 </body>
